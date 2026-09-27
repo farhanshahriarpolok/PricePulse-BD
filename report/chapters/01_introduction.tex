@@ -1,0 +1,47 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Background and Motivation}
+In developing agrarian economies such as Bangladesh, food security and household economic welfare are inextricably linked to the price stability of essential commodities. Daily staples—predominantly coarse rice, local and imported onions, potatoes, edible oils, and pulses—constitute over 55\% of the monthly consumption expenditure for lower- and middle-income urban and rural households \cite{bbs2023inflation}. Consequently, sudden and erratic price spikes in these basic goods impose an immediate inflationary tax on vulnerable populations, disrupt supply chains, and create pervasive social friction.
+
+The domestic supply chain for agricultural commodities across Bangladesh is characterized by high geographical fragmentation, multiple tiers of speculative intermediaries (\textit{farias}, \textit{beparis}, and \textit{arathdars}), high transport overheads, and persistent market opacity \cite{minten2010food}. Price signals generated at rural farm gates or major riverine wholesale hubs (such as Khatunganj in Chittagong, Badamtoli in Dhaka, or Shyambazar) transmit unevenly to urban kitchen markets (\textit{kachabazar}) and modern e-grocery platforms \cite{worldbank2023bangladesh}. Consumers and policymakers often encounter substantial price markups between wholesale and retail channels that cannot be explained solely by logistical expenditures or normal seasonal fluctuations.
+
+While state regulatory bodies—specifically the Department of Agricultural Marketing (DAM) under the Ministry of Agriculture and the Trading Corporation of Bangladesh (TCB) under the Ministry of Commerce—publish daily price monitoring bulletins, these datasets suffer from three primary structural deficiencies:
+\begin{enumerate}
+    \item \textbf{Syntactic and Format Fragmentation:} Data is released primarily as static HTML tables, unstructured PDF bulletins, or newspaper press releases. No publicly queryable, standardized RESTful API or machine-readable interface is maintained.
+    \item \textbf{Unit Heterogeneity and Orthographic Ambiguity:} Price quotes are recorded using non-standardized customary market units (e.g., \textit{maund}, \textit{seer}, \textit{hali}, \textit{quintal}) alongside modern metric units (kilograms, liters). Furthermore, commodity names exhibit wide dialectical and orthographic variation across Bengali script and English phonetic transcriptions (e.g., ``দেশি পেঁয়াজ'', ``Deshi Onion'', ``Peyaj Local'').
+    \item \textbf{Absence of Explainable Real-Time Analytics:} Raw price quotes are reported without statistical context. There is no automated computational mechanism to determine whether a given 20 BDT/kg daily increment represents normal seasonal variance or a statistically significant market anomaly driven by artificial hoarding or supply contraction.
+\end{enumerate}
+
+To bridge this critical technological divide, this research designs, develops, and evaluates \textbf{PricePulse BD}—a location-aware, multi-source price intelligence and explainable anomaly detection platform engineered specifically for the socio-economic and infrastructural realities of Bangladesh.
+
+\section{Problem Statement}
+Existing market surveillance mechanisms in Bangladesh fail to provide automated, reproducible, and explainable computational pipelines capable of:
+\begin{itemize}
+    \item Continuously ingesting, parsing, and normalizing heterogeneous commodity quotes across official government surveillance feeds, physical wholesale terminal markets, and modern digital retail stores.
+    \item Standardizing non-metric regional commercial units into canonical SI metrics with auditable data provenance and confidence attribution.
+    \item Detecting cross-temporal price anomalies and inter-district geographical spread anomalies using mathematically rigorous, explainable algorithms that avoid black-box opacity.
+    \item Serving low-latency, mobile-ready analytical intelligence over high-efficiency decoupled web and mobile interfaces that remain resilient in offline or resource-constrained domestic hosting environments.
+\end{itemize}
+
+\section{Research Objectives}
+The primary objective of this thesis is to architect, implement, and benchmark an end-to-end software system that democratizes market transparency in Bangladesh. Specific research goals include:
+\begin{enumerate}
+    \item \textbf{Design a Multi-Source Ingestion Architecture:} Formulate an extensible collector framework supporting both deterministic structured web harvesters (for official DAM bulletins) and headless digital retail adapters (for e-commerce grocery channels such as Chaldal).
+    \item \textbf{Develop a Bilingual Normalization and Confidence Engine:} Formulate a Unicode NFKC-compliant text normalization pipeline capable of resolving Bengali dialectical variants into canonical taxonomies, paired with a deterministic mathematical unit converter and a four-factor linear confidence scoring model.
+    \item \textbf{Formulate an Explainable Parametric Anomaly Engine:} Develop statistical anomaly detection routines utilizing 14-day Rolling Simple Moving Averages (SMA), sample standard deviations ($\sigma$), Z-scores, and Volatility Coefficients of Variation (CV\%), governed by a Compound Decision Rule and natural language explanation generation algorithms.
+    \item \textbf{Construct Spatial Spread Analytics:} Model inter-district price dispersion across Bangladesh's administrative hierarchy, providing GeoJSON-enriched spatial representations for geospatial intelligence.
+    \item \textbf{Implement a Modern Decoupled System Stack:} Realize the platform using a local-first SQLite Write-Ahead Logging (WAL) relational store, high-throughput asynchronous FastAPI REST services, and an interactive React-Vite analytical dashboard incorporating Leaflet geo-maps and Recharts time-series visualizations.
+    \item \textbf{Empirical Verification and Benchmarking:} Conduct comprehensive automated testing, latency profiling, and anomaly detection accuracy benchmarks under simulated local market shocks (e.g., the seasonal onion price crisis).
+\end{enumerate}
+
+\section{Thesis Outline}
+The remainder of this thesis is structured as follows:
+\begin{itemize}
+    \item \textbf{Chapter 2 (Literature Review):} Reviews prior academic literature on agricultural market information systems (MIS), multi-source data fusion, schema matching, and time-series anomaly detection paradigms.
+    \item \textbf{Chapter 3 (System Architecture):} Presents the overarching decoupled system design, the relational database schema, SQLite WAL concurrency, the ingestion orchestrator, and API decoupling contracts.
+    \item \textbf{Chapter 4 (Bilingual Normalization and Data Fusion):} Details the Unicode NFKC normalization algorithm, alias matching logic, unit standardization mathematics, and the four-factor linear confidence metric.
+    \item \textbf{Chapter 5 (Statistical Anomaly Detection and Spatial Analytics):} Formulates the rolling SMA baseline, Z-score mathematics, volatility CV, compound decision thresholds, and natural language explanation synthesis.
+    \item \textbf{Chapter 6 (Experimental Evaluation and Discussion):} Discusses empirical results, latency benchmarks, taxonomy matching precision/recall, and anomaly detection performance on historical testbeds.
+    \item \textbf{Chapter 7 (Conclusion and Future Work):} Summarizes key research contributions, discusses current limitations, and outlines future roadmaps, including edge-native Android deployment.
+\end{itemize}

@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-09-28
+
+### Added
+- **Academic LaTeX Research Thesis (`report/`)**:
+  - Full university final-year undergraduate thesis entitled *"PricePulse BD: A Location-Aware Multi-Source Market Price Intelligence and Anomaly Detection System for Essential Commodities in Bangladesh"*.
+  - Compilable, modular LaTeX structure with `main.tex`, front matter (declaration, abstract, acknowledgments, table of contents), and comprehensive BibTeX references (`references.bib`).
+  - Seven exhaustive technical chapters:
+    - *Chapter 1: Introduction* (Macro context, commodity volatility in Bangladesh, research objectives).
+    - *Chapter 2: Literature Review* (Agricultural MIS, multi-source data fusion, schema matching, parametric vs deep learning anomaly detection).
+    - *Chapter 3: System Architecture* (Decoupled local-first design, SQLite WAL concurrency, FastAPI REST gateway, Android decoupling contracts).
+    - *Chapter 4: Bilingual Normalization and Data Fusion* (NFKC Unicode normalization, alias resolution cascade, customary unit standardization formulas, 4-factor linear confidence formulation).
+    - *Chapter 5: Statistical Anomaly Detection and Spatial Analytics* (14-day rolling SMA, sample standard deviation, Z-score, volatility CV%, compound decision rule, deterministic natural language generator, and spatial inter-district markups).
+    - *Chapter 6: Experimental Evaluation and Results* (Bilingual normalization precision/recall benchmarks, 30-day onion supply-shock case study, REST latency profiling with P95 < 45ms, and 47-test pytest verification).
+    - *Chapter 7: Conclusion and Future Work* (Summary of contributions, acknowledged boundaries, and Android Kotlin native client roadmap).
+- **Viva Defense Master Kit (`docs/`)**:
+  - `docs/VIVA_DEFENSE_GUIDE.md`: Comprehensive defense playbook addressing core committee questions, including Computer Science contributions, mathematical justification of parametric statistics over deep learning, confidence scoring mechanics, web harvesting ethics, and Android architecture.
+  - `docs/DEMO_SCRIPT.md`: Step-by-step 5-to-7-minute deterministic live demonstration script for the defense board spanning all 5 views, bilingual search, anomaly drilldown, and offline resilience.
+- **Unified System Orchestrator & Launcher (`run_system.py`)**:
+  - Single-command launcher providing environment checks, automated taxonomy seeding, 30-day demo history verification, and single-port unified serving of both backend REST API and React frontend on port 8000.
+  - Command-line flags for self-test verification (`--test`), static serving toggles (`--no-frontend`), port/host configuration, and demo history regeneration (`--seed-history`).
+
 ## [0.4.0] - 2026-09-28
 
 ### Added

@@ -1,0 +1,138 @@
+\chapter{Statistical Anomaly Detection and Spatial Analytics}
+\label{ch:anomaly_engine}
+
+\section{Introduction and Theoretical Motivation}
+Sudden price spikes in essential food commodities in Bangladesh are frequently triggered by artificial market syndicate manipulation, speculative hoarding ahead of religious festivals, or acute supply chain disruptions (e.g., sudden export embargoes by neighboring exporting nations). Detecting these disruptions in real-time requires mathematical models that satisfy three core requirements:
+\begin{enumerate}
+    \item \textbf{Mathematical Rigor and Low Latency:} The algorithm must evaluate continuous streams of multi-market observations in sub-millisecond execution times without necessitating heavy GPU clusters.
+    \item \textbf{Parametric Explainability:} The output must provide a clear statistical rationale (Z-scores, moving baseline departures, volatility metrics) that can be audited by economic policymakers, market regulators, and the judiciary.
+    \item \textbf{Noise Immunity:} Agricultural prices fluctuate naturally due to weekday trading volumes and normal transportation variances. The detector must separate benign micro-volatility from systemic price shocks.
+\end{enumerate}
+
+To meet these requirements, PricePulse BD implements a parametric statistical framework combining 14-day Rolling Simple Moving Averages, sample standard deviation, standardized Z-scores, and a Compound Anomaly Decision Rule, integrated with an automated natural language explanation engine.
+
+\section{Statistical Baseline Formulations}
+
+\subsection{Chronological Daily Price Aggregation}
+Let $\mathcal{O}_c = \{p_{c,1}, p_{c,2}, \dots, p_{c,N}\}$ represent the chronological sequence of daily average standardized prices (in BDT/base unit) for commodity $c$, where $p_{c,t}$ denotes the observation on day $t$.
+
+\subsection{Rolling Simple Moving Average (SMA)}
+The moving average provides a dynamically smoothed baseline representing the expected prevailing market equilibrium. For a sliding temporal window of $k$ days ending at day $t$, the Simple Moving Average $\text{SMA}_k(t)$ is defined as:
+
+\begin{equation}
+\text{SMA}_k(t) = \frac{1}{k} \sum_{i=0}^{k-1} p_{c,t-i}
+\end{equation}
+
+In our analytical engine, $k = 14$ days serves as the primary anomaly baseline, balancing sensitivity to recent supply shifts with immunity to single-day transactional noise. Secondary rolling baselines ($k = 7$ for high-frequency trends and $k = 30$ for monthly macroeconomic monitoring) are maintained concurrently.
+
+\subsection{Sample Standard Deviation ($\sigma$)}
+The dispersion of daily market prices around the rolling baseline is quantified by the unbiased sample standard deviation $\sigma_k(t)$:
+
+\begin{equation}
+\sigma_k(t) = \sqrt{\frac{1}{k - 1} \sum_{i=0}^{k-1} \left( p_{c,t-i} - \text{SMA}_k(t) \right)^2 }
+\end{equation}
+
+To prevent catastrophic numerical division-by-zero during completely flat pricing regimes, the engine applies a mathematical floor $\sigma_{\text{eff}} = \max(\sigma_k(t), \; 10^{-4})$.
+
+\subsection{Standardized Z-Score}
+The Z-score standardizes the magnitude of the current price departure relative to the historical dispersion observed over the baseline window:
+
+\begin{equation}
+Z(t) = \frac{p_{c,t} - \text{SMA}_k(t)}{\sigma_{\text{eff}}}
+\end{equation}
+
+A positive Z-score ($Z > 0$) signifies that current prices exceed the historical moving average, while a negative score ($Z < 0$) indicates an abnormal price drop. Under assumptions of asymptotic normality, $|Z| \ge 2.0$ represents a statistical occurrence falling in the extreme 5\% tails of the distribution.
+
+\subsection{Percentage Departure ($\Delta\%$)}
+To ground statistical standardized scores in concrete economic terms, the engine computes the raw relative percentage deviation from the rolling baseline:
+
+\begin{equation}
+\Delta\%(t) = \left( \frac{p_{c,t} - \text{SMA}_k(t)}{\text{SMA}_k(t)} \right) \times 100\%
+\end{equation}
+
+\subsection{Volatility Coefficient of Variation (CV\%)}
+The relative volatility of the commodity across the historical window is computed as the dimensionless ratio of the standard deviation to the mean, expressed as a percentage:
+
+\begin{equation}
+\text{CV}\%(t) = \left( \frac{\sigma_k(t)}{\text{SMA}_k(t)} \right) \times 100\%
+\end{equation}
+
+Commodities with $\text{CV} \le 5.0\%$ are classified as \textit{Stable}, those with $5.0\% < \text{CV} \le 12.0\%$ as \textit{Moderate Volatility}, and those with $\text{CV} > 12.0\%$ as \textit{High Volatility}.
+
+\section{Compound Anomaly Decision Rule}
+Relying solely on Z-scores can yield false positives in highly stable commodities where standard deviation is negligible (e.g., a 2 BDT increment on an item with $\sigma = 0.5$ yields $Z = 4.0$, despite representing a trivial 3\% economic price change). Conversely, relying solely on percentage thresholds fails on high-value, naturally volatile commodities.
+
+Therefore, PricePulse BD formulates a \textbf{Compound Anomaly Decision Rule}: an anomaly is triggered if and only if both the statistical Z-score threshold and the economic percentage threshold are breached simultaneously:
+
+\begin{equation}
+\label{eq:compound_rule}
+\text{IsAnomaly}(t) = \left( |Z(t)| \ge \theta_Z \right) \;\land\; \left( |\Delta\%(t)| \ge \theta_{\Delta} \right)
+\end{equation}
+
+where default operational thresholds are calibrated to $\theta_Z = 1.5$ and $\theta_{\Delta} = 10.0\%$.
+
+\subsection{Severity Tier Classification}
+When condition \eqref{eq:compound_rule} evaluates to true, the anomaly is categorized into three standardized severity tiers based on departure magnitude:
+
+\begin{equation}
+\text{Severity}(t) = \begin{cases}
+\textbf{Critical}, & \text{if } |Z(t)| \ge 2.5 \;\lor\; |\Delta\%(t)| \ge 25.0\% \\
+\textbf{Severe}, & \text{if } 2.0 \le |Z(t)| < 2.5 \;\lor\; 18.0\% \le |\Delta\%(t)| < 25.0\% \\
+\textbf{Moderate}, & \text{if } 1.5 \le |Z(t)| < 2.0 \;\lor\; 10.0\% \le |\Delta\%(t)| < 18.0\%
+\end{cases}
+\end{equation}
+
+Furthermore, the anomaly is assigned a directional attribute:
+\begin{equation}
+\text{Direction}(t) = \begin{cases}
+\textbf{Spike}, & \text{if } \Delta\%(t) > 0 \\
+\textbf{Drop}, & \text{if } \Delta\%(t) < 0
+\end{cases}
+\end{equation}
+
+\section{Explainable Natural Language Explanation Synthesis}
+A distinctive contribution of this research is the automated translation of complex statistical parameters into clear, auditable, and human-readable natural language explanations. This enables non-technical market inspectors, journalists, and civic advocates to immediately comprehend the underlying drivers of an alert.
+
+Algorithm~\ref{alg:explanation_generation} formalizes the deterministic rule-based natural language generator.
+
+\begin{algorithm}[htbp]
+\caption{Deterministic Natural Language Explanation Generator}
+\label{alg:explanation_generation}
+\begin{algorithmic}[1]
+\Require Commodity name $N$, current price $P_{\text{curr}}$, 14-day baseline $\text{SMA}_{14}$, Z-score $Z$, percentage delta $\Delta\%$, volatility $\text{CV}\%$, severity tier $S$
+\Ensure Human-readable analytical justification string $E$
+\State $\text{dir\_str} \gets (\Delta\% > 0) \textbf{ ? } \text{``surged''} \textbf{ : } \text{``plummeted''}$
+\State $\text{diff\_bdt} \gets |P_{\text{curr}} - \text{SMA}_{14}|$
+\State $E \gets \text{``ALERT: } N \text{ has } \text{dir\_str} \text{ by } |\Delta\%|\% \text{ (} \text{diff\_bdt} \text{ BDT/kg deviation)} \text{ above its 14-day baseline of } \text{SMA}_{14} \text{ BDT/kg. }''$
+\State $E \gets E + \text{``The current price of } P_{\text{curr}} \text{ BDT/kg yields a statistical Z-score of } Z \text{, triggering a } S \text{ anomaly warning. }''$
+\If{$\text{CV}\% \le 5.0$}
+    \State $E \gets E + \text{``This sharp movement violates the historically low volatility (CV: } \text{CV}\% \% \text{) of this staple, indicating artificial supply restriction or severe hoarding.''}$
+\ElsIf{$\text{CV}\% > 15.0$}
+    \State $E \gets E + \text{``Market volatility is already elevated (CV: } \text{CV}\% \% \text{); continuous monitoring is recommended.''}$
+\Else
+    \State $E \gets E + \text{``The commodity exhibits moderate volatility (CV: } \text{CV}\% \% \text{); verifying wholesale transport margins is advised.''}$
+\EndIf
+\State \Return $E$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Spatial Market Spread Analytics}
+In addition to temporal anomaly detection, PricePulse BD evaluates spatial price dispersion across regional administrative districts. For any active commodity, the spatial engine aggregates observations across district markets $D = \{d_1, d_2, \dots, d_M\}$.
+
+\subsection{Inter-District Markup Formulation}
+Let $P_{\min} = \min_{d \in D} P(d)$ represent the lowest observed price in the nation (typically observed in rural farm-gate districts such as Pabna, Bogra, or Dinajpur), and $P_{\max} = \max_{d \in D} P(d)$ represent the peak price (typically observed in metropolitan consumption centers such as Dhaka or Chittagong).
+
+The spatial spread ($\Omega$) and geographic markup percentage ($\mu_{\text{geo}}$) are defined as:
+
+\begin{equation}
+\Omega = P_{\max} - P_{\min}
+\end{equation}
+
+\begin{equation}
+\mu_{\text{geo}} = \left( \frac{P_{\max} - P_{\min}}{P_{\min}} \right) \times 100\%
+\end{equation}
+
+When $\mu_{\text{geo}}$ exceeds 35\%, the system flags a spatial transmission inefficiency, signifying exorbitant transport tolls, extortion at transit checkpoints, or localized speculative hoarding.
+
+\subsection{GeoJSON Dynamic Feature Collection}
+The spatial engine binds dynamic pricing metrics directly into a simplified Bangladesh District GeoJSON polygon layer. Each district feature is enriched with live attributes (\texttt{district\_name}, \texttt{price}, \texttt{is\_cheapest}, \texttt{is\_highest}, \texttt{observation\_count}). This feature collection is consumed directly by the React Leaflet web interface, rendering dynamic choropleth maps and interactive popup cards on OpenStreetMap tile layers without external proprietary mapping API fees.

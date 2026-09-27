@@ -1,0 +1,143 @@
+\chapter{Bilingual Normalization and Data Fusion}
+\label{ch:data_normalization}
+
+\section{Introduction to the Normalization Problem}
+In raw agricultural price bulletins collected across Bangladesh, commodity naming conventions exhibit severe orthographic and linguistic divergence. An identical agricultural product—such as coarse rice (\textit{Mota Chal})—may be cataloged in government HTML tables as ``মোটা চাল (ইরি/বোরো)'', in retail grocery inventories as ``Coarse Rice 5kg'', and in consumer search queries as ``mota chawl''. Furthermore, observed prices are quoted in diverse regional units ranging from bulk wholesale measures (\textit{maund}, \textit{quintal}) to retail packet subdivisions (\textit{seer}, grams, halis).
+
+This chapter presents the mathematical formulation and algorithmic design of the PricePulse BD bilingual normalization and confidence attribution pipeline.
+
+\section{Lexical Standardization and NFKC Unicode Normalization}
+Raw text tokens undergo a three-stage lexical sanitization process:
+\begin{enumerate}
+    \item \textbf{Unicode Compatibility Decomposition and Composition (NFKC):} Bengali Unicode text frequently contains non-standard combining character sequences, zero-width joiners (\texttt{U+200D}), zero-width non-joiners (\texttt{U+200C}), and legacy font artifact glyphs. Applying the Unicode Standard Annex \#15 NFKC normalization collapses graphically equivalent character forms into canonical code points.
+    \item \textbf{Whitespace and Punctuation Stripping:} Multiple whitespace characters, non-breaking spaces (\texttt{\textbackslash u00a0}), trailing punctuation, hyphens, and brackets are collapsed into single standard spaces.
+    \item \textbf{Case Folding:} Latin script characters are lower-cased to facilitate case-insensitive lexical matching.
+\end{enumerate}
+
+Algorithm~\ref{alg:lexical_sanitization} formalizes this pipeline.
+
+\begin{algorithm}[htbp]
+\caption{Lexical Sanitization and NFKC Normalization}
+\label{alg:lexical_sanitization}
+\begin{algorithmic}[1]
+\Require Raw token string $T_{\text{raw}}$
+\Ensure Sanitized token string $T_{\text{clean}}$
+\State $T_1 \gets \Call{unicodedata.normalize}{\text{``NFKC''}, T_{\text{raw}}}$
+\State $T_2 \gets \Call{regex.replace}{[\backslash\text{u200B}-\backslash\text{u200D}\backslash\text{uFEFF}], \text{``''}, T_1}$ \Comment{Strip zero-width characters}
+\State $T_3 \gets \Call{regex.replace}{[\text{()}[\backslash]\{\},;:\text{"}''], \text{`` ''}, T_2}$ \Comment{Remove bracketings}
+\State $T_{\text{clean}} \gets \Call{strip}{\Call{regex.replace}{\backslash\text{s}+, \text{`` ''}, T_3.\Call{lower}{}}}$
+\State \Return $T_{\text{clean}}$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Bilingual Commodity Taxonomy and Alias Matching}
+Following lexical sanitization, the cleaned string is queried against the commodity taxonomy catalog. The system evaluates alias mappings through a prioritized decision cascade:
+\begin{enumerate}
+    \item \textbf{Exact Canonical Match:} If $T_{\text{clean}}$ matches the canonical English name or canonical Bengali display title, the commodity is resolved with an alias match score $S_{\text{alias}} = 1.00$.
+    \item \textbf{Direct Alias Lookup:} The system matches against the registered \texttt{commodity\_aliases} dictionary. If a direct key match is found, the mapping resolves with $S_{\text{alias}} = 0.90$.
+    \item \textbf{Substring and Dialectical Token Overlap:} If exact lookups fail, the normalizer executes token intersection and boundary-checked substring containment against registered synonyms. When a unique substring match is identified without lexical collision, the mapping resolves with $S_{\text{alias}} = 0.70$.
+    \item \textbf{Unmapped Rejection:} If no candidate achieves the boundary threshold, the record is flagged as unmapped and rejected from downstream analytics, preventing corrupt or ambiguous observations from contaminating time-series models.
+\end{enumerate}
+
+Table~\ref{tab:alias_sample} presents representative alias mapping resolutions.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Sample bilingual commodity alias resolution and scoring.}
+\label{tab:alias_sample}
+\begin{tabular}{@{}llllc@{}}
+\toprule
+\textbf{Raw Input String} & \textbf{Sanitized Token} & \textbf{Resolved Commodity} & \textbf{Category} & $S_{\text{alias}}$ \\
+\midrule
+``পেঁয়াজ (দেশি)'' & \texttt{পেয়াজ দেশি} & Local Onion & Vegetable & 0.90 \\
+``Indian Imported Onion'' & \texttt{indian imported onion} & Imported Onion & Vegetable & 0.90 \\
+``Coarse Rice (মণ)'' & \texttt{coarse rice মণ} & Coarse Rice & Grain & 0.90 \\
+``Soybean Oil (1 Litre Bottle)'' & \texttt{soybean oil 1 litre} & Soybean Oil & Edible Oil & 0.90 \\
+``গোল আলু (ডায়মন্ড)'' & \texttt{গোল আলু ডায়মন্ড} & Potato & Vegetable & 0.90 \\
+``Unknown Chemical Fertilizer'' & \texttt{unknown chemical} & \textit{Unmapped} & -- & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Deterministic Unit Standardization}
+Agricultural commodities in Bangladesh are transacted using both customary regional units and metric units. To establish an auditable, comparable baseline for statistical modeling, PricePulse BD standardizes all price observations into canonical SI base units:
+\begin{itemize}
+    \item \textbf{Mass Standard:} Base unit is the kilogram (\texttt{kg}).
+    \item \textbf{Volume Standard:} Base unit is the liter (\texttt{liter}).
+    \item \textbf{Count Standard:} Base unit is the individual piece (\texttt{pc}).
+\end{itemize}
+
+Let $P_{\text{raw}}$ denote the observed price in Bangladeshi Taka (BDT), $U_{\text{raw}}$ denote the raw trading unit, and $Q_{\text{pack}}$ denote the optional packaging quantity (e.g., a 5 kg sack or a 2 liter container). The standardized price per base unit $P_{\text{std}}$ is defined mathematically as:
+
+\begin{equation}
+P_{\text{std}} = \frac{P_{\text{raw}}}{\Phi(U_{\text{raw}}) \times Q_{\text{pack}}}
+\end{equation}
+
+where $\Phi(U)$ is the unit conversion coefficient defined as follows:
+
+\subsection{Mass Conversion Matrix}
+\begin{equation}
+\Phi(U) = \begin{cases}
+1.0, & \text{if } U \in \{\text{``kg''}, \text{``kilogram''}, \text{``কেজি''}, \text{``কিলোগ্রাম''}\} \\
+0.001, & \text{if } U \in \{\text{``gm''}, \text{``gram''}, \text{``গ্রাম''}\} \\
+40.0, & \text{if } U \in \{\text{``maund''}, \text{``mon''}, \text{``মণ''}\} \\
+0.9331, & \text{if } U \in \{\text{``seer''}, \text{``ser''}, \text{``সের''}\} \\
+100.0, & \text{if } U \in \{\text{``quintal''}, \text{``কুইন্টাল''}\}
+\end{cases}
+\end{equation}
+
+Note on the \textit{maund}: Under historical British imperial administration, 1 maund equaled 37.324 kg. However, in modern commercial wholesale agricultural produce markets across Bangladesh (regulated by the DAM), commercial practice universally defines 1 maund as exactly 40.0 kg \cite{dam2024daily}. Our system adopts this verified commercial market standard.
+
+\subsection{Volume and Discrete Count Conversion Matrices}
+\begin{equation}
+\Phi(U) = \begin{cases}
+1.0, & \text{if } U \in \{\text{``liter''}, \text{``litre''}, \text{``লিটার''}, \text{``L''}\} \\
+0.001, & \text{if } U \in \{\text{``ml''}, \text{``milliliter''}, \text{``মিলি''}\}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\Phi(U) = \begin{cases}
+1.0, & \text{if } U \in \{\text{``pc''}, \text{``piece''}, \text{``টি''}, \text{``টা''}\} \\
+4.0, & \text{if } U \in \{\text{``hali''}, \text{``হালি''}\} \\
+12.0, & \text{if } U \in \{\text{``dozen''}, \text{``ডজন''}\}
+\end{cases}
+\end{equation}
+
+\section{Four-Factor Linear Confidence Formulation}
+Every observation in PricePulse BD is accompanied by an auditable confidence score $C \in [0.0, 1.0]$. The confidence score quantifies data trustworthiness, temporal recency, and structural completeness. It is formulated as a weighted linear combination of four normalized sub-scores:
+
+\begin{equation}
+\label{eq:confidence}
+C = (w_{\text{src}} \times S_{\text{src}}) + (w_{\text{alias}} \times S_{\text{alias}}) + (w_{\text{fresh}} \times S_{\text{fresh}}) + (w_{\text{cmpl}} \times S_{\text{cmpl}})
+\end{equation}
+
+subject to the convex unity constraint:
+\begin{equation}
+w_{\text{src}} + w_{\text{alias}} + w_{\text{fresh}} + w_{\text{cmpl}} = 1.0
+\end{equation}
+
+The empirically calibrated weights and constituent components are parameterized as follows:
+\begin{enumerate}
+    \item \textbf{Source Reliability ($w_{\text{src}} = 0.35$):} Reflects the institutional credibility and data governance of the publisher.
+    \begin{itemize}
+        \item Official Government Bulletin (DAM Official): $S_{\text{src}} = 0.90$
+        \item Verified Digital Retailer (e.g., Chaldal e-Grocery): $S_{\text{src}} = 0.85$
+        \item Unverified Crowd/Spot Observation: $S_{\text{src}} = 0.60$
+    \end{itemize}
+    \item \textbf{Alias Match Quality ($w_{\text{alias}} = 0.25$):} Captures semantic certainty during lexical entity resolution.
+    \begin{itemize}
+        \item Exact canonical match: $S_{\text{alias}} = 1.00$
+        \item Direct dictionary alias: $S_{\text{alias}} = 0.90$
+        \item Substring / fuzzy containment: $S_{\text{alias}} = 0.70$
+    \end{itemize}
+    \item \textbf{Temporal Freshness ($w_{\text{fresh}} = 0.20$):} Quantifies age decay since physical market observation.
+    Let $\Delta t$ denote observation age in days:
+    \begin{equation}
+    S_{\text{fresh}}(\Delta t) = \max\left(0.10, \; 1.0 - 0.15 \times \Delta t\right)
+    \end{equation}
+    \item \textbf{Data Completeness ($w_{\text{cmpl}} = 0.20$):} Measures the presence of essential pricing attributes (minimum, maximum, modal/average prices, verified market location centroid, and explicit packaging metadata). An observation providing both price bounds and verified market identifiers receives $S_{\text{cmpl}} = 1.00$.
+\end{enumerate}
+
+Observations falling below an empirical acceptance threshold ($C < 0.50$) are retained for audit provenance but excluded from real-time anomaly calculation, ensuring noise immunity in downstream statistical modeling.

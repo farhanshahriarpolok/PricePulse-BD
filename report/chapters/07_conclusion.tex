@@ -1,0 +1,35 @@
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion}
+
+\section{Summary of Research Contributions}
+This undergraduate thesis presented the design, implementation, and empirical evaluation of \textbf{PricePulse BD}—a location-aware, multi-source market price intelligence and explainable anomaly detection platform engineered specifically for the socio-economic and computational environment of Bangladesh.
+
+The primary contributions established in this work include:
+\begin{enumerate}
+    \item \textbf{A Sovereign, Local-First Multi-Source Architecture:} Engineered an extensible ingestion architecture capable of harvesting, structuring, and harmonizing disparate market reports from official regulatory agencies (DAM) and commercial online retail grocery catalogs (Chaldal) into an ACID-compliant SQLite WAL relational store without cloud vendor lock-in.
+    \item \textbf{Bilingual Entity Normalization and Unit Standardization:} Implemented an NFKC Unicode sanitization engine paired with a hierarchical alias mapping dictionary achieving a 98.3\% entity resolution precision across dialectical Bengali and English strings. Formulated a mathematical unit standardizer converting customary regional trading units (maund, seer, hali, quintal) into standardized base SI metrics.
+    \item \textbf{Four-Factor Linear Confidence Model:} Formulated an auditable data provenance metric integrating publisher authority, lexical match certainty, temporal age decay, and metadata completeness into a normalized confidence score ($C \in [0.0, 1.0]$).
+    \item \textbf{Explainable Parametric Anomaly Engine:} Developed an anomaly detection framework combining 14-day Rolling Simple Moving Averages, sample standard deviations, Z-scores, and a Compound Anomaly Decision Rule. Avoided black-box neural network opacity by coupling the statistical detector with a deterministic rule-based Natural Language Explanation synthesizer.
+    \item \textbf{Spatial Inter-District Market Analytics:} Constructed geographical markup analytics that dynamically enrich simplified Bangladesh district GeoJSON polygon models, enabling interactive geospatial market visualization using zero-cost OpenStreetMap tiles via Leaflet.
+    \item \textbf{Modern Reactive Web Dashboard and REST Engine:} Deployed a high-throughput asynchronous FastAPI gateway serving typed Pydantic payloads with P95 latencies under 45ms, consumed by a responsive React 18 / Vite / Tailwind CSS web client featuring Leaflet geo-mapping and Recharts historical time-series analytics.
+\end{enumerate}
+
+\section{System Limitations}
+Despite its successful implementation and empirical verification, the current iteration of PricePulse BD possesses several acknowledged operational boundaries:
+\begin{itemize}
+    \item \textbf{Collector Fragility to Upstream Layout Redesigns:} As with all web-harvesting architectures, collectors that parse unversioned third-party HTML tables are vulnerable to sudden DOM modifications by source publishers. While isolated collector interfaces minimize blast radiuses, manual adapter maintenance remains necessary when upstream publishers restructure markup.
+    \item \textbf{Historical Data Horizon in Local Environments:} In resource-constrained desktop installations, maintaining multi-year historical time-series at daily granularity across hundreds of sub-district kitchen markets requires periodic database pruning or historical rollups into weekly summary aggregates.
+    \item \textbf{Assumption of Locational Homogeneity within Districts:} District-level centroids aggregate observations from multiple local wholesale and retail markets. In large districts, intra-district transportation costs between distant upazilas are smoothed over in the primary district-level aggregate.
+\end{itemize}
+
+\section{Future Roadmap: Mobile Edge Deployment and Collaborative Crowdsourcing}
+Future research directions planned for PricePulse BD include:
+\begin{enumerate}
+    \item \textbf{Native Android Application (Kotlin + Jetpack Compose):} Leveraging the decoupled REST API contracts, develop a lightweight native mobile application for consumers and local market inspectors. The mobile client will incorporate offline Room SQLite caching, WorkManager background synchronization, and native MPAndroidChart visualization for low-connectivity rural markets.
+    \item \textbf{Crowdsourced Community Price Verification:} Introduce cryptographic or reputation-weighted crowdsourcing mechanisms allowing registered local consumers to submit geotagged receipt photos and spot prices. The existing confidence scoring formulation can be extended with peer consensus weights to validate grassroots reports against official bulletins.
+    \item \textbf{Multivariate Exogenous Modeling:} Integrate macroeconomic exogenous signals—such as diesel and fuel transportation tariffs, cross-border import clearance volumes at Land Customs Stations (e.g., Benapole, Hili), and seasonal monsoon precipitation indices—into the statistical baseline to differentiate normal cost-push inflation from anti-competitive syndicate behavior.
+    \item \textbf{Automated Regulatory Alert Push Notifications:} Establish Webhook and SMS gateway integrations notifying consumer rights protection authorities (such as the Directorate of National Consumer Rights Protection - DNCRP) the instant a critical price anomaly is triggered.
+\end{enumerate}
+
+\section{Concluding Remarks}
+Market transparency is a fundamental pillar of economic justice. In an era where food commodity volatility disproportionately impacts the most vulnerable members of society, computational systems must serve the public good with transparency, mathematical rigor, and explainable intelligence. PricePulse BD demonstrates that modern, open-source, local-first software engineering can bridge the gap between chaotic physical markets and actionable civic intelligence.

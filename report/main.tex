@@ -1,0 +1,169 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx} % Times New Roman typography
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{cite}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue,
+    pdftitle={PricePulse BD: A Location-Aware Multi-Source Market Price Intelligence and Anomaly Detection System},
+    pdfauthor={Farhan Shahriar Polok}
+}
+
+% Code listing styling
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\backcolour,   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+% ----------------------------------------------------
+% Title Page
+% ----------------------------------------------------
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+    
+    {\Huge \bfseries PricePulse BD \par}
+    \vspace{0.4cm}
+    {\LARGE \bfseries A Location-Aware Multi-Source Market Price Intelligence and Anomaly Detection System for Essential Commodities in Bangladesh \par}
+    
+    \vspace{2.0cm}
+    {\large An Undergraduate Final Year Research Thesis Submitted in Partial Fulfillment of the Requirements for the Degree of \par}
+    \vspace{0.4cm}
+    {\Large \bfseries Bachelor of Science in Computer Science and Engineering \par}
+    
+    \vspace{2.5cm}
+    {\large \textbf{Authored by:} \par}
+    \vspace{0.2cm}
+    {\Large Farhan Shahriar Polok \par}
+    {\large Student ID: 2021-CSE-048 \par}
+    
+    \vspace{2.0cm}
+    {\large Department of Computer Science and Engineering \par}
+    \vspace{0.2cm}
+    {\large Faculty of Engineering and Technology \par}
+    \vspace{0.5cm}
+    {\large September 2026 \par}
+\end{titlepage}
+
+% ----------------------------------------------------
+% Front Matter
+% ----------------------------------------------------
+\pagenumbering{roman}
+\setcounter{page}{2}
+
+\chapter*{Declaration of Authorship}
+\addcontentsline{toc}{chapter}{Declaration of Authorship}
+I hereby declare that this undergraduate thesis entitled \textit{"PricePulse BD: A Location-Aware Multi-Source Market Price Intelligence and Anomaly Detection System for Essential Commodities in Bangladesh"} is my own original work conducted under academic supervision. To the best of my knowledge, this manuscript contains no material previously submitted for the award of any other degree or diploma in any university, nor any material published by any other person except where due reference and academic acknowledgment is made in the text.
+
+\vspace{1.5cm}
+\noindent
+\begin{tabular}{@{}p{3.5in}p{2.5in}@{}}
+Date: September 28, 2026 & \dotfill \\
+Dhaka, Bangladesh & Farhan Shahriar Polok \\
+& Department of CSE
+\end{tabular}
+
+\newpage
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Agricultural and retail essential commodity markets in developing economies such as Bangladesh are characterized by high price volatility, geographical fragmentation, asymmetric price transmission between intermediaries, and an absence of unified real-time monitoring infrastructure. Official market bulletins published by government agencies such as the Department of Agricultural Marketing (DAM) and Trading Corporation of Bangladesh (TCB) rely on disparate PDF/HTML bulletins and regional customary units (maund, seer, hali) that preclude direct analytical querying. Conversely, commercial online retail aggregators publish localized packet-level quotes lacking wholesale cross-referencing.
+
+This research presents \textbf{PricePulse BD}, a location-aware, multi-source market price intelligence and explainable anomaly detection platform designed specifically for the sovereign economic context of Bangladesh. The system introduces: (1) a bilingual lexical normalization pipeline utilizing Unicode NFKC standardization and phonetic alias mapping for seamless Bengali-English commodity resolution; (2) a deterministic unit standardizer translating non-metric customary trade units to base SI metrics; (3) a four-factor linear confidence scoring model assessing observation provenance; (4) an explainable parametric anomaly detection engine combining Rolling Simple Moving Averages (14-day SMA), sample standard deviations, Z-scores, Volatility Coefficients of Variation (CV\%), and deterministic natural language explanation generators; and (5) a spatial spread layer computing inter-district markups rendered via GeoJSON feature collections. 
+
+The software architecture leverages a decoupled, local-first paradigm with SQLite Write-Ahead Logging (WAL) concurrency, a high-throughput FastAPI REST engine, and a reactive dashboard client built with React, Vite, Leaflet, and Recharts. Empirical evaluation demonstrates sub-45ms P95 query latencies, 100\% precision on canonical taxonomy mapping across regional dialectical fixtures, and reliable identification of supply-shock price spikes without the opacity or computational overhead of black-box deep learning models.
+
+\vspace{0.5cm}
+\noindent \textbf{Keywords:} Market Price Intelligence, Commodity Anomaly Detection, Agro-Informatics, Z-Score Analytics, Data Fusion, Bangladesh Retail Markets.
+
+\newpage
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+I express my deepest gratitude to Almighty Allah for granting me the strength, perseverance, and intellectual clarity required to bring this research endeavor to fruition.
+
+I extend my sincere appreciation to my academic supervisor, whose rigorous critique, pedagogical encouragement, and insistence on methodological discipline shaped the foundational direction of this system. I am equally indebted to the faculty members of the Department of Computer Science and Engineering for cultivating an academic environment that values applied computational engineering addressing domestic socio-economic challenges.
+
+Finally, I dedicate this work to my family, whose unwavering support, sacrifices, and belief in my aspirations provided the bedrock upon which my academic journey stands.
+
+\newpage
+
+% ----------------------------------------------------
+% Table of Contents & Lists
+% ----------------------------------------------------
+\tableofcontents
+\listoffigures
+\listoftables
+
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ----------------------------------------------------
+% Chapters
+% ----------------------------------------------------
+\include{chapters/01_introduction}
+\include{chapters/02_literature_review}
+\include{chapters/03_system_architecture}
+\include{chapters/04_data_normalization}
+\include{chapters/05_anomaly_engine}
+\include{chapters/06_evaluation}
+\include{chapters/07_conclusion}
+
+% ----------------------------------------------------
+% Bibliography
+% ----------------------------------------------------
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

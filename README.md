@@ -79,11 +79,19 @@ PricePulse BD/
 ├── requirements.txt                # Production and test dependencies
 ├── README.md                       # Academic & system documentation
 ├── CHANGELOG.md                    # Semantic version release notes
-├── docs/                           # Technical documentation specifications
+├── run_system.py                   # Unified system orchestrator and launcher
+├── report/                         # Academic Undergraduate Research Thesis (LaTeX)
+│   ├── main.tex                    # Master thesis root document
+│   ├── references.bib              # Scholarly BibTeX bibliography
+│   └── chapters/                   # Chapters 01 to 07 (Architecture, Anomaly, Evaluation)
+├── docs/                           # Technical documentation & defense materials
 │   ├── ARCHITECTURE.md             # System design, dataflow, and concurrency model
 │   ├── DATA_MODEL.md               # Relational schema and confidence formulation
 │   ├── NORMALIZATION.md            # Taxonomy, alias resolution, and unit conversion
-│   └── API_SPEC.md                 # REST API endpoints for Web & Android
+│   ├── ALGORITHMS.md               # Mathematical formulations for anomaly & spatial spread
+│   ├── API_SPEC.md                 # REST API endpoints for Web & Android
+│   ├── VIVA_DEFENSE_GUIDE.md       # Comprehensive examination defense playbook
+│   └── DEMO_SCRIPT.md              # 6-step deterministic live presentation script
 ├── frontend/                       # Interactive Web Dashboard (React 18 + Vite)
 │   ├── src/
 │   │   ├── api/                    # Axios REST client and endpoint services
@@ -170,7 +178,7 @@ PricePulse BD/
    pytest tests/ -v
    ```
 
-7. **Launch Frontend Web Client:**
+7. **Launch Frontend Web Client (Development):**
    ```bash
    cd frontend
    npm install
@@ -178,6 +186,15 @@ PricePulse BD/
    npm run dev
    # Production build verification:
    npm run build
+   ```
+
+8. **One-Click Unified System Launcher (Offline Viva Mode):**
+   ```bash
+   # Launch both FastAPI REST API and React Web Client simultaneously on http://localhost:8000
+   python run_system.py
+
+   # Perform environment self-test without launching:
+   python run_system.py --test
    ```
 
 ---
@@ -204,16 +221,26 @@ Where:
 
 ---
 
-## 6. Research Roadmap
+## 6. Academic Thesis & Viva Defense Materials
+
+- **Undergraduate Research Thesis (LaTeX)**: Located in [`report/`](file:///D:/PricePulse%20BD/report/). Compilable via `pdflatex main.tex` or `xelatex main.tex`. Incorporates full methodology, mathematical formulations, and evaluation across 7 chapters.
+- **Viva Defense Master Guide**: [`docs/VIVA_DEFENSE_GUIDE.md`](file:///D:/PricePulse%20BD/docs/VIVA_DEFENSE_GUIDE.md) provides comprehensive, academically defensible answers addressing core Computer Science contributions, parametric Z-score justification, confidence formulation, and web harvesting boundaries.
+- **Live Demonstration Walkthrough**: [`docs/DEMO_SCRIPT.md`](file:///D:/PricePulse%20BD/docs/DEMO_SCRIPT.md) outlines a 6-step deterministic 5-minute presentation script designed specifically for the final examination committee.
+
+---
+
+## 7. Research Roadmap
 
 - [x] **Milestone 001**: Relational schema, SQLite WAL configuration, bilingual normalization engine, DAM bulletin ingestion slice, and automated testing.
 - [x] **Milestone 002**: Realtime on-demand price search engine, Chaldal online retail collector, channel spread analytics, and FastAPI REST routing.
 - [x] **Milestone 003**: Explainable statistical anomaly detection engine (Rolling SMA, Z-score, Volatility CV), Bangladesh spatial spread with GeoJSON, and 30-day historical seed generator.
 - [x] **Milestone 004**: Modern interactive web client (React 18 + Vite + Tailwind CSS + Leaflet + Recharts) with 5 core intelligence views and bilingual search.
-- [ ] **Milestone 005**: Native Android client (Kotlin + Jetpack Compose) integration with offline caching.
+- [x] **Milestone 005**: Academic LaTeX research thesis, Viva Defense Master Guide, 6-step live demo script, and unified system launcher (`run_system.py`).
+- [ ] **Milestone 006**: Native Android client (Kotlin + Jetpack Compose) integration with offline Room caching.
 
 ---
 
-## 7. License & Academic Attribution
+## 8. License & Academic Attribution
 
 This project is developed as part of an undergraduate CSE Final Year Research Project. Released under the [MIT License](LICENSE).
+

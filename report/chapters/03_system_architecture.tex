@@ -1,0 +1,119 @@
+\chapter{System Architecture}
+\label{ch:system_architecture}
+
+\section{Architectural Overview and Design Philosophy}
+PricePulse BD is engineered around three guiding architectural principles:
+\begin{enumerate}
+    \item \textbf{Local-First and Sovereign Deployment:} The system must execute deterministically in offline or localized environments without external cloud dependencies, API key subscriptions, or continuous third-party telemetry.
+    \item \textbf{Decoupled Multi-Client Extensibility:} The backend functions as a pure headless RESTful API service communicating via standardized JSON contracts. This ensures seamless interoperability with modern web clients (React/Vite) as well as native mobile operating systems (such as Android Kotlin applications via Retrofit).
+    \item \textbf{Extensible Pipeline Isolation:} Data harvesting, lexical normalization, confidence attribution, and analytical modeling are decoupled into isolated modular services, preventing pipeline failures in one source from destabilizing the core service layer.
+\end{enumerate}
+
+Figure~\ref{fig:architecture} illustrates the high-level system topology and dataflow pipeline.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.9\textwidth}{\centering
+        \textbf{PricePulse BD Layered Architecture} \\
+        \vspace{0.2cm}
+        \textbf{[Data Harvesting Layer]} \\
+        DAM Official Scraper $\cdot$ Chaldal Online Retail Adapter $\cdot$ Wholesale Spot Observers \\
+        $\Downarrow$ \textit{(Raw Unstructured Records: Strings, Customary Units)} \\
+        \textbf{[Ingestion \& Normalization Pipeline]} \\
+        NFKC Unicode Normalizer $\cdot$ Alias Resolution Engine $\cdot$ Metric Unit Standardizer $\cdot$ 4-Factor Linear Confidence Scorer \\
+        $\Downarrow$ \textit{(Canonical Observations: BDT/kg, BDT/L, Timestamped)} \\
+        \textbf{[Persistence Layer: SQLite 3.40+ (WAL Mode)]} \\
+        Commodities $\cdot$ Aliases $\cdot$ Administrative Hierarchy $\cdot$ Sources $\cdot$ Price Observations \\
+        $\Downarrow$ \\
+        \textbf{[Core Analytical Engines]} \\
+        Statistical Anomaly Engine (14d SMA, Z-Score, CV\%) $\cdot$ Spatial Spread Geo-Engine \\
+        $\Downarrow$ \\
+        \textbf{[FastAPI Asynchronous REST Gateway (/api/v1)]} \\
+        CORS Middleware $\cdot$ RFC 7807 Error Handling $\cdot$ Pydantic Schemas \\
+        $\Downarrow$ \\
+        \textbf{[Client Presentation Tier]} \\
+        React 18 / Vite SPA (Leaflet Geo-Map + Recharts) $\quad \Longleftrightarrow \quad$ Future Android Client (Kotlin / Retrofit)
+    }}
+    \caption{System topology and data processing pipeline of PricePulse BD.}
+    \label{fig:architecture}
+\end{figure}
+
+\section{Relational Schema Design and Database Concurrency}
+The persistence layer utilizes SQLite with Write-Ahead Logging (WAL) enabled \cite{hipp2020sqlite}. SQLite WAL mode decouples read operations from write transactions: reading threads never block concurrent write operations, and writing transactions never block reading clients. This is critical for sustaining sub-50ms analytical API response times while background data harvesters persist batch observations.
+
+\subsection{Relational Entity Definitions}
+The database schema encompasses five core relational tables:
+\begin{enumerate}
+    \item \textbf{\texttt{commodities}}: Master catalog of standardized food staples, storing the English canonical identifier, Bengali display title, category classification (e.g., Grain, Vegetable, Edible Oil), and standard SI metric base unit (\texttt{kg}, \texttt{liter}, \texttt{pc}).
+    \item \textbf{\texttt{commodity\_aliases}}: Orthographic lookup table mapping colloquial, dialectical, and phonetic string variations to the canonical commodity ID, annotated with an alias quality match rating ($S_{\text{alias}} \in [0.70, 1.00]$).
+    \item \textbf{\texttt{administrative\_hierarchy}}: Three-tiered spatial model comprising \texttt{divisions}, \texttt{districts}, and physical \texttt{markets}, storing geographic centroids (latitude and longitude) and market classification types (Wholesale Terminal, Urban Retail, Rural Primary).
+    \item \textbf{\texttt{sources}}: Registry of data providers (e.g., DAM Official, Chaldal Online Retail, TCB Market Intelligence), encoding their institutional reliability coefficient ($S_{\text{src}} \in [0.0, 1.0]$) and ingestion protocol.
+    \item \textbf{\texttt{price\_observations}}: High-density temporal transaction log capturing the harvested price bounds (minimum, maximum, modal/average), standardized price per base metric unit, computed confidence score, channel type, and data provenance references.
+\end{enumerate}
+
+Listing~\ref{lst:wal_pragma} demonstrates the engine connection initialization implementing foreign key constraints and WAL execution.
+
+\begin{lstlisting}[language=Python, caption={SQLite WAL pragma configuration in SQLAlchemy.}, label={lst:wal_pragma}]
+from sqlalchemy import create_engine, event
+
+def configure_sqlite_engine(database_url: str):
+    engine = create_engine(database_url, connect_args={"check_same_thread": False})
+    
+    @event.listens_for(engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+        
+    return engine
+\end{lstlisting}
+
+\section{Ingestion Pipeline and Data Harvester Interface}
+Data acquisition is governed by an abstract interface, \texttt{BaseCollector}, defining standard harvest contracts. The collector returns a standardized sequence of \texttt{RawPriceRecord} data transfer objects containing unparsed strings, source identifiers, raw units, and observed market dates.
+
+\begin{lstlisting}[language=Python, caption={Abstract BaseCollector contract.}, label={lst:base_collector}]
+from abc import ABC, abstractmethod
+from typing import List
+from app.schemas.observation import RawPriceRecord
+
+class BaseCollector(ABC):
+    @property
+    @abstractmethod
+    def source_code(self) -> str:
+        """Unique identifier matching the registered data source."""
+        pass
+
+    @abstractmethod
+    def harvest(self) -> List[RawPriceRecord]:
+        """Harvest raw observations from the underlying data publisher."""
+        pass
+\end{lstlisting}
+
+Two concrete collectors are implemented:
+\begin{itemize}
+    \item \textbf{\texttt{DAMFixtureCollector}}: Parses the official Department of Agricultural Marketing (DAM) daily market bulletin HTML tables, extracting both wholesale quotes (recorded in BDT per quintal or BDT per maund) and retail quotes across major metropolitan markets.
+    \item \textbf{\texttt{ChaldalCollector}}: Headless parser designed for modern online grocery catalog feeds, processing multi-SKU packet varieties (e.g., 500g, 1kg, 2kg packets, 1L, 2L, 5L bottles) and computing weighted retail averages.
+\end{itemize}
+
+\section{Realtime Fallback Service and On-Demand Ingestion}
+To ensure the platform serves current market intelligence without relying on manual cron orchestrators, PricePulse BD implements a \textit{Realtime On-Demand Fallback Service} (\texttt{RealtimePriceService}). When a consumer or client application requests price intelligence for a specific commodity on a given day:
+\begin{enumerate}
+    \item The service inspects the local database for existing observations matching the commodity and target date.
+    \item If observations exist and their cache age is within the freshness threshold ($\le 12$ hours), the service returns the persisted records tagged with a \texttt{fresh} status marker.
+    \item If no observations exist for the current date (or cached records are stale), the service triggers an immediate, non-blocking on-demand harvest through registered collectors.
+    \item Newly harvested observations pass through the bilingual normalizer and confidence scorer, are persisted to SQLite, and are returned to the client marked with a \texttt{realtime\_ingested} freshness badge.
+\end{enumerate}
+
+\section{REST API Engine and Decoupled Client Contracts}
+The application exposes an asynchronous, OpenAPI-compliant REST gateway built with FastAPI \cite{ramirez2020rest}. All endpoint responses conform strictly to typed Pydantic v2 schemas. Global exception handlers intercept operational errors and translate them into RFC 7807 Problem Details JSON objects, guaranteeing consistent error payload semantics for both web clients and native mobile consumers.
+
+Key API endpoints include:
+\begin{itemize}
+    \item \texttt{GET /api/v1/pulse/today}: Serves macro summary metrics, monitored commodity counts, active anomalies, and cross-channel retail markups.
+    \item \texttt{GET /api/v1/search/realtime?query=\{q\}}: Resolves bilingual search strings, triggers on-demand harvesting if necessary, and returns channel price spreads.
+    \item \texttt{GET /api/v1/commodities/\{id\}/history?days=30}: Delivers 30-day chronological price observations with 14-day SMA baselines and anomaly point markers.
+    \item \texttt{GET /api/v1/anomalies/active}: Scans all registered staples and returns active supply shocks with plain-language explanations.
+    \item \texttt{GET /api/v1/locations/spread?commodity\_id=\{id\}}: Computes inter-district spatial spreads and serves GeoJSON feature collections for geospatial mapping.
+\end{itemize}

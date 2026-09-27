@@ -1,0 +1,40 @@
+\chapter{Literature Review}
+\label{ch:literature_review}
+
+\section{Agricultural Market Information Systems (MIS)}
+The vital role of Agricultural Market Information Systems (MIS) in reducing spatial arbitrage and market frictions has been widely documented in development economics and computer science literature \cite{fao2021amis, minten2010food}. In classic microeconomic theory, price dispersion across geographically separated regional markets should not exceed the physical cost of inter-market transport (the Law of One Price). However, empirical studies across South Asia consistently demonstrate that severe information asymmetry between rural producers, intermediary syndicates, and urban consumers leads to persistent supra-competitive trading margins \cite{baur2013statistical}.
+
+Traditional government-operated MIS platforms in low-income nations were historically modeled after centralized bulletin boards or SMS push notifications. While early mobile agro-advisory systems delivered marginal price realization gains for specific cash crops, they exhibited significant operational shortcomings:
+\begin{itemize}
+    \item \textbf{High Latency and Intermittent Publishing:} Official price collection routines often rely on manual enumerators visiting wholesale yards on paper clipboards, introducing reporting delays ranging from 24 to 72 hours \cite{dam2024daily}.
+    \item \textbf{Lack of Data Granularity:} Bulletins report static national or divisional averages, failing to capture hyperlocal variations between primary wholesale terminal markets (e.g., Karwan Bazar) and neighborhood retail outlets.
+    \item \textbf{Unidirectional Dissemination:} Systems operate as broadcast mechanisms without programmatic API endpoints, preventing civic developers, economic researchers, or automated analytics engines from ingesting the raw data streams \cite{blazquez2018big}.
+\end{itemize}
+
+\section{Multi-Source Data Fusion and Entity Normalization}
+The integration of heterogeneous web-harvested datasets into a unified analytical catalog is a classic challenge in data engineering, commonly formalized as the schema matching and record linkage problem \cite{rahm2001survey}. The seminal work of Cavallo and Rigobon on the \textit{Billion Prices Project} demonstrated that high-frequency scraping of online retail store prices could construct daily consumer price indexes that anticipate official macroeconomic statistics with remarkable accuracy \cite{cavallo2018billion}. 
+
+However, translating web-scraping methodologies to developing market contexts introduces severe linguistic and domain-specific complexities:
+\begin{enumerate}
+    \item \textbf{Orthographic and Graphemic Ambiguities:} South Asian languages, particularly Bengali, feature complex conjunct characters (\textit{juktakkhor}), variant vowels, and diverse regional dialectical nomenclature for the same botanical cultivar \cite{ahmed2022bengali}. For example, ``ছোলা'' (chickpeas) may appear as ``বুট'', ``ছোলা বুট'', or phonetically transliterated as ``Chhola Boot'' or ``Gram Chickpeas''. Standard string distance metrics (such as Levenshtein or Jaro-Winkler) fail when applied directly to raw Unicode byte streams without prior grapheme cluster normalization.
+    \item \textbf{Customary Regional Units:} Unlike Western e-commerce platforms where quantities conform to standardized ISO metric units, agricultural markets in Bangladesh continue to employ customary imperial and Mughal-era trade units. The \textit{maund} (মণ) is commercially recognized as 40.0 kg in wholesale produce, the \textit{seer} (সের) as approximately 0.933 kg, the \textit{quintal} as 100 kg, and the \textit{hali} (হালি) as a 4-item discrete grouping. Automatic data fusion requires deterministic unit translation matrices linked directly to the canonical physical dimensions (mass, volume, count).
+\end{enumerate}
+
+\section{Time-Series Anomaly Detection: Parametric vs. Deep Learning}
+Anomaly detection in temporal sequences seeks to identify observations that deviate significantly from expected normal patterns \cite{chandola2009anomaly}. Within the computational literature, anomaly detection methodologies broadly bifurcate into:
+\begin{enumerate}
+    \item \textbf{Deep Learning and Recurrent Architectures:} Recurrent Neural Networks (RNN), Long Short-Term Memory (LSTM) networks, and Transformer-based temporal models (e.g., Temporal Fusion Transformers).
+    \item \textbf{Statistical and Parametric Frameworks:} Rolling Moving Averages, Exponential Smoothing, Autoregressive Integrated Moving Average (ARIMA) models, and parametric Z-score / interquartile range (IQR) estimators \cite{box2015time}.
+\end{enumerate}
+
+While deep learning architectures have gained widespread popularity for general time-series forecasting, their deployment in sovereign commodity price monitoring within developing economies faces severe theoretical and practical impediments:
+\begin{itemize}
+    \item \textbf{The ``Black-Box'' Opacity Problem:} Deep neural networks generate point predictions and anomaly scores via millions of non-linear parameter activations. In civic intelligence, public policy, and legal market enforcement, regulatory bodies require \textit{explainable justifications} (e.g., ``Price increased by 31.2\% over the 14-day rolling mean, yielding a Z-score of +2.48, which exceeds the critical threshold of 2.0'') rather than uninterpretable latent vector embeddings.
+    \item \textbf{Data Scarcity and Non-Stationary Regime Shifts:} Essential commodity price histories in Bangladesh are prone to structural policy shocks (e.g., sudden export bans imposed by neighboring trade partners, tariff exemptions, or severe flood disasters). Machine learning models trained on stationary historical sequences overfit or produce erratic hallucinatory outputs when confronted with regime shifts.
+    \item \textbf{Computational Footprint and Resource Efficiency:} Real-time inference on edge devices or modest server infrastructure requires sub-millisecond computation without specialized GPU accelerators.
+\end{itemize}
+
+Consequently, this research adopts a rigorous, parametric statistical framework combining 14-day Rolling Simple Moving Averages, sample standard deviation, and standardized Z-score metrics, augmented with a rule-based Natural Language Explanation generator that delivers transparent, legally defensible auditability.
+
+\section{Summary and Research Gap}
+While prior works address isolated components—such as pure web scraping, standalone NLP tokenization, or theoretical time-series forecasting—no prior system provides an end-to-end, localized, and open-source architecture that harmonizes multi-tier agricultural price feeds, resolves customary Bengali trade units, scores data confidence, and executes explainable anomaly detection within a unified, production-grade engine. PricePulse BD is engineered specifically to address this critical gap.
