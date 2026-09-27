@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-28
+
+### Added
+- **Resilient Live Web Harvesting Engine**:
+  - `DAMLiveCollector` (`app/collectors/dam_live_collector.py`): Real-time HTTP harvesting of official Department of Agricultural Marketing (DAM) daily bulletins with automatic, zero-downtime fallback to verified cached HTML fixtures upon network timeout, DNS failure, or HTTP 5xx responses.
+  - `ChaldalLiveCollector` (`app/collectors/chaldal_live_collector.py`): Live retail catalog harvester featuring retry logic with exponential backoff and seamless fallback to verified cached JSON fixtures during network failures or HTTP 429 rate limits.
+- **Upstream Provider Source Health Telemetry**:
+  - `SourceHealthService` (`app/services/source_health.py`): Real-time telemetry tracker recording operational health (`HEALTHY`, `DEGRADED`, `OFFLINE`), millisecond response latency, sync timestamps, error/success counts, and fallback activation indicators across all registered data providers.
+- **In-Process Async Background Scheduler & Sync Layer**:
+  - `BackgroundSyncScheduler` (`app/services/scheduler.py`): Asyncio background scheduler running periodic harvests without external cron dependencies. Provides non-blocking execution of on-demand sync tasks with tracking IDs.
+  - System REST endpoints:
+    - `GET /api/v1/system/sources`: Returns health telemetry and latency metrics for all providers.
+    - `POST /api/v1/system/sync`: Triggers asynchronous background ingestion and immediately returns task tracking ID.
+    - `GET /api/v1/system/sync/{task_id}`: Real-time progress and completion polling endpoint.
+    - `GET /api/v1/system/sync`: Lists all recorded background sync task executions.
+  - FastAPI `lifespan` handler integration in `app/main.py` ensuring graceful scheduler startup and termination.
+- **Frontend Source Health Dashboard & Live Sync Controls**:
+  - `SourceHealthCard.jsx`: Telemetry monitoring cards displaying live connection badges, response latencies, and last updated timestamps for DAM, Chaldal, and Field Spot Submissions.
+  - Dynamic "Sync Live Data" trigger button in `Navbar.jsx` with an active spinning animation and non-intrusive status toast alerts.
+  - Dedicated "Source Health" tab in `App.jsx` providing architecture explanations and on-demand live re-harvest actions.
+- **Resilience Test Suite**:
+  - `tests/test_resilient_collectors.py`: Validates network timeouts, connection errors, HTTP 500, and HTTP 429 mocked conditions, confirming seamless fallback to local fixtures without raising unhandled exceptions.
+  - `tests/test_source_health.py`: Validates telemetry state transitions and verifies the complete `/api/v1/system/` endpoint contract, expanding the test suite to 84 passing tests.
+
 ## [1.1.0] - 2026-09-28
 
 ### Added

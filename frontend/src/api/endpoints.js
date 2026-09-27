@@ -50,3 +50,9 @@ export const getComparisonData = (params) => {
   return apiClient.get('/commodities/compare', { params });
 };
 
+export const getSourceHealth = () => apiClient.get('/system/sources');
+
+export const triggerManualSync = () => apiClient.post('/system/sync');
+
+export const getSyncTaskStatus = (taskId) => apiClient.get(`/system/sync/${taskId}`);
+

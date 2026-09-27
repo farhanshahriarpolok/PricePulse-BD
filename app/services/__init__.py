@@ -13,6 +13,8 @@ from app.services.analytics import AnalyticsService, analytics_service
 from app.services.realtime_service import RealtimePriceService
 from app.services.anomaly_engine import AnomalyEngine, anomaly_engine
 from app.services.spatial_service import SpatialService, spatial_service
+from app.services.source_health import SourceHealthService, source_health_service
+from app.services.scheduler import BackgroundSyncScheduler, sync_scheduler
 
 __all__ = [
     "ConfidenceScorer",
@@ -29,4 +31,8 @@ __all__ = [
     "anomaly_engine",
     "SpatialService",
     "spatial_service",
+    "SourceHealthService",
+    "source_health_service",
+    "BackgroundSyncScheduler",
+    "sync_scheduler",
 ]

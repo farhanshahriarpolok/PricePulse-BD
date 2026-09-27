@@ -24,6 +24,7 @@ import BangladeshPriceMap from './components/BangladeshPriceMap';
 import ProvenanceDrawer from './components/ProvenanceDrawer';
 import ComparisonView from './components/ComparisonView';
 import ManualIngestionModal from './components/ManualIngestionModal';
+import SourceHealthCard from './components/SourceHealthCard';
 
 import {
   getDailyPulse,
@@ -32,12 +33,19 @@ import {
   getActiveAnomalies,
   getLocationSpread,
   explainAnomaly,
+  getSourceHealth,
+  triggerManualSync,
+  getSyncTaskStatus,
 } from './api/endpoints';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('pulse');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncToast, setSyncToast] = useState(null);
+  const [sourcesData, setSourcesData] = useState([]);
+  const [isSourcesRefreshing, setIsSourcesRefreshing] = useState(false);
 
   // Global State
   const [pulseData, setPulseData] = useState(null);
@@ -48,6 +56,70 @@ export default function App() {
   const [spatialData, setSpatialData] = useState(null);
   const [activeProvenance, setActiveProvenance] = useState(null);
 
+  // Fetch telemetry for upstream data providers
+  const fetchSourceHealth = async () => {
+    setIsSourcesRefreshing(true);
+    try {
+      const res = await getSourceHealth();
+      setSourcesData(res?.sources || (Array.isArray(res) ? res : []));
+    } catch (err) {
+      console.error('Source health fetch error:', err);
+    } finally {
+      setIsSourcesRefreshing(false);
+    }
+  };
+
+  // Trigger manual background sync with polling
+  const handleTriggerSync = async () => {
+    setIsSyncing(true);
+    setSyncToast({ message: 'Initiating live background harvest...', details: 'Connecting to DAM & Chaldal' });
+    try {
+      const res = await triggerManualSync();
+      const taskId = res?.task_id;
+      if (!taskId) {
+        setSyncToast({ message: 'Sync initiated', details: 'Task running in background' });
+        setIsSyncing(false);
+        setTimeout(() => setSyncToast(null), 4000);
+        return;
+      }
+
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts += 1;
+        try {
+          const task = await getSyncTaskStatus(taskId);
+          if (task.status === 'completed') {
+            clearInterval(interval);
+            setIsSyncing(false);
+            setSyncToast({
+              message: 'Live Sync Completed Successfully!',
+              details: `${task.total_harvested} items (${task.total_inserted} inserted, ${task.total_updated} updated)`,
+            });
+            loadData();
+            fetchSourceHealth();
+            setTimeout(() => setSyncToast(null), 5000);
+          } else if (task.status === 'failed' || attempts > 15) {
+            clearInterval(interval);
+            setIsSyncing(false);
+            setSyncToast({
+              message: task.status === 'failed' ? 'Sync encountered an issue' : 'Sync completed in background',
+              details: task.error || 'Check telemetry tab',
+            });
+            fetchSourceHealth();
+            setTimeout(() => setSyncToast(null), 5000);
+          }
+        } catch {
+          clearInterval(interval);
+          setIsSyncing(false);
+          setTimeout(() => setSyncToast(null), 3000);
+        }
+      }, 1000);
+    } catch (err) {
+      setIsSyncing(false);
+      setSyncToast({ message: 'Live harvest failed', details: err?.message || 'Check network connection' });
+      setTimeout(() => setSyncToast(null), 4000);
+    }
+  };
 
   // Load initial datasets
   const loadData = async () => {
@@ -58,6 +130,7 @@ export default function App() {
         getCommodities().catch(() => ({ items: [] })),
         getActiveAnomalies().catch(() => ({ anomalies: [] })),
       ]);
+      fetchSourceHealth();
 
       setPulseData(pulseRes);
       setCommodities(commsRes?.items || []);
@@ -105,6 +178,9 @@ export default function App() {
         onRefresh={loadData}
         isRefreshing={isRefreshing}
         onOpenReportModal={() => setIsManualModalOpen(true)}
+        onTriggerSync={handleTriggerSync}
+        isSyncing={isSyncing}
+        syncToast={syncToast}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -318,7 +394,47 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 5: DATA PROVENANCE */}
+        {/* TAB 5: SOURCE HEALTH & TELEMETRY */}
+        {activeTab === 'sources' && (
+          <div>
+            <SourceHealthCard
+              sources={sourcesData}
+              onRefresh={fetchSourceHealth}
+              isRefreshing={isSourcesRefreshing}
+            />
+
+            <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6">
+              <h4 className="text-sm font-bold text-white mb-2 font-outfit">
+                Resilient Harvesting & Graceful Degradation Architecture
+              </h4>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                PricePulse BD operates a zero-downtime, fault-tolerant ingestion pipeline. Network connectivity timeouts,
+                HTTP 5xx server errors, or anti-scraping rate-limits (HTTP 429) automatically trigger a seamless
+                fallback to verified cached fixtures. Telemetry markers record degraded operational states without
+                halting system services or compromising historical market integrity.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleTriggerSync}
+                  disabled={isSyncing}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow-md shadow-teal-950/40 transition-all border border-teal-500/40 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                  <span>{isSyncing ? 'Harvest In Progress...' : 'Trigger Immediate Network Harvest'}</span>
+                </button>
+                <button
+                  onClick={fetchSourceHealth}
+                  disabled={isSourcesRefreshing}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 transition"
+                >
+                  <span>Re-check Latency & Status</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: DATA PROVENANCE */}
         {activeTab === 'provenance' && (
           <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-6">

@@ -135,6 +135,11 @@ class IngestionPipeline:
             existing_obs = self.db.scalars(existing_stmt).first()
 
             if existing_obs:
+                if raw.is_fallback:
+                    # Fallback fixture data must not alter existing historical records
+                    skipped_count += 1
+                    continue
+
                 if existing_obs.raw_name != raw.raw_commodity_name:
                     # Multi-SKU package averaging for retail offerings (e.g., 1kg vs 2kg packs)
                     existing_obs.normalized_price = round(

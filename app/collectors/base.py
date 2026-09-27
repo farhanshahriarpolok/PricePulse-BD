@@ -19,6 +19,7 @@ class RawObservation:
     price_type: str  # e.g., 'retail_avg', 'wholesale_avg', 'wholesale_min', 'wholesale_max'
     observation_date: date
     completeness_score: float = 1.0
+    is_fallback: bool = False
 
 
 class BaseCollector(ABC):

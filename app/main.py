@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.core.database import engine, Base, SessionLocal
 from app.schemas.common import HealthResponse, ErrorResponse, ErrorDetail
 from app.api.v1.router import api_router
+from app.services.scheduler import sync_scheduler
 from scripts.init_db import seed_locations, seed_commodities, seed_sources
 
 
@@ -25,7 +26,11 @@ async def lifespan(app: FastAPI):
         seed_locations(session)
         seed_commodities(session)
         seed_sources(session)
+    # Start in-process background sync scheduler
+    sync_scheduler.start()
     yield
+    # Gracefully terminate background scheduler
+    sync_scheduler.shutdown()
 
 
 

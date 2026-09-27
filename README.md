@@ -221,7 +221,32 @@ Where:
 
 ---
 
-## 6. Academic Thesis & Viva Defense Materials
+## 6. Live Web Ingestion, Fallback Resilience & Scheduler Mechanics
+
+### Resilient Live Harvesting & Graceful Degradation
+To operate robustly across real-world internet instability without crashing or polluting time-series observations, PricePulse BD implements a fault-tolerant multi-tier collection strategy:
+1. **Live HTTP Harvesting (`DAMLiveCollector`, `ChaldalLiveCollector`)**:
+   - Collectors attempt real-time harvesting against upstream web endpoints (`http://www.dam.gov.bd` bulletin tables and retail grocery catalog feeds).
+   - Upstream requests enforce strict connection timeouts (3.0s) and exponential backoff retry cycles.
+2. **Deterministic Offline Fallback**:
+   - If upstream servers face DNS resolution failure, network disconnection, HTTP 5xx internal server errors, or anti-scraping rate limits (HTTP 429), collectors **never crash**.
+   - The engine automatically logs a structured warning and delegates ingestion to verified local cached fixtures (`dam_bulletin_sample.html`, `chaldal_catalog_sample.json`).
+   - Observations harvested from fallback fixtures are marked with completeness flags, and provider health is updated to `DEGRADED`.
+3. **Telemetry & Source Health (`SourceHealthService`)**:
+   - Real-time latency tracking (`latency_ms`), last synchronization timestamps, success/error counters, and provider status (`HEALTHY`, `DEGRADED`, `OFFLINE`).
+   - Accessible via REST endpoint `GET /api/v1/system/sources`.
+
+### In-Process Background Task Scheduler
+- Built on Python's native `asyncio` event loop inside `app/services/scheduler.py`, requiring zero external daemon or cron infrastructure.
+- **Periodic Harvesting**: Automatically executes periodic data harvests and incremental anomaly checks on a recurring 12-hour cadence.
+- **Asynchronous On-Demand Trigger**:
+  - `POST /api/v1/system/sync` schedules background execution without blocking the FastAPI event loop and returns an immediate tracking task ID.
+  - Clients poll `GET /api/v1/system/sync/{task_id}` for execution progress, inserted count, and updated record counts.
+- **Application Lifespan Integration**: Integrated into FastAPI `lifespan` in `app/main.py` ensuring clean task startup and graceful teardown during process termination.
+
+---
+
+## 7. Academic Thesis & Viva Defense Materials
 
 - **Undergraduate Research Thesis (LaTeX)**: Located in [`report/`](file:///D:/PricePulse%20BD/report/). Compilable via `pdflatex main.tex` or `xelatex main.tex`. Incorporates full methodology, mathematical formulations, and evaluation across 7 chapters.
 - **Viva Defense Master Guide**: [`docs/VIVA_DEFENSE_GUIDE.md`](file:///D:/PricePulse%20BD/docs/VIVA_DEFENSE_GUIDE.md) provides comprehensive, academically defensible answers addressing core Computer Science contributions, parametric Z-score justification, confidence formulation, and web harvesting boundaries.
@@ -229,14 +254,16 @@ Where:
 
 ---
 
-## 7. Research Roadmap
+## 8. Research Roadmap
 
 - [x] **Milestone 001**: Relational schema, SQLite WAL configuration, bilingual normalization engine, DAM bulletin ingestion slice, and automated testing.
 - [x] **Milestone 002**: Realtime on-demand price search engine, Chaldal online retail collector, channel spread analytics, and FastAPI REST routing.
 - [x] **Milestone 003**: Explainable statistical anomaly detection engine (Rolling SMA, Z-score, Volatility CV), Bangladesh spatial spread with GeoJSON, and 30-day historical seed generator.
 - [x] **Milestone 004**: Modern interactive web client (React 18 + Vite + Tailwind CSS + Leaflet + Recharts) with 5 core intelligence views and bilingual search.
 - [x] **Milestone 005**: Academic LaTeX research thesis, Viva Defense Master Guide, 6-step live demo script, and unified system launcher (`run_system.py`).
-- [ ] **Milestone 006**: Native Android client (Kotlin + Jetpack Compose) integration with offline Room caching.
+- [x] **Milestone 006**: Protein and pulse taxonomy expansion (Broiler Chicken, Eggs, Masur Dal, Garlic), customary count units (`hali`, `dozen`), side-by-side comparison view, and field spot price ingestion form.
+- [x] **Milestone 007**: Resilient live web harvesting (DAM and Chaldal), zero-downtime offline fallback, in-process async scheduler, source health monitor, and UI live sync controls.
+- [ ] **Milestone 008**: Native Android client (Kotlin + Jetpack Compose) integration with offline Room caching.
 
 ---
 
