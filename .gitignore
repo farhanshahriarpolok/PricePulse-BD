@@ -1,0 +1,41 @@
+# Python environment and dependencies
+venv/
+env/
+ENV/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and runtime state
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+instance/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# IDE and Editor configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Local AI / LLM orchestration directories & task trackers
+.ai_workflow/
+.agent/
+.agents/
+.tasks/
+.system_generated/
+*.log

@@ -1,0 +1,63 @@
+{
+  "divisions": [
+    {
+      "name": "Dhaka",
+      "bangla_name": "ঢাকা",
+      "districts": [
+        {
+          "name": "Dhaka",
+          "bangla_name": "ঢাকা",
+          "markets": [
+            {
+              "name": "Karwan Bazar",
+              "bangla_name": "কারওয়ান বাজার",
+              "market_type": "wholesale",
+              "latitude": 23.7516,
+              "longitude": 90.3944
+            },
+            {
+              "name": "Mirpur-1 Kacha Bazar",
+              "bangla_name": "মিরপুর-১ কাঁচা বাজার",
+              "market_type": "retail",
+              "latitude": 23.8067,
+              "longitude": 90.3541
+            },
+            {
+              "name": "Chaldal Online Hub",
+              "bangla_name": "চালডাল অনলাইন হাব",
+              "market_type": "online",
+              "latitude": 23.7808,
+              "longitude": 90.4192
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chittagong",
+      "bangla_name": "চট্টগ্রাম",
+      "districts": [
+        {
+          "name": "Chattogram",
+          "bangla_name": "চট্টগ্রাম",
+          "markets": [
+            {
+              "name": "Khatunganj",
+              "bangla_name": "খাতুনগঞ্জ",
+              "market_type": "wholesale",
+              "latitude": 22.3362,
+              "longitude": 91.8365
+            },
+            {
+              "name": "Reazuddin Bazar",
+              "bangla_name": "রিয়াজউদ্দিন বাজার",
+              "market_type": "retail",
+              "latitude": 22.3384,
+              "longitude": 91.8312
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

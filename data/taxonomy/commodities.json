@@ -1,0 +1,110 @@
+[
+  {
+    "canonical_name": "Onion (Local)",
+    "bangla_name": "দেশি পেঁয়াজ",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "দেশি পেঁয়াজ", "language": "bn", "weight": 1.0},
+      {"alias": "দেশি পেঁয়াজ", "language": "bn", "weight": 1.0},
+      {"alias": "দেশী পেঁয়াজ", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁয়াজ (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁয়াজ (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "deshi peyaj", "language": "phonetic", "weight": 0.95},
+      {"alias": "local onion", "language": "en", "weight": 0.95},
+      {"alias": "onion (local)", "language": "en", "weight": 1.0},
+      {"alias": "onion local", "language": "en", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Onion (Imported)",
+    "bangla_name": "আমদানি পেঁয়াজ",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "আমদানি পেঁয়াজ", "language": "bn", "weight": 1.0},
+      {"alias": "আমদানি পেঁয়াজ", "language": "bn", "weight": 1.0},
+      {"alias": "ভারতীয় পেঁয়াজ", "language": "bn", "weight": 0.95},
+      {"alias": "ভারতীয় পেঁয়াজ", "language": "bn", "weight": 0.95},
+      {"alias": "পেঁয়াজ (আমদানি)", "language": "bn", "weight": 0.98},
+      {"alias": "imported onion", "language": "en", "weight": 0.95},
+      {"alias": "onion (imported)", "language": "en", "weight": 1.0},
+      {"alias": "indian onion", "language": "en", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Potato (Diamond)",
+    "bangla_name": "ডায়মন্ড আলু",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "ডায়মন্ড আলু", "language": "bn", "weight": 1.0},
+      {"alias": "ডায়মন্ড আলু", "language": "bn", "weight": 1.0},
+      {"alias": "আলু (ডায়মন্ড)", "language": "bn", "weight": 0.98},
+      {"alias": "আলু (ডায়মন্ড)", "language": "bn", "weight": 0.98},
+      {"alias": "গোল আলু", "language": "bn", "weight": 0.90},
+      {"alias": "আলু", "language": "bn", "weight": 0.85},
+      {"alias": "potato (diamond)", "language": "en", "weight": 1.0},
+      {"alias": "diamond potato", "language": "en", "weight": 0.95},
+      {"alias": "potato regular", "language": "en", "weight": 0.88},
+      {"alias": "alu diamond", "language": "phonetic", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Rice (Miniket)",
+    "bangla_name": "মিনিকেট চাল",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "মিনিকেট চাল", "language": "bn", "weight": 1.0},
+      {"alias": "মিনিকেট", "language": "bn", "weight": 0.95},
+      {"alias": "চাল (মিনিকেট)", "language": "bn", "weight": 0.98},
+      {"alias": "miniket rice", "language": "en", "weight": 0.95},
+      {"alias": "rice (miniket)", "language": "en", "weight": 1.0},
+      {"alias": "miniket chal", "language": "phonetic", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Rice (Nazirshail)",
+    "bangla_name": "নাজিরশাইল চাল",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "নাজিরশাইল চাল", "language": "bn", "weight": 1.0},
+      {"alias": "নাজিরশাইল", "language": "bn", "weight": 0.95},
+      {"alias": "চাল (নাজিরশাইল)", "language": "bn", "weight": 0.98},
+      {"alias": "nazirshail rice", "language": "en", "weight": 0.95},
+      {"alias": "rice (nazirshail)", "language": "en", "weight": 1.0},
+      {"alias": "najirshail chal", "language": "phonetic", "weight": 0.90}
+    ]
+  },
+  {
+    "canonical_name": "Rice (Coarse)",
+    "bangla_name": "মোটা চাল",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "মোটা চাল", "language": "bn", "weight": 1.0},
+      {"alias": "স্বর্ণা চাল", "language": "bn", "weight": 0.92},
+      {"alias": "চাল (মোটা)", "language": "bn", "weight": 0.98},
+      {"alias": "coarse rice", "language": "en", "weight": 0.95},
+      {"alias": "rice (coarse)", "language": "en", "weight": 1.0},
+      {"alias": "swarna rice", "language": "en", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Soybean Oil (Bottled)",
+    "bangla_name": "বোতলজাত সয়াবিন তেল",
+    "category": "Edible Oils",
+    "default_unit": "liter",
+    "aliases": [
+      {"alias": "বোতলজাত সয়াবিন তেল", "language": "bn", "weight": 1.0},
+      {"alias": "সয়াবিন তেল (বোতল)", "language": "bn", "weight": 0.98},
+      {"alias": "সয়াবিন তেল", "language": "bn", "weight": 0.92},
+      {"alias": "সয়াবিন তেল", "language": "bn", "weight": 0.92},
+      {"alias": "bottled soybean oil", "language": "en", "weight": 0.95},
+      {"alias": "soybean oil (bottled)", "language": "en", "weight": 1.0},
+      {"alias": "soybean oil", "language": "en", "weight": 0.90}
+    ]
+  }
+]
