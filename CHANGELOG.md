@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-28
+
+### Added
+- **Explainable Statistical Anomaly Detection Engine**:
+  - `AnomalyEngine` computing Rolling Simple Moving Averages (7, 14, 30 days), sample standard deviation ($\sigma$), Z-score, and Volatility Coefficient of Variation (CV%).
+  - Compound Anomaly Decision Rule ($|Z| \ge 1.5$ AND $|\Delta\%| \ge 10.0\%$) with granular severity tiers (`Moderate`, `Severe`, `Critical`) and directional classification (`Spike` vs `Drop`).
+  - Rule-based Natural Language Explanation Generator delivering auditable justifications.
+- **Spatial Market Spread & GeoJSON Intelligence**:
+  - `SpatialService` calculating inter-district spatial dispersion, identifying cheapest vs most expensive market nodes, and computing geographical markup percentages.
+  - Simplified Bangladesh district GeoJSON dataset (`data/geo/bangladesh_districts_simplified.json`) enriched dynamically with live market prices for Leaflet map visualization.
+  - Complete administrative location hierarchy endpoint (`/api/v1/locations/hierarchy`).
+- **REST API Endpoints**:
+  - `GET /api/v1/anomalies/active`: scans all registered commodities for active price anomalies.
+  - `GET /api/v1/anomalies/{commodity_id}/explain`: in-depth statistical decomposition and natural language breakdown for a specific commodity.
+  - `GET /api/v1/locations/spread?commodity_id={id}`: inter-district spatial spread and enriched GeoJSON feature collection.
+- **Offline Viva Defense Seed Generator**:
+  - `scripts/generate_demo_history.py`: populates 30 days of continuous market observations across four core staples, embedding a calibrated 5-day supply shock on Onion to demonstrate live anomaly detection.
+- **Documentation**:
+  - Mathematical formulation document (`docs/ALGORITHMS.md`) covering SMA, Standard Deviation, Z-score, Volatility CV, Compound Anomaly Rule, and Spatial Spread.
+- **Automated Test Suite**:
+  - Added unit and integration tests across statistical formulas, anomaly decision matrices, spatial calculations, and REST endpoints (47 passing tests total).
+
 ## [0.2.0] - 2026-09-28
 
 ### Added
