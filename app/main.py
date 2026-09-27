@@ -13,7 +13,7 @@ from app.core.config import settings
 from app.core.database import engine, Base, SessionLocal
 from app.schemas.common import HealthResponse, ErrorResponse, ErrorDetail
 from app.api.v1.router import api_router
-from scripts.init_db import seed_locations, seed_commodities
+from scripts.init_db import seed_locations, seed_commodities, seed_sources
 
 
 @asynccontextmanager
@@ -24,7 +24,9 @@ async def lifespan(app: FastAPI):
     with SessionLocal() as session:
         seed_locations(session)
         seed_commodities(session)
+        seed_sources(session)
     yield
+
 
 
 def create_application() -> FastAPI:

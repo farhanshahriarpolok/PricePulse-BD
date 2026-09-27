@@ -22,6 +22,8 @@ import HistoricalTrendChart from './components/HistoricalTrendChart';
 import AnomalyAlertCard from './components/AnomalyAlertCard';
 import BangladeshPriceMap from './components/BangladeshPriceMap';
 import ProvenanceDrawer from './components/ProvenanceDrawer';
+import ComparisonView from './components/ComparisonView';
+import ManualIngestionModal from './components/ManualIngestionModal';
 
 import {
   getDailyPulse,
@@ -35,6 +37,7 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState('pulse');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
 
   // Global State
   const [pulseData, setPulseData] = useState(null);
@@ -44,6 +47,7 @@ export default function App() {
   const [anomaliesData, setAnomaliesData] = useState(null);
   const [spatialData, setSpatialData] = useState(null);
   const [activeProvenance, setActiveProvenance] = useState(null);
+
 
   // Load initial datasets
   const loadData = async () => {
@@ -100,6 +104,7 @@ export default function App() {
         anomalyCount={activeAnomalyCount}
         onRefresh={loadData}
         isRefreshing={isRefreshing}
+        onOpenReportModal={() => setIsManualModalOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -115,6 +120,7 @@ export default function App() {
                 setActiveTab('explorer');
               }}
             />
+
 
             {/* Daily Staples Grid */}
             <div className="mb-8">
@@ -178,8 +184,21 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 2: COMMODITY EXPLORER */}
+        {/* TAB 2: COMPARE MARKETS */}
+        {activeTab === 'compare' && (
+          <ComparisonView
+            commodities={commodities}
+            onSelectCommodity={(id) => {
+              const matched = commodities.find((c) => c.id === id);
+              if (matched) setSelectedCommodity(matched);
+              setActiveTab('explorer');
+            }}
+          />
+        )}
+
+        {/* TAB 3: COMMODITY EXPLORER */}
         {activeTab === 'explorer' && (
+
           <div>
             {/* Commodity Selector Pills */}
             <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-5 scrollbar-none">
@@ -343,6 +362,16 @@ export default function App() {
       {/* Provenance Modal Drawer */}
       <ProvenanceDrawer observation={activeProvenance} onClose={() => setActiveProvenance(null)} />
 
+      {/* Manual Spot Price Ingestion Modal */}
+      <ManualIngestionModal
+        isOpen={isManualModalOpen}
+        onClose={() => setIsManualModalOpen(false)}
+        commodities={commodities}
+        onSuccess={() => {
+          loadData();
+        }}
+      />
+
       {/* Footer */}
       <footer className="border-t border-slate-800 bg-slate-900/80 py-4 text-center text-xs text-slate-500">
         <p>PricePulse BD • CSE Final Year Project • Academic Research Platform</p>
@@ -350,3 +379,4 @@ export default function App() {
     </div>
   );
 }
+

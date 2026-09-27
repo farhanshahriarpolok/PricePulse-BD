@@ -6,12 +6,22 @@ import {
   MapPin, 
   ShieldCheck, 
   RefreshCw,
-  Database
+  Database,
+  GitCompare,
+  PlusCircle
 } from 'lucide-react';
 
-export default function Navbar({ activeTab, setActiveTab, anomalyCount = 0, onRefresh, isRefreshing = false }) {
+export default function Navbar({ 
+  activeTab, 
+  setActiveTab, 
+  anomalyCount = 0, 
+  onRefresh, 
+  isRefreshing = false,
+  onOpenReportModal
+}) {
   const navItems = [
     { id: 'pulse', label: 'Market Pulse', icon: Activity },
+    { id: 'compare', label: 'Compare Markets', icon: GitCompare },
     { id: 'explorer', label: 'Commodity Explorer', icon: TrendingUp },
     { id: 'anomalies', label: 'Anomaly Monitor', icon: AlertTriangle, count: anomalyCount },
     { id: 'map', label: 'Spatial Map', icon: MapPin },
@@ -37,7 +47,7 @@ export default function Navbar({ activeTab, setActiveTab, anomalyCount = 0, onRe
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -45,7 +55,7 @@ export default function Navbar({ activeTab, setActiveTab, anomalyCount = 0, onRe
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                     isActive
                       ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent'
@@ -54,7 +64,7 @@ export default function Navbar({ activeTab, setActiveTab, anomalyCount = 0, onRe
                   <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
                   <span>{item.label}</span>
                   {item.count > 0 && (
-                    <span className="ml-1.5 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-rose-500 text-white animate-pulse">
+                    <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-rose-500 text-white animate-pulse">
                       {item.count}
                     </span>
                   )}
@@ -63,24 +73,34 @@ export default function Navbar({ activeTab, setActiveTab, anomalyCount = 0, onRe
             })}
           </nav>
 
-          {/* System Status Controls */}
-          <div className="flex items-center space-x-3">
-            <div className="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
+          {/* System Status & Ingestion Trigger */}
+          <div className="flex items-center space-x-2.5">
+            {/* Primary Action Button */}
+            <button
+              onClick={onOpenReportModal}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-950/40 transition-all border border-emerald-500/40"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Report Price</span>
+            </button>
+
+            <div className="hidden sm:flex items-center space-x-2 px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
               <Database className="w-3.5 h-3.5 text-slate-400" />
-              <span className="font-mono text-slate-300">SQLite WAL</span>
+              <span className="font-mono text-slate-300 text-[11px]">SQLite WAL</span>
             </div>
 
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
               title="Refresh Market Data"
-              className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/50 transition-colors disabled:opacity-50"
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/50 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
             </button>
           </div>
         </div>
+
 
         {/* Mobile Navigation Row */}
         <div className="flex md:hidden overflow-x-auto py-2 space-x-1 border-t border-slate-800/80 scrollbar-none">

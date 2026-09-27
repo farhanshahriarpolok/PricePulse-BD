@@ -285,7 +285,102 @@ interface PricePulseApi {
         @Query("start_date") startDate: String? = null,
         @Query("end_date") endDate: String? = null
     ): CommodityHistoryResponse
+
+    @GET("api/v1/commodities/compare")
+    suspend fun compareCommodities(
+        @Query("ids") ids: String,
+        @Query("district_id") districtId: Int? = null
+    ): ComparisonResponse
+
+    @POST("api/v1/observations/manual")
+    suspend fun submitManualObservation(
+        @Body payload: ManualObservationRequest
+    ): ManualObservationResponse
 }
+```
+
+---
+
+## 5. Field Ingestion & Spot Price Reporting API
+
+### `POST /api/v1/observations/manual`
+Submits a spot price observation collected from the field. Normalizes custom units (e.g. `হালি` -> 4 pcs, `ডজন` -> 12 pcs), validates bounds, assigns Tier-4 confidence (`reliability = 0.60`), and persists to SQLite WAL.
+
+**Request Payload:**
+```json
+{
+  "commodity_id": 8,
+  "market_id": 1,
+  "price": 52.0,
+  "raw_unit": "হালি",
+  "market_tier": "retail",
+  "observation_date": "2026-09-28",
+  "reporter_note": "Observed at Kawran Bazar morning shift",
+  "reporter_name": "Inspector Rahim"
+}
+```
+
+**Response (`201 Created`):**
+```json
+{
+  "id": 142,
+  "commodity_id": 8,
+  "commodity_name": "Farm Egg",
+  "commodity_bangla_name": "ফার্মের ডিম",
+  "market_id": 1,
+  "market_name": "Kawran Bazar Wholesale & Retail Hub",
+  "district_name": "Dhaka",
+  "raw_price": 52.0,
+  "raw_unit": "হালি",
+  "normalized_price": 13.0,
+  "normalized_unit": "pc",
+  "price_type": "retail_avg",
+  "source_code": "field_report",
+  "source_name": "Field Spot Report (Manual)",
+  "observation_date": "2026-09-28",
+  "confidence_score": 0.84,
+  "reporter_note": "Observed at Kawran Bazar morning shift",
+  "created_at": "2026-09-28T03:10:00Z",
+  "message": "Manual price observation recorded and normalized successfully"
+}
+```
+
+---
+
+### `GET /api/v1/commodities/compare`
+Returns side-by-side pricing, wholesale vs retail spreads, 14-day trends, and volatility metrics for comparison.
+
+**Parameters:**
+- `ids` (string, required): Comma-separated commodity IDs (e.g. `1,2,3`).
+- `district_id` (integer, optional): Filter by administrative district.
+
+**Response (`200 OK`):**
+```json
+{
+  "total_compared": 2,
+  "district_id": null,
+  "items": [
+    {
+      "commodity_id": 1,
+      "canonical_name": "Onion (Local)",
+      "bangla_name": "দেশি পেঁয়াজ",
+      "category": "Vegetables",
+      "unit": "kg",
+      "retail_price": 98.0,
+      "wholesale_price": 85.0,
+      "spread_bdt": 13.0,
+      "spread_pct": 15.3,
+      "baseline_sma_14d": 65.2,
+      "delta_pct": 50.3,
+      "z_score": 17.98,
+      "volatility_cv": 2.8,
+      "is_anomaly": true,
+      "severity": "Critical",
+      "direction": "Spike"
+    }
+  ]
+}
+
 ```
 
 ---

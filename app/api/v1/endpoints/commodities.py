@@ -47,7 +47,101 @@ def list_commodities(
 
 
 @router.get(
+    "/compare",
+    summary="Compare Multiple Commodities",
+    description="Returns side-by-side pricing, wholesale vs retail spreads, 14-day trends, and volatility metrics for comparison.",
+)
+def compare_commodities(
+    ids: str = Query(..., description="Comma-separated commodity IDs to compare (e.g., '1,2,3')"),
+    district_id: Optional[int] = Query(None, description="Optional district filter"),
+    db: Session = Depends(get_db),
+):
+    from app.services.anomaly_engine import AnomalyEngine
+    from app.models.location import Market
+
+    anomaly_engine = AnomalyEngine()
+    try:
+        id_list = [int(i.strip()) for i in ids.split(",") if i.strip()]
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ids parameter must be comma-separated integers (e.g., '1,2,3')",
+        )
+
+    if not id_list:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one commodity ID must be provided",
+        )
+
+    results = []
+    for c_id in id_list:
+        commodity = db.get(Commodity, c_id)
+        if not commodity:
+            continue
+
+        # Retail and wholesale price queries
+        base_query = select(PriceObservation).where(PriceObservation.commodity_id == c_id)
+        if district_id:
+            base_query = base_query.join(Market).where(Market.district_id == district_id)
+
+        retail_obs = (
+            db.scalars(
+                base_query.where(PriceObservation.price_type.like("%retail%"))
+                .order_by(PriceObservation.observation_date.desc(), PriceObservation.id.desc())
+            ).first()
+        )
+
+        wholesale_obs = (
+            db.scalars(
+                base_query.where(PriceObservation.price_type.like("%wholesale%"))
+                .order_by(PriceObservation.observation_date.desc(), PriceObservation.id.desc())
+            ).first()
+        )
+
+        retail_price = round(retail_obs.normalized_price, 2) if retail_obs else None
+        wholesale_price = round(wholesale_obs.normalized_price, 2) if wholesale_obs else None
+
+        spread_bdt = None
+        spread_pct = None
+        if retail_price is not None and wholesale_price is not None and wholesale_price > 0:
+            spread_bdt = round(retail_price - wholesale_price, 2)
+            spread_pct = round(((retail_price - wholesale_price) / wholesale_price) * 100, 1)
+
+        # Anomaly evaluation
+        detail = anomaly_engine.analyze_commodity(db, commodity)
+        metrics = detail.metrics
+
+        results.append({
+            "commodity_id": commodity.id,
+            "canonical_name": commodity.canonical_name,
+            "bangla_name": commodity.bangla_name,
+            "category": commodity.category,
+            "unit": commodity.default_unit,
+            "retail_price": retail_price or (metrics.current_price if metrics else None),
+            "wholesale_price": wholesale_price,
+            "spread_bdt": spread_bdt,
+            "spread_pct": spread_pct,
+            "baseline_sma_14d": metrics.baseline_sma_14d if metrics else None,
+            "delta_pct": metrics.percentage_change_14d if metrics else None,
+            "z_score": metrics.z_score_14d if metrics else None,
+            "volatility_cv": metrics.volatility_cv if metrics else None,
+            "is_anomaly": detail.is_anomaly,
+            "severity": detail.anomaly_severity,
+            "direction": detail.anomaly_direction,
+        })
+
+
+    return {
+        "total_compared": len(results),
+        "district_id": district_id,
+        "items": results,
+    }
+
+
+@router.get(
     "/{commodity_id}",
+
     response_model=CommodityDetailOut,
     summary="Get Commodity Details",
     description="Retrieve details and registered alias mappings for a specific canonical commodity.",

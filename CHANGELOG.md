@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-09-28
+
+### Added
+- **Essential Protein & Pulse Taxonomy Expansion**:
+  - Expanded canonical taxonomy with 4 core daily staples: **Broiler Chicken** (`ব্রয়লার মুরগি` - kg), **Farm Egg** (`ফার্মের ডিম` - pc), **Masur Dal (Medium)** (`মসুর ডাল (মাঝারি)` - kg), and **Garlic (Local)** (`দেশি রসুন` - kg).
+  - Enriched bilingual alias mappings covering phonetic variants and regional culinary expressions.
+  - Enhanced unit normalizer supporting customary discrete units (`হালি` -> 4 pcs, `ডজন` -> 12 pcs), fractions (`1/2 dozen`, `হাফ ডজন` -> 6 pcs), and Bengali numerals (`১ হালি`, `২ হালি`).
+- **Human-in-the-Loop Spot Price Ingestion API**:
+  - `POST /api/v1/observations/manual`: endpoint accepting authenticated field market reports with Pydantic validation (`price > 0`, valid commodity and market keys).
+  - Dynamic unit standardization translating customary trading units to SI metric equivalents.
+  - Calibrated Tier 4 confidence scoring applying a 0.60 publisher reliability scalar to prevent outlier poisoning until peer corroborated.
+  - Idempotent record persistence updating same-day quotes or logging new price observation records.
+- **Interactive Multi-Commodity Comparison Matrix**:
+  - Dedicated **Compare Markets** view (`ComparisonView.jsx`) enabling side-by-side comparative analysis of up to 3 commodities.
+  - Side-by-side metric comparison across retail vs wholesale price spreads, 14-day SMA baselines, percentage deltas ($\Delta\%$), volatility indices (CV%), and anomaly classifications.
+  - District-level spatial filtering for comparative inter-regional arbitrage analysis.
+  - Backend analytical endpoint `GET /api/v1/commodities/compare` powering sub-25ms matrix computations.
+- **Manual Price Reporting Modal**:
+  - Interactive modal dialog (`ManualIngestionModal.jsx`) triggered via the `+ Report Price` button in the navigation header.
+  - Live unit conversion preview estimating standardized price per base unit in real-time.
+- **Automated Verification Suite**:
+  - Added `tests/test_manual_ingestion.py` verifying validation rules, persistence, and confidence calculation.
+  - Added `tests/test_expanded_taxonomy.py` testing customary unit conversions and bilingual entity resolution (expanding test suite from 47 to 70 passing tests).
+
 ## [1.0.0] - 2026-09-28
 
 ### Added

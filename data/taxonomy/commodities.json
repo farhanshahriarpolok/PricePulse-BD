@@ -109,5 +109,85 @@
       {"alias": "soybean oil (bottled)", "language": "en", "weight": 1.0},
       {"alias": "soybean oil", "language": "en", "weight": 0.90}
     ]
+  },
+  {
+    "canonical_name": "Broiler Chicken",
+    "bangla_name": "ব্রয়লার মুরগি",
+    "category": "Meat & Poultry",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "ব্রয়লার মুরগি", "language": "bn", "weight": 1.0},
+      {"alias": "ব্রয়লার মুরগি", "language": "bn", "weight": 1.0},
+      {"alias": "ব্রয়লার মুরগী", "language": "bn", "weight": 0.98},
+      {"alias": "ব্রয়লার", "language": "bn", "weight": 0.95},
+      {"alias": "মুরগি (ব্রয়লার)", "language": "bn", "weight": 0.98},
+      {"alias": "মুরগি", "language": "bn", "weight": 0.85},
+      {"alias": "broiler chicken", "language": "en", "weight": 1.0},
+      {"alias": "chicken broiler", "language": "en", "weight": 0.95},
+      {"alias": "broiler", "language": "en", "weight": 0.90},
+      {"alias": "chicken", "language": "en", "weight": 0.85},
+      {"alias": "broiler murgi", "language": "phonetic", "weight": 0.95},
+      {"alias": "murgi", "language": "phonetic", "weight": 0.85}
+    ]
+  },
+  {
+    "canonical_name": "Farm Egg",
+    "bangla_name": "ফার্মের ডিম",
+    "category": "Eggs & Dairy",
+    "default_unit": "pc",
+    "aliases": [
+      {"alias": "ফার্মের ডিম", "language": "bn", "weight": 1.0},
+      {"alias": "ফার্মের মুরগির ডিম", "language": "bn", "weight": 0.98},
+      {"alias": "মুরগির ডিম", "language": "bn", "weight": 0.95},
+      {"alias": "ডিম (ফার্ম)", "language": "bn", "weight": 0.98},
+      {"alias": "ডিম", "language": "bn", "weight": 0.85},
+      {"alias": "লাল ডিম", "language": "bn", "weight": 0.90},
+      {"alias": "farm egg", "language": "en", "weight": 1.0},
+      {"alias": "egg (farm)", "language": "en", "weight": 0.98},
+      {"alias": "chicken egg", "language": "en", "weight": 0.95},
+      {"alias": "egg", "language": "en", "weight": 0.85},
+      {"alias": "eggs", "language": "en", "weight": 0.85},
+      {"alias": "dim", "language": "phonetic", "weight": 0.85},
+      {"alias": "farm er dim", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Masur Dal (Medium)",
+    "bangla_name": "মসুর ডাল (মাঝারি)",
+    "category": "Pulses",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "মসুর ডাল (মাঝারি)", "language": "bn", "weight": 1.0},
+      {"alias": "মসুর ডাল", "language": "bn", "weight": 0.95},
+      {"alias": "মশুর ডাল", "language": "bn", "weight": 0.92},
+      {"alias": "ডাল (মসুর)", "language": "bn", "weight": 0.98},
+      {"alias": "মাঝারি মসুর ডাল", "language": "bn", "weight": 0.95},
+      {"alias": "ডাল", "language": "bn", "weight": 0.80},
+      {"alias": "masur dal (medium)", "language": "en", "weight": 1.0},
+      {"alias": "masur dal", "language": "en", "weight": 0.95},
+      {"alias": "masoor dal", "language": "en", "weight": 0.95},
+      {"alias": "medium masur dal", "language": "en", "weight": 0.95},
+      {"alias": "red lentil", "language": "en", "weight": 0.90},
+      {"alias": "lentil", "language": "en", "weight": 0.85}
+    ]
+  },
+  {
+    "canonical_name": "Garlic (Local)",
+    "bangla_name": "দেশি রসুন",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "দেশি রসুন", "language": "bn", "weight": 1.0},
+      {"alias": "দেশী রসুন", "language": "bn", "weight": 0.98},
+      {"alias": "রসুন (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "রসুন", "language": "bn", "weight": 0.85},
+      {"alias": "দেশি রশুন", "language": "bn", "weight": 0.92},
+      {"alias": "local garlic", "language": "en", "weight": 0.95},
+      {"alias": "garlic (local)", "language": "en", "weight": 1.0},
+      {"alias": "garlic local", "language": "en", "weight": 0.95},
+      {"alias": "deshi roshun", "language": "phonetic", "weight": 0.95},
+      {"alias": "garlic deshi", "language": "en", "weight": 0.95},
+      {"alias": "roshun", "language": "phonetic", "weight": 0.85}
+    ]
   }
 ]

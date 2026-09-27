@@ -64,11 +64,27 @@ class CommodityNormalizer:
         "pcs": ("pc", 1.0),
         "পিস": ("pc", 1.0),
         "টি": ("pc", 1.0),
+        "টা": ("pc", 1.0),
         "হালি": ("pc", 4.0),
         "hali": ("pc", 4.0),
         "ডজন": ("pc", 12.0),
         "dozen": ("pc", 12.0),
+        "doz": ("pc", 12.0),
+        "হাফডজন": ("pc", 6.0),
+        "halfdozen": ("pc", 6.0),
+        "1/2ডজন": ("pc", 6.0),
+        "1/2dozen": ("pc", 6.0),
+        "0.5ডজন": ("pc", 6.0),
+        "0.5dozen": ("pc", 6.0),
+        "১/২ডজন": ("pc", 6.0),
+        "০.৫ডজন": ("pc", 6.0),
     }
+
+    def reload(self) -> None:
+        """Clear and re-read taxonomy seeds from disk."""
+        self._alias_index.clear()
+        self._canonical_list.clear()
+        self._load_taxonomy()
 
     def __init__(self, taxonomy_file: Optional[Path] = None):
         self.taxonomy_file = taxonomy_file or (settings.taxonomy_dir / "commodities.json")
@@ -167,31 +183,58 @@ class CommodityNormalizer:
     def normalize_unit(self, raw_unit: str) -> Tuple[str, float]:
         """
         Normalize unit string to canonical base unit and price multiplier.
-        Supports compound packaging units such as '5 kg', '500 gm', '2 liter'.
+        Supports compound packaging units such as '5 kg', '500 gm', '2 liter',
+        '1 hali', '1/2 dozen', 'হাফ ডজন', '১/২ ডজন'.
         Returns: (base_unit, multiplier_to_base)
         Raises: ValueError if unit is unmapped.
         """
         cleaned = self._clean_text(raw_unit).replace(" ", "")
         if cleaned in self.UNIT_MAP:
             return self.UNIT_MAP[cleaned]
-        # Attempt lowercase match
-        lower_raw = raw_unit.strip().lower()
-        if lower_raw in self.UNIT_MAP:
-            return self.UNIT_MAP[lower_raw]
 
-        # Check for numeric quantity prefix (e.g., '5 kg', '500 gm', '2 liter')
-        prefix_match = re.match(r"^(\d+(?:\.\d+)?)\s*(.+)$", lower_raw)
-        if prefix_match:
-            qty_str, unit_part = prefix_match.groups()
-            cleaned_unit = self._clean_text(unit_part).replace(" ", "")
-            if cleaned_unit in self.UNIT_MAP:
-                base_unit, base_mult = self.UNIT_MAP[cleaned_unit]
-                return base_unit, float(qty_str) * base_mult
+        # Transliterate Bengali numerals to standard ASCII digits
+        bn_to_en = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+        trans_raw = raw_unit.translate(bn_to_en).strip().lower()
+
+        # Direct lowercase/transliterated match
+        trans_cleaned = self._clean_text(trans_raw).replace(" ", "")
+        if trans_cleaned in self.UNIT_MAP:
+            return self.UNIT_MAP[trans_cleaned]
+        if trans_raw in self.UNIT_MAP:
+            return self.UNIT_MAP[trans_raw]
+
+        # Handle colloquial 'half' or 'হাফ' prefix (e.g. 'half dozen', 'হাফ ডজন')
+        half_pattern = re.match(r"^(?:half|হাফ)\s*(.+)$", trans_raw)
+        if half_pattern:
+            unit_part = half_pattern.group(1).strip()
+            unit_cleaned = self._clean_text(unit_part).replace(" ", "")
+            if unit_cleaned in self.UNIT_MAP:
+                base_unit, base_mult = self.UNIT_MAP[unit_cleaned]
+                return base_unit, 0.5 * base_mult
+            if unit_part in self.UNIT_MAP:
+                base_unit, base_mult = self.UNIT_MAP[unit_part]
+                return base_unit, 0.5 * base_mult
+
+        # Check for fractional or decimal quantity prefix (e.g. '1/2 dozen', '5 kg', '0.5 dozen')
+        fraction_match = re.match(r"^(\d+\s*/\s*\d+|\d+(?:\.\d+)?)\s*(.+)$", trans_raw)
+        if fraction_match:
+            qty_expr, unit_part = fraction_match.groups()
+            if "/" in qty_expr:
+                num, denom = qty_expr.split("/")
+                qty_val = float(num.strip()) / float(denom.strip())
+            else:
+                qty_val = float(qty_expr.strip())
+
+            unit_cleaned = self._clean_text(unit_part).replace(" ", "")
+            if unit_cleaned in self.UNIT_MAP:
+                base_unit, base_mult = self.UNIT_MAP[unit_cleaned]
+                return base_unit, qty_val * base_mult
             if unit_part.strip() in self.UNIT_MAP:
                 base_unit, base_mult = self.UNIT_MAP[unit_part.strip()]
-                return base_unit, float(qty_str) * base_mult
+                return base_unit, qty_val * base_mult
 
         raise ValueError(f"Unknown or unsupported unit: '{raw_unit}'")
+
 
     def normalize_price(self, raw_price: float, raw_unit: str) -> Tuple[float, str]:
         """

@@ -42,3 +42,11 @@ export const getLocationSpread = (commodityId, date = null) => {
 };
 
 export const getLocationHierarchy = () => apiClient.get('/locations/hierarchy');
+
+export const submitManualObservation = (payload) => apiClient.post('/observations/manual', payload);
+
+export const getComparisonData = (params) => {
+  // params: { ids: '1,2,3', district_id: null }
+  return apiClient.get('/commodities/compare', { params });
+};
+

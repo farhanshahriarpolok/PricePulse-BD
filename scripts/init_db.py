@@ -141,6 +141,32 @@ def seed_commodities(session):
     print(f"   Seeded commodities: {comm_count} commodities, {alias_count} aliases.")
 
 
+def seed_sources(session):
+    """Seed default publisher sources and field reporter source."""
+    default_sources = [
+        {"code": "dam_bulletin", "name": "Department of Agricultural Marketing (DAM)", "source_type": "government", "reliability_score": 0.90},
+        {"code": "tcb_bulletin", "name": "Trading Corporation of Bangladesh (TCB)", "source_type": "government", "reliability_score": 0.88},
+        {"code": "chaldal_retail", "name": "Chaldal Online Grocery", "source_type": "digital_retail", "reliability_score": 0.85},
+        {"code": "field_report", "name": "Field Spot Report (Manual)", "source_type": "field_report", "reliability_score": 0.60},
+    ]
+    src_count = 0
+    for s_data in default_sources:
+        stmt = select(Source).where(Source.code == s_data["code"])
+        src = session.scalars(stmt).first()
+        if not src:
+            src = Source(
+                code=s_data["code"],
+                name=s_data["name"],
+                source_type=s_data["source_type"],
+                reliability_score=s_data["reliability_score"],
+            )
+            session.add(src)
+            src_count += 1
+    session.commit()
+    if src_count > 0:
+        print(f"   Seeded sources: {src_count} data sources.")
+
+
 def main():
     print("=== PricePulse BD: Database Initialization ===")
     init_schema()
@@ -150,8 +176,11 @@ def main():
         seed_locations(session)
         print("-> Seeding canonical commodity taxonomy & aliases...")
         seed_commodities(session)
+        print("-> Seeding data publishers and sources...")
+        seed_sources(session)
 
     print("=== Database initialization completed successfully ===")
+
 
 
 if __name__ == "__main__":
