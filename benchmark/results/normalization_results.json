@@ -1,0 +1,65 @@
+{
+  "benchmark": "normalization",
+  "results": {
+    "Exact Bengali": {
+      "sample_size": 40,
+      "TP": 11,
+      "FP": 4,
+      "FN": 15,
+      "TN": 10,
+      "precision": 73.3,
+      "recall": 42.3,
+      "f1_score": 0.537,
+      "avg_latency_ms": 0.012,
+      "p95_latency_ms": 0.022
+    },
+    "Phonetic Variant": {
+      "sample_size": 35,
+      "TP": 21,
+      "FP": 2,
+      "FN": 12,
+      "TN": 0,
+      "precision": 91.3,
+      "recall": 63.6,
+      "f1_score": 0.75,
+      "avg_latency_ms": 0.005,
+      "p95_latency_ms": 0.013
+    },
+    "Complex Packaged": {
+      "sample_size": 30,
+      "TP": 20,
+      "FP": 1,
+      "FN": 9,
+      "TN": 0,
+      "precision": 95.2,
+      "recall": 69.0,
+      "f1_score": 0.8,
+      "avg_latency_ms": 0.007,
+      "p95_latency_ms": 0.009
+    },
+    "Out-of-Domain": {
+      "sample_size": 15,
+      "TP": 0,
+      "FP": 0,
+      "FN": 0,
+      "TN": 15,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "avg_latency_ms": 0.007,
+      "p95_latency_ms": 0.007
+    },
+    "Overall": {
+      "sample_size": 120,
+      "TP": 52,
+      "FP": 7,
+      "FN": 36,
+      "TN": 25,
+      "precision": 88.1,
+      "recall": 59.1,
+      "f1_score": 0.707,
+      "avg_latency_ms": 0.008,
+      "p95_latency_ms": 0.015
+    }
+  }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PricePulse BD</string>
+    <string name="label_today_pulse">Today\'s Price Pulse</string>
+    <string name="label_anomalies">Market Anomalies</string>
+    <string name="label_commodities">Commodities</string>
+    <string name="label_field_report">Report a Price</string>
+    <string name="label_price_bdt">BDT</string>
+    <string name="label_confidence">Confidence</string>
+    <string name="label_per_kg">per kg</string>
+    <string name="label_wholesale">Wholesale</string>
+    <string name="label_retail">Retail</string>
+    <string name="error_network">Could not reach the PricePulse server. Check your connection.</string>
+    <string name="info_no_data">No data available for today. Tap refresh to fetch latest prices.</string>
+</resources>
