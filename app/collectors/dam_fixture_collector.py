@@ -18,8 +18,9 @@ class DAMFixtureCollector(BaseCollector):
     source_type = "government"
     reliability_score = 0.95
 
-    def __init__(self, fixture_path: Optional[Path] = None):
+    def __init__(self, fixture_path: Optional[Path] = None, target_date: Optional[date] = None):
         self.fixture_path = fixture_path or (settings.fixtures_dir / "dam_bulletin_sample.html")
+        self.target_date = target_date
 
     def collect(self) -> List[RawObservation]:
         """Parse HTML fixture and yield raw observations for all markets and commodities."""
@@ -29,14 +30,17 @@ class DAMFixtureCollector(BaseCollector):
         with open(self.fixture_path, "r", encoding="utf-8") as f:
             soup = BeautifulSoup(f.read(), "html.parser")
 
-        # Extract bulletin date
-        date_elem = soup.find(class_="bulletin-date")
-        obs_date = date.today()
-        if date_elem and date_elem.get("data-date"):
-            try:
-                obs_date = datetime.strptime(date_elem["data-date"], "%Y-%m-%d").date()
-            except ValueError:
-                pass
+        # Extract bulletin date or use target_date if specified
+        if self.target_date:
+            obs_date = self.target_date
+        else:
+            date_elem = soup.find(class_="bulletin-date")
+            obs_date = date.today()
+            if date_elem and date_elem.get("data-date"):
+                try:
+                    obs_date = datetime.strptime(date_elem["data-date"], "%Y-%m-%d").date()
+                except ValueError:
+                    pass
 
         observations: List[RawObservation] = []
 

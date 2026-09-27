@@ -1,0 +1,104 @@
+{
+  "store": "Chaldal Online Grocery",
+  "market_name": "Chaldal Online Hub",
+  "catalog_date": "2026-09-28",
+  "currency": "BDT",
+  "items": [
+    {
+      "product_id": "chaldal-101",
+      "name": "Onion (Deshi) 1 kg",
+      "category": "Fresh Vegetables",
+      "price": 105.00,
+      "package_unit": "1 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-102",
+      "name": "Deshi Peyaj 500 gm",
+      "category": "Fresh Vegetables",
+      "price": 55.00,
+      "package_unit": "500 gm",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-103",
+      "name": "Imported Onion 1 kg",
+      "category": "Fresh Vegetables",
+      "price": 85.00,
+      "package_unit": "1 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-104",
+      "name": "Imported Onion 2 kg Pack",
+      "category": "Fresh Vegetables",
+      "price": 165.00,
+      "package_unit": "2 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-105",
+      "name": "Diamond Potato 1 kg",
+      "category": "Fresh Vegetables",
+      "price": 55.00,
+      "package_unit": "1 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-106",
+      "name": "Diamond Potato 2 kg Net Bag",
+      "category": "Fresh Vegetables",
+      "price": 105.00,
+      "package_unit": "2 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-107",
+      "name": "Miniket Rice Premium 5 kg Bag",
+      "category": "Rice & Grains",
+      "price": 395.00,
+      "package_unit": "5 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-108",
+      "name": "Miniket Rice 1 kg Packet",
+      "category": "Rice & Grains",
+      "price": 82.00,
+      "package_unit": "1 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-109",
+      "name": "Nazirshail Rice 5 kg Pack",
+      "category": "Rice & Grains",
+      "price": 430.00,
+      "package_unit": "5 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-110",
+      "name": "Coarse Rice (Mota Chal) 5 kg",
+      "category": "Rice & Grains",
+      "price": 285.00,
+      "package_unit": "5 kg",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-111",
+      "name": "Teer Pure Soybean Oil 1 Liter",
+      "category": "Oil & Ghee",
+      "price": 167.00,
+      "package_unit": "1 liter",
+      "in_stock": true
+    },
+    {
+      "product_id": "chaldal-112",
+      "name": "Rupchanda Fortified Soybean Oil 2 Liter",
+      "category": "Oil & Ghee",
+      "price": 332.00,
+      "package_unit": "2 liter",
+      "in_stock": true
+    }
+  ]
+}

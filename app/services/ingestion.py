@@ -135,7 +135,14 @@ class IngestionPipeline:
             existing_obs = self.db.scalars(existing_stmt).first()
 
             if existing_obs:
-                if score >= existing_obs.confidence_score:
+                if existing_obs.raw_name != raw.raw_commodity_name:
+                    # Multi-SKU package averaging for retail offerings (e.g., 1kg vs 2kg packs)
+                    existing_obs.normalized_price = round(
+                        (existing_obs.normalized_price + norm_price) / 2.0, 2
+                    )
+                    existing_obs.confidence_score = max(existing_obs.confidence_score, score)
+                    updated_count += 1
+                elif score >= existing_obs.confidence_score:
                     existing_obs.raw_name = raw.raw_commodity_name
                     existing_obs.raw_price = raw.raw_price
                     existing_obs.raw_unit = raw.raw_unit
@@ -160,6 +167,7 @@ class IngestionPipeline:
                     confidence_score=score,
                 )
                 self.db.add(new_obs)
+                self.db.flush()
                 inserted_count += 1
 
         self.db.commit()

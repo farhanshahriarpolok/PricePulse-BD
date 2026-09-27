@@ -1,22 +1,164 @@
 # PricePulse BD REST API Specification
 
-## 1. Overview & Mobile Readiness
+## 1. Architectural Overview & Mobile-First Principles
 
-The PricePulse BD API serves normalized commodity prices and spatial market hierarchies over standard HTTP/JSON. The interface is designed to support both modern responsive web applications and native Android clients (Retrofit + Kotlinx Serialization / Gson).
+The PricePulse BD API serves normalized commodity prices, daily market intelligence pulses, and spatial market hierarchies over HTTP/JSON. The interface is optimized for high-performance consumption by:
+- **Responsive Web Portals** (React, Vue, or Vanilla JS)
+- **Native Android Clients** (Kotlin + Retrofit + Kotlinx Serialization / Gson)
 
+### Protocol Conventions
 - **Base URL**: `/api/v1`
-- **Protocol**: HTTP/1.1 or HTTP/2, JSON UTF-8
-- **Error Format**: RFC 7807 Problem Details compliant JSON
-- **Date Format**: ISO 8601 extended format (`YYYY-MM-DD` and `YYYY-MM-DDTHH:MM:SSZ`)
+- **Content-Type**: `application/json; charset=utf-8`
+- **Error Standard**: RFC 7807 Problem Details compliant JSON
+- **Date/Time Formatting**: ISO 8601 (`YYYY-MM-DD` and `YYYY-MM-DDTHH:MM:SSZ`)
+- **Currency**: Bangladeshi Taka (`BDT`)
+- **Metric Base Units**: `kg`, `liter`, `pc`
 
 ---
 
-## 2. API Endpoints
+## 2. System Endpoints
 
-### 2.1 Commodities Catalog
+### `GET /api/v1/health`
+Verifies backend service availability and database connectivity.
 
-#### `GET /api/v1/commodities`
-Retrieves all registered canonical commodities with localized names and categories.
+**Response (`200 OK`):**
+```json
+{
+  "status": "ok",
+  "app": "PricePulse BD",
+  "version": "0.2.0",
+  "timestamp": "2026-09-28T02:00:00Z"
+}
+```
+
+---
+
+## 3. Realtime Price Discovery & Market Pulse
+
+### `GET /api/v1/search/realtime`
+Performs an on-demand commodity price discovery query.
+> **On-Demand Fallback Invariant**: If the requested date has no recorded observations or cached data is older than 12 hours, the service automatically triggers background collectors (DAM bulletin parser and Chaldal retail collector) and serves the normalized live pulse.
+
+**Query Parameters:**
+- `query` (required, string): Commodity label in English or Bengali (e.g., `onion`, `আলু`, `মিনিকেট`).
+- `date` (optional, string, `YYYY-MM-DD`): Target observation date. Defaults to today's date.
+
+**Response (`200 OK`):**
+```json
+{
+  "query": "onion",
+  "canonical_name": "Onion (Local)",
+  "bangla_name": "দেশি পেঁয়াজ",
+  "category": "Vegetables",
+  "unit": "kg",
+  "observation_date": "2026-09-28",
+  "price_summary": {
+    "min_price": 82.0,
+    "max_price": 110.0,
+    "avg_price": 91.0,
+    "currency": "BDT",
+    "sample_count": 9
+  },
+  "channels": {
+    "wholesale_avg": 86.0,
+    "retail_avg": 96.5,
+    "online_avg": 110.0,
+    "spread_bdt": 10.5,
+    "markup_percentage": 12.21
+  },
+  "price_status": "Normal",
+  "freshness": {
+    "status": "fresh",
+    "last_scraped_at": "2026-09-28T02:05:00Z",
+    "is_stale": false,
+    "cache_age_seconds": 120
+  },
+  "observations": [
+    {
+      "id": 45,
+      "commodity_name": "Onion (Local)",
+      "market_name": "Karwan Bazar",
+      "market_type": "wholesale",
+      "source_name": "Department of Agricultural Marketing",
+      "price_type": "retail_avg",
+      "raw_price": 95.0,
+      "raw_unit": "কেজি",
+      "normalized_price": 95.0,
+      "normalized_unit": "kg",
+      "currency": "BDT",
+      "confidence_score": 0.935,
+      "observation_date": "2026-09-28",
+      "scraped_at": "2026-09-28T02:05:00Z"
+    },
+    {
+      "id": 89,
+      "commodity_name": "Onion (Local)",
+      "market_name": "Chaldal Online Hub",
+      "market_type": "online",
+      "source_name": "Chaldal Online Grocery",
+      "price_type": "retail_avg",
+      "raw_price": 55.0,
+      "raw_unit": "500 gm",
+      "normalized_price": 110.0,
+      "normalized_unit": "kg",
+      "currency": "BDT",
+      "confidence_score": 0.8868,
+      "observation_date": "2026-09-28",
+      "scraped_at": "2026-09-28T02:05:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### `GET /api/v1/pulse/today`
+Returns the macro commodity pulse for all tracked daily essentials.
+
+**Response (`200 OK`):**
+```json
+{
+  "date": "2026-09-28",
+  "total_tracked": 7,
+  "items": [
+    {
+      "commodity_id": 1,
+      "canonical_name": "Onion (Local)",
+      "bangla_name": "দেশি পেঁয়াজ",
+      "category": "Vegetables",
+      "unit": "kg",
+      "price_summary": {
+        "min_price": 82.0,
+        "max_price": 110.0,
+        "avg_price": 91.0,
+        "currency": "BDT",
+        "sample_count": 9
+      },
+      "channels": {
+        "wholesale_avg": 86.0,
+        "retail_avg": 96.5,
+        "online_avg": 110.0,
+        "spread_bdt": 10.5,
+        "markup_percentage": 12.21
+      },
+      "price_status": "Normal",
+      "freshness": {
+        "status": "fresh",
+        "last_scraped_at": "2026-09-28T02:05:00Z",
+        "is_stale": false,
+        "cache_age_seconds": 0
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 4. Commodities Catalog & Time-Series History
+
+### `GET /api/v1/commodities`
+Lists all canonical commodities in the taxonomy.
 
 **Query Parameters:**
 - `category` (optional, string): Filter by category (e.g., `Vegetables`, `Grains`, `Edible Oils`).
@@ -35,9 +177,9 @@ Retrieves all registered canonical commodities with localized names and categori
     },
     {
       "id": 2,
-      "canonical_name": "Rice (Miniket)",
-      "bangla_name": "মিনিকেট চাল",
-      "category": "Grains",
+      "canonical_name": "Onion (Imported)",
+      "bangla_name": "আমদানি পেঁয়াজ",
+      "category": "Vegetables",
       "default_unit": "kg"
     }
   ]
@@ -46,113 +188,61 @@ Retrieves all registered canonical commodities with localized names and categori
 
 ---
 
-### 2.2 Markets & Spatial Hierarchy
-
-#### `GET /api/v1/markets`
-Retrieves physical and online retail/wholesale markets across administrative divisions.
-
-**Query Parameters:**
-- `division` (optional, string): Filter by division name (e.g., `Dhaka`, `Chittagong`).
-- `market_type` (optional, string): Filter by type (`wholesale`, `retail`, `online`).
+### `GET /api/v1/commodities/{id}`
+Returns commodity details and all registered bilingual alias mappings.
 
 **Response (`200 OK`):**
 ```json
 {
-  "total": 2,
-  "items": [
-    {
-      "id": 1,
-      "name": "Karwan Bazar",
-      "bangla_name": "কারওয়ান বাজার",
-      "market_type": "wholesale",
-      "district": "Dhaka",
-      "division": "Dhaka",
-      "coordinates": {
-        "latitude": 23.7516,
-        "longitude": 90.3944
-      }
-    },
-    {
-      "id": 2,
-      "name": "Khatunganj",
-      "bangla_name": "খাতুনগঞ্জ",
-      "market_type": "wholesale",
-      "district": "Chattogram",
-      "division": "Chittagong",
-      "coordinates": {
-        "latitude": 22.3362,
-        "longitude": 91.8365
-      }
-    }
-  ]
-}
-```
-
----
-
-### 2.3 Latest Price Observations
-
-#### `GET /api/v1/prices/latest`
-Returns the most recent price observation for a commodity, optionally scoped to a market.
-
-**Query Parameters:**
-- `commodity_id` (required, integer): Canonical commodity ID.
-- `market_id` (optional, integer): Specific market ID.
-
-**Response (`200 OK`):**
-```json
-{
-  "commodity_id": 1,
+  "id": 1,
   "canonical_name": "Onion (Local)",
   "bangla_name": "দেশি পেঁয়াজ",
-  "observation_date": "2026-09-27",
-  "prices": [
-    {
-      "market_id": 1,
-      "market_name": "Karwan Bazar",
-      "price_type": "retail_avg",
-      "normalized_price": 95.0,
-      "normalized_unit": "kg",
-      "currency": "BDT",
-      "confidence_score": 0.92,
-      "source_name": "Department of Agricultural Marketing"
-    }
+  "category": "Vegetables",
+  "default_unit": "kg",
+  "aliases": [
+    "দেশি পেঁয়াজ",
+    "দেশি পেঁয়াজ",
+    "দেশী পেঁয়াজ",
+    "পেঁয়াজ (দেশি)",
+    "deshi peyaj",
+    "local onion",
+    "onion local",
+    "onion (deshi)",
+    "onion deshi"
   ]
 }
 ```
 
 ---
 
-### 2.4 Time-Series Price History
-
-#### `GET /api/v1/prices/history`
-Returns historical price time-series for trend graphing in web and Android charting libraries (e.g., MPAndroidChart).
+### `GET /api/v1/commodities/{id}/history`
+Returns aggregated historical daily price curves for Android (MPAndroidChart) or Web charts.
 
 **Query Parameters:**
-- `commodity_id` (required, integer): Canonical commodity ID.
-- `market_id` (optional, integer): Target market ID.
-- `start_date` (required, string, `YYYY-MM-DD`): Start date.
-- `end_date` (optional, string, `YYYY-MM-DD`): End date (defaults to current date).
+- `start_date` (optional, string, `YYYY-MM-DD`)
+- `end_date` (optional, string, `YYYY-MM-DD`)
+- `market_id` (optional, integer)
 
 **Response (`200 OK`):**
 ```json
 {
   "commodity_id": 1,
   "canonical_name": "Onion (Local)",
-  "market_id": 1,
-  "market_name": "Karwan Bazar",
+  "unit": "kg",
   "series": [
     {
-      "date": "2026-09-20",
-      "retail_avg": 90.0,
-      "wholesale_avg": 82.5,
-      "confidence": 0.91
+      "date": "2026-09-27",
+      "avg_price": 88.5,
+      "min_price": 82.0,
+      "max_price": 98.0,
+      "sample_count": 8
     },
     {
-      "date": "2026-09-27",
-      "retail_avg": 95.0,
-      "wholesale_avg": 86.0,
-      "confidence": 0.93
+      "date": "2026-09-28",
+      "avg_price": 91.0,
+      "min_price": 82.0,
+      "max_price": 110.0,
+      "sample_count": 9
     }
   ]
 }
@@ -160,41 +250,57 @@ Returns historical price time-series for trend graphing in web and Android chart
 
 ---
 
-### 2.5 Ingestion Trigger (Administrative)
+## 5. Android Retrofit Integration Guide
 
-#### `POST /api/v1/ingest/trigger`
-Triggers an asynchronous harvest run for a specified source collector.
+Android mobile developers can bind these endpoints using standard Retrofit interfaces:
 
-**Request Body:**
-```json
-{
-  "source_code": "DAM_DAILY",
-  "force_refresh": false
-}
-```
+```kotlin
+// PricePulseApi.kt
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
-**Response (`202 Accepted`):**
-```json
-{
-  "status": "queued",
-  "job_id": "ingest_dam_20260928_01",
-  "message": "Collector DAM_DAILY dispatched successfully."
+interface PricePulseApi {
+
+    @GET("api/v1/health")
+    suspend fun getHealth(): HealthResponse
+
+    @GET("api/v1/search/realtime")
+    suspend fun searchRealtime(
+        @Query("query") query: String,
+        @Query("date") date: String? = null
+    ): RealtimePriceResponse
+
+    @GET("api/v1/pulse/today")
+    suspend fun getDailyPulse(): DailyPulseResponse
+
+    @GET("api/v1/commodities")
+    suspend fun getCommodities(
+        @Query("category") category: String? = null
+    ): CommodityListResponse
+
+    @GET("api/v1/commodities/{id}/history")
+    suspend fun getCommodityHistory(
+        @Path("id") commodityId: Int,
+        @Query("start_date") startDate: String? = null,
+        @Query("end_date") endDate: String? = null
+    ): CommodityHistoryResponse
 }
 ```
 
 ---
 
-## 3. Error Contract
+## 6. Error Response Schema (RFC 7807)
 
-When a request encounters an error, the API responds with standard HTTP status codes and a structured body:
+When validation fails or an unknown resource is requested, the API returns a structured error object:
 
 ```json
 {
   "error": {
     "code": "NOT_FOUND",
-    "message": "Commodity with id 999 does not exist.",
+    "message": "Commodity 'unknown_item' could not be resolved in the canonical taxonomy.",
     "status": 404,
-    "timestamp": "2026-09-28T01:50:00Z"
+    "timestamp": "2026-09-28T02:00:00Z"
   }
 }
 ```

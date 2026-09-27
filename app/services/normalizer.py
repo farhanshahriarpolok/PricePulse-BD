@@ -167,6 +167,7 @@ class CommodityNormalizer:
     def normalize_unit(self, raw_unit: str) -> Tuple[str, float]:
         """
         Normalize unit string to canonical base unit and price multiplier.
+        Supports compound packaging units such as '5 kg', '500 gm', '2 liter'.
         Returns: (base_unit, multiplier_to_base)
         Raises: ValueError if unit is unmapped.
         """
@@ -177,6 +178,19 @@ class CommodityNormalizer:
         lower_raw = raw_unit.strip().lower()
         if lower_raw in self.UNIT_MAP:
             return self.UNIT_MAP[lower_raw]
+
+        # Check for numeric quantity prefix (e.g., '5 kg', '500 gm', '2 liter')
+        prefix_match = re.match(r"^(\d+(?:\.\d+)?)\s*(.+)$", lower_raw)
+        if prefix_match:
+            qty_str, unit_part = prefix_match.groups()
+            cleaned_unit = self._clean_text(unit_part).replace(" ", "")
+            if cleaned_unit in self.UNIT_MAP:
+                base_unit, base_mult = self.UNIT_MAP[cleaned_unit]
+                return base_unit, float(qty_str) * base_mult
+            if unit_part.strip() in self.UNIT_MAP:
+                base_unit, base_mult = self.UNIT_MAP[unit_part.strip()]
+                return base_unit, float(qty_str) * base_mult
+
         raise ValueError(f"Unknown or unsupported unit: '{raw_unit}'")
 
     def normalize_price(self, raw_price: float, raw_unit: str) -> Tuple[float, str]:

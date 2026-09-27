@@ -13,7 +13,10 @@
       {"alias": "deshi peyaj", "language": "phonetic", "weight": 0.95},
       {"alias": "local onion", "language": "en", "weight": 0.95},
       {"alias": "onion (local)", "language": "en", "weight": 1.0},
-      {"alias": "onion local", "language": "en", "weight": 0.95}
+      {"alias": "onion local", "language": "en", "weight": 0.95},
+      {"alias": "onion (deshi)", "language": "en", "weight": 0.98},
+      {"alias": "onion deshi", "language": "en", "weight": 0.98},
+      {"alias": "deshi onion", "language": "en", "weight": 0.95}
     ]
   },
   {

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-28
+
+### Added
+- **Realtime Price Search & On-Demand Ingestion**:
+  - `RealtimePriceService` providing automatic collector fallback when observations are absent or cached records exceed 12 hours.
+  - Multi-tier freshness markers (`fresh`, `stale`, `realtime_ingested`, `historical`) and cache age metrics.
+- **Retail Catalog Collector (Chaldal)**:
+  - `ChaldalCollector` and realistic retail fixture (`chaldal_catalog_sample.json`) supporting commercial packet sizes (`1 kg`, `500 gm`, `2 kg`, `5 kg`, `1 liter`, `2 liter`).
+  - Multi-SKU package price averaging for retail product varieties.
+- **Market Analytics & Spread Engine**:
+  - `AnalyticsService` calculating price ranges (`min`, `max`, `avg`), wholesale vs physical retail vs online grocery channel breakdowns, and price pressure classifications (`Normal`, `Elevated`, `High`).
+- **REST API Routers & FastAPI Application**:
+  - Production FastAPI app factory with CORS middleware, lifespan events, and global RFC 7807 problem details error handling.
+  - `GET /api/v1/health` and `/health` system status endpoints.
+  - `GET /api/v1/search/realtime` for on-demand price discovery.
+  - `GET /api/v1/pulse/today` for macro essential market summaries.
+  - `GET /api/v1/commodities`, `/{id}`, and `/{id}/history` for catalog and time-series charting.
+- **API Schemas & Android Compatibility**:
+  - Pydantic v2 schemas (`app/schemas/`) with strict validation and Retrofit Kotlin client integration contracts.
+- **Automated Test Suite**:
+  - `tests/test_realtime_service.py` verifying on-demand ingestion triggers, cache hits, and analytics calculations.
+  - `tests/test_api_endpoints.py` verifying all REST API endpoints using FastAPI `TestClient`.
+
 ## [0.1.0] - 2026-09-28
 
 ### Added

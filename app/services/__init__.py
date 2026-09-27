@@ -1,5 +1,5 @@
 """
-Services package: normalization, confidence scoring, and ingestion orchestration.
+Services package: normalization, confidence scoring, analytics, and realtime orchestration.
 """
 
 from app.services.confidence import ConfidenceScorer, confidence_scorer
@@ -9,6 +9,8 @@ from app.services.normalizer import (
     commodity_normalizer,
 )
 from app.services.ingestion import IngestionPipeline, IngestionReport
+from app.services.analytics import AnalyticsService, analytics_service
+from app.services.realtime_service import RealtimePriceService
 
 __all__ = [
     "ConfidenceScorer",
@@ -18,4 +20,7 @@ __all__ = [
     "commodity_normalizer",
     "IngestionPipeline",
     "IngestionReport",
+    "AnalyticsService",
+    "analytics_service",
+    "RealtimePriceService",
 ]
