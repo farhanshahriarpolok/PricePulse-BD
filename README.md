@@ -84,6 +84,15 @@ PricePulse BD/
 │   ├── DATA_MODEL.md               # Relational schema and confidence formulation
 │   ├── NORMALIZATION.md            # Taxonomy, alias resolution, and unit conversion
 │   └── API_SPEC.md                 # REST API endpoints for Web & Android
+├── frontend/                       # Interactive Web Dashboard (React 18 + Vite)
+│   ├── src/
+│   │   ├── api/                    # Axios REST client and endpoint services
+│   │   ├── components/             # Reusable UI cards, Recharts, Leaflet map
+│   │   ├── App.jsx                 # Multi-view application shell
+│   │   ├── main.jsx                # DOM mount entry
+│   │   └── index.css               # Tailwind & Leaflet global styles
+│   ├── package.json                # React, Vite, Tailwind, Leaflet, Recharts deps
+│   └── vite.config.js              # Vite server config with /api reverse proxy
 ├── app/
 │   ├── core/
 │   │   ├── config.py               # Application settings and filesystem paths
@@ -156,9 +165,19 @@ PricePulse BD/
    ```
    *This extracts observations from the verified Department of Agricultural Marketing (DAM) bulletin fixture, resolves aliases, standardizes prices to standard units (BDT/kg or BDT/liter), computes confidence scores, and stores them in SQLite.*
 
-6. **Run Test Suite:**
+6. **Run Backend Test Suite:**
    ```bash
    pytest tests/ -v
+   ```
+
+7. **Launch Frontend Web Client:**
+   ```bash
+   cd frontend
+   npm install
+   # Development server (http://localhost:3000) with /api proxy to FastAPI:
+   npm run dev
+   # Production build verification:
+   npm run build
    ```
 
 ---
@@ -188,9 +207,9 @@ Where:
 ## 6. Research Roadmap
 
 - [x] **Milestone 001**: Relational schema, SQLite WAL configuration, bilingual normalization engine, DAM bulletin ingestion slice, and automated testing.
-- [ ] **Milestone 002**: Live multi-source collectors (TCB bulletin scraper, Chaldal/Shwapno headless adapters) with rate-limiting and rotating user-agents.
-- [ ] **Milestone 003**: FastAPI REST routing with geospatial market bounding, price trend aggregations, and OpenAPI schema generation.
-- [ ] **Milestone 004**: Real-time on-demand price search engine with cross-market anomaly detection.
+- [x] **Milestone 002**: Realtime on-demand price search engine, Chaldal online retail collector, channel spread analytics, and FastAPI REST routing.
+- [x] **Milestone 003**: Explainable statistical anomaly detection engine (Rolling SMA, Z-score, Volatility CV), Bangladesh spatial spread with GeoJSON, and 30-day historical seed generator.
+- [x] **Milestone 004**: Modern interactive web client (React 18 + Vite + Tailwind CSS + Leaflet + Recharts) with 5 core intelligence views and bilingual search.
 - [ ] **Milestone 005**: Native Android client (Kotlin + Jetpack Compose) integration with offline caching.
 
 ---

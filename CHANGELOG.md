@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - 2026-09-28
+## [0.4.0] - 2026-09-28
+
+### Added
+- **Modern Interactive Web Client (React 18 + Vite + Tailwind CSS)**:
+  - Production-grade frontend application created in `frontend/` powered by Vite 5 and responsive Tailwind CSS layout.
+  - Vite reverse proxy routing `/api` directly to local FastAPI server (`http://127.0.0.1:8000`).
+  - Five core dashboard views:
+    - **Market Pulse**: Real-time market metrics, KPI summary cards (monitored items, active anomalies, retail spread, market health), channel comparison (wholesale vs physical retail vs online grocery), and daily staple overview.
+    - **Commodity Explorer**: Interactive Recharts time-series visualization rendering 30-day price trends against a 14-day Rolling Simple Moving Average (SMA) baseline, with anomaly point callouts and statistical summary metrics.
+    - **Anomaly Monitor**: Live anomaly alert stream with severity classification (`Critical`, `Severe`, `Moderate`), Z-score and percentage departure badges, and plain-language natural language explanations.
+    - **Bangladesh Price Map**: Interactive Leaflet geospatial map rendering district-level price observations on OpenStreetMap tiles with dynamic price markers, cheapest vs highest market callouts, and hover tooltips.
+    - **Data Provenance Drawer**: Detailed audit panel breaking down raw collected values, normalized canonical prices, publisher authority tiers, and confidence score decomposition.
+  - Realtime search component supporting bilingual English and Bengali queries with instant price quotes and freshness badges.
+- **Frontend Architecture & API Client**:
+  - Modular Axios client with standardized timeout and error handling.
+  - Service endpoints module wrapping backend REST APIs for commodities, pulse, realtime queries, anomalies, and geo-spread.
+
 
 ### Added
 - **Explainable Statistical Anomaly Detection Engine**:
