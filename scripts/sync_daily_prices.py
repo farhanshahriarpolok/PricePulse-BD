@@ -85,8 +85,13 @@ def run_sync(source_filter: str | None = None) -> dict:
 
                 print(f"    OK: {len(raw_items)} harvested, {inserted} inserted, {updated} updated "
                       f"[{elapsed_ms}ms]")
-                results[key] = {"status": "ok", "items": len(raw_items),
-                                 "inserted": inserted, "updated": updated}
+                results[key] = {
+                    "status": "ok",
+                    "items": len(raw_items),
+                    "inserted": inserted,
+                    "updated": updated,
+                    "latency_ms": elapsed_ms,
+                }
 
             except Exception as exc:
                 elapsed_ms = int((time.perf_counter() - t0) * 1000)
@@ -98,9 +103,28 @@ def run_sync(source_filter: str | None = None) -> dict:
                     session.commit()
                 except Exception:
                     pass
-                results[key] = {"status": "error", "error": str(exc)}
+                results[key] = {
+                    "status": "error",
+                    "items": 0,
+                    "inserted": 0,
+                    "updated": 0,
+                    "latency_ms": elapsed_ms,
+                    "error": str(exc),
+                }
 
-    print()
+    # Render formatted console summary table
+    print("\n" + "=" * 74)
+    print(f"{'Source':<12} | {'Status':<10} | {'Harvested':<10} | {'Inserted':<9} | {'Updated':<8} | {'Latency':<8}")
+    print("-" * 74)
+    for key, data in results.items():
+        st = data.get("status", "unknown").upper()
+        items = data.get("items", 0)
+        ins = data.get("inserted", 0)
+        upd = data.get("updated", 0)
+        lat = f"{data.get('latency_ms', 0)}ms"
+        print(f"{key.upper():<12} | {st:<10} | {items:<10} | {ins:<9} | {upd:<8} | {lat:<8}")
+    print("=" * 74)
+
     success = any(r.get("status") == "ok" for r in results.values())
     if success:
         total_harvested = sum(r.get("items", 0) for r in results.values())

@@ -10,8 +10,6 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 from app.core.database import SessionLocal
-from app.collectors.dam_live_collector import DAMLiveCollector
-from app.collectors.chaldal_live_collector import ChaldalLiveCollector
 from app.services.ingestion import IngestionPipeline
 
 logger = logging.getLogger(__name__)
@@ -126,9 +124,19 @@ class BackgroundSyncScheduler:
             }
 
         def _sync_worker():
+            from app.collectors.dam_live_collector import DAMLiveCollector
+            from app.collectors.chaldal_live_collector import ChaldalLiveCollector
+            from app.collectors.tcb_collector import TCBCollector
+            from app.collectors.news_collector import NewsCollector
+
             with SessionLocal() as db:
                 pipeline = IngestionPipeline(db=db)
-                collectors = [DAMLiveCollector(), ChaldalLiveCollector()]
+                collectors = [
+                    DAMLiveCollector(),
+                    ChaldalLiveCollector(),
+                    TCBCollector(),
+                    NewsCollector(),
+                ]
                 total_harvested = 0
                 total_inserted = 0
                 total_updated = 0

@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-09-29
+
+### Added
+- **TCB & DAM Live Harvester Hardening & Adaptive DOM Parsing (TASK-003)**:
+  - `app/collectors/tcb_collector.py`:
+    - Multi-strategy CSS selectors (`table.tcb-price-table`, `table.price-table`, `table.content-table`, `.content-table table`, `table.table-bordered`, `table.table`) for resilient table discovery across upstream DOM shifts.
+    - Adaptive column detection identifying commodity, unit, min price, max price, and average price indices dynamically from header cells.
+    - Enhanced numeral parser handling Bengali (`১২০ - ১৩০`, `১২০ থেকে ১৩০`) and English (`120 - 130`, `120 to 130`) ranges and currency suffixes (`টাকা`, `Tk/kg`).
+    - Exponential backoff with randomized jitter (`base * 2^attempt + uniform(0, 0.5)`) and zero-halt fallback to verified cached fixtures.
+  - `app/collectors/dam_live_collector.py`:
+    - Adaptive column order detection accommodating varying wholesale vs retail column orderings.
+    - Support for Bengali numerals in table price cells.
+    - Granular network error telemetry recording (`ConnectTimeout`, `DNS/ConnectError`, `HTTPStatusError`) in `SourceHealthService`.
+    - Exponential backoff retry jitter to survive transient gateway timeouts.
+  - `app/services/scheduler.py`:
+    - Integrated all four collectors (`DAMLiveCollector`, `ChaldalLiveCollector`, `TCBCollector`, `NewsCollector`) into periodic and on-demand synchronization workers with localized imports to eliminate circular import risks.
+  - `scripts/sync_daily_prices.py`:
+    - Formatted ASCII console summary table displaying Source, Status, Harvested, Inserted, Updated, and Latency for operational clarity.
+  - `tests/test_resilient_collectors.py`:
+    - 8 comprehensive unit tests validating TCB DOM mutation tolerance, exponential backoff retries, DAM adaptive column swapping, Bengali numeral support, and SourceHealth status lifecycle transitions (`HEALTHY` -> `DEGRADED` -> `OFFLINE`).
+
 ## [1.9.0] - 2026-09-29
 
 ### Added

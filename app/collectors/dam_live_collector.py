@@ -4,10 +4,12 @@ Attempts live HTTP harvesting with automatic, seamless fallback to verified cach
 """
 
 import logging
+import random
+import re
 import time
 from datetime import date, datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 import httpx
 from bs4 import BeautifulSoup
 
@@ -16,6 +18,8 @@ from app.core.config import settings
 from app.services.source_health import source_health_service
 
 logger = logging.getLogger(__name__)
+
+BN_TO_EN = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
 
 
 class DAMLiveCollector(BaseCollector):
@@ -35,48 +39,83 @@ class DAMLiveCollector(BaseCollector):
         fixture_path: Optional[Path] = None,
         target_date: Optional[date] = None,
         timeout_seconds: float = 3.0,
+        max_retries: int = 2,
+        base_delay: float = 0.5,
     ):
         self.live_url = live_url or self.DEFAULT_LIVE_URL
         self.fixture_path = fixture_path or (settings.fixtures_dir / "dam_bulletin_sample.html")
         self.target_date = target_date
         self.timeout = timeout_seconds
+        self.max_retries = max_retries
+        self.base_delay = base_delay
 
-    def _fetch_html(self) -> tuple[str, bool, float, Optional[str]]:
+    @staticmethod
+    def _convert_num(text: Optional[str]) -> Optional[float]:
+        """Convert English or Bengali numeric string to float."""
+        if not text:
+            return None
+        trans = str(text).translate(BN_TO_EN).strip()
+        trans = re.sub(r"(?i)(tk|taka|টাকা|bdt|\/kg|\/pc)", "", trans)
+        nums = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", trans)]
+        if not nums:
+            return None
+        return nums[0] if len(nums) == 1 else round(sum(nums) / len(nums), 2)
+
+    def _fetch_html(self) -> Tuple[str, bool, float, Optional[str]]:
         """
-        Attempt to fetch live HTML via HTTP.
+        Attempt to fetch live HTML via HTTP with exponential backoff retry jitter.
         Returns: (html_content, is_fallback, latency_ms, error_msg)
         """
         start_time = time.perf_counter()
-        try:
-            with httpx.Client(timeout=self.timeout, follow_redirects=True) as client:
-                headers = {"User-Agent": "PricePulse-BD-Researcher/1.0 (+http://localhost:8000)"}
-                resp = client.get(self.live_url, headers=headers)
-                latency_ms = (time.perf_counter() - start_time) * 1000.0
+        last_error: Optional[str] = None
 
-                if resp.status_code == 200 and len(resp.text) > 200:
-                    source_health_service.record_attempt(
-                        source_code=self.source_code,
-                        latency_ms=latency_ms,
-                        success=True,
-                        is_fallback=False,
-                    )
-                    return resp.text, False, latency_ms, None
-                else:
-                    msg = f"Live endpoint returned HTTP {resp.status_code}"
-                    logger.warning(f"DAM Live Collector: {msg}. Falling back to cached fixture.")
-        except Exception as exc:
-            latency_ms = (time.perf_counter() - start_time) * 1000.0
-            msg = f"Network connection error ({exc.__class__.__name__})"
-            logger.warning(f"DAM Live Collector: {msg}. Falling back to cached fixture.")
+        for attempt in range(self.max_retries + 1):
+            if attempt > 0:
+                delay = self.base_delay * (2 ** attempt) + random.uniform(0.0, 0.5)
+                logger.info(f"DAM harvest retry attempt {attempt}/{self.max_retries} backing off for {delay:.2f}s")
+                time.sleep(delay)
+            else:
+                time.sleep(random.uniform(0.05, 0.15))
+
+            try:
+                with httpx.Client(timeout=self.timeout, follow_redirects=True) as client:
+                    headers = {"User-Agent": "PricePulse-BD-Researcher/1.0 (+http://localhost:8000)"}
+                    resp = client.get(self.live_url, headers=headers)
+                    latency_ms = (time.perf_counter() - start_time) * 1000.0
+
+                    if resp.status_code == 200 and len(resp.text) > 50:
+                        source_health_service.record_attempt(
+                            source_code=self.source_code,
+                            latency_ms=latency_ms,
+                            success=True,
+                            is_fallback=False,
+                        )
+                        return resp.text, False, latency_ms, None
+                    else:
+                        last_error = f"HTTP {resp.status_code}: Live endpoint returned non-200"
+                        logger.warning(f"DAM Live Collector: {last_error}")
+            except httpx.ConnectTimeout as exc:
+                last_error = f"ConnectTimeout: {exc}"
+                logger.warning(f"DAM Live Collector connect timeout on attempt {attempt}: {exc}")
+            except httpx.ConnectError as exc:
+                last_error = f"DNS / ConnectError: {exc}"
+                logger.warning(f"DAM Live Collector DNS/network error on attempt {attempt}: {exc}")
+            except httpx.HTTPStatusError as exc:
+                last_error = f"HTTPStatusError {exc.response.status_code}: {exc}"
+                logger.warning(f"DAM Live Collector HTTP error on attempt {attempt}: {exc}")
+            except Exception as exc:
+                last_error = f"{exc.__class__.__name__}: {exc}"
+                logger.warning(f"DAM Live Collector network error on attempt {attempt}: {exc}")
 
         # Fallback to local verified fixture
+        latency_ms = (time.perf_counter() - start_time) * 1000.0
         if not self.fixture_path.exists():
             source_health_service.record_attempt(
                 source_code=self.source_code,
                 latency_ms=latency_ms,
                 success=False,
                 is_fallback=False,
-                error_message="Both live fetch and local fixture are missing",
+                error_message=last_error or "Both live fetch and local fixture are missing",
             )
             raise FileNotFoundError(f"DAM fixture not found at {self.fixture_path}")
 
@@ -85,14 +124,135 @@ class DAMLiveCollector(BaseCollector):
             latency_ms=latency_ms,
             success=True,
             is_fallback=True,
-            error_message=msg,
+            error_message=last_error or "Fell back to cached fixture",
         )
 
         with open(self.fixture_path, "r", encoding="utf-8") as f:
-            return f.read(), True, latency_ms, msg
+            return f.read(), True, latency_ms, last_error
+
+    def _detect_dam_columns(self, header_cells: List[str]) -> Dict[str, int]:
+        """Dynamically detect column mapping for wholesale vs retail prices in DAM tables."""
+        mapping: Dict[str, int] = {}
+        for idx, text in enumerate(header_cells):
+            t = text.lower()
+            if any(k in t for k in ["পণ্যের নাম", "commodity", "item", "নাম"]):
+                mapping.setdefault("commodity", idx)
+            elif any(k in t for k in ["একক", "unit"]):
+                mapping.setdefault("unit", idx)
+            elif any(k in t for k in ["খুচরা", "retail"]):
+                mapping.setdefault("retail_avg", idx)
+            elif any(k in t for k in ["পাইকারি সর্বনিম্ন", "wholesale min"]):
+                mapping.setdefault("wholesale_min", idx)
+            elif any(k in t for k in ["পাইকারি সর্বোচ্চ", "wholesale max"]):
+                mapping.setdefault("wholesale_max", idx)
+            elif any(k in t for k in ["পাইকারি গড়", "পাইকারি গড়", "wholesale avg", "wholesale price", "wholesale", "পাইকারি"]):
+                mapping.setdefault("wholesale_avg", idx)
+        return mapping
+
+    def _parse_table_rows(
+        self,
+        table: BeautifulSoup,
+        market_name: str,
+        obs_date: date,
+        is_fallback: bool,
+    ) -> List[RawObservation]:
+        """Parse observations from a table using CSS classes or adaptive header mapping."""
+        observations: List[RawObservation] = []
+        rows = table.find_all("tr")
+        if not rows:
+            return observations
+
+        # Detect headers
+        header_row = rows[0]
+        header_cells = [c.get_text(strip=True) for c in header_row.find_all(["th", "td"])]
+        col_map = self._detect_dam_columns(header_cells)
+
+        for row in rows[1:]:
+            # Strategy A: Use class names if present
+            comm_elem = row.find(class_="commodity-name")
+            unit_elem = row.find(class_="unit-name")
+
+            if comm_elem and unit_elem:
+                raw_comm = comm_elem.get_text(strip=True)
+                raw_unit = unit_elem.get_text(strip=True)
+
+                price_mappings = [
+                    ("price-retail-avg", "retail_avg"),
+                    ("price-wholesale-avg", "wholesale_avg"),
+                    ("price-wholesale-min", "wholesale_min"),
+                    ("price-wholesale-max", "wholesale_max"),
+                ]
+
+                for css_class, price_type in price_mappings:
+                    cell = row.find(class_=css_class)
+                    if not cell:
+                        continue
+                    price_val = self._convert_num(cell.get_text(strip=True))
+                    if price_val is not None and price_val > 0:
+                        observations.append(
+                            RawObservation(
+                                source_code=self.source_code,
+                                market_name=market_name,
+                                raw_commodity_name=raw_comm,
+                                raw_unit=raw_unit,
+                                raw_price=price_val,
+                                price_type=price_type,
+                                observation_date=obs_date,
+                                completeness_score=0.90 if is_fallback else 1.0,
+                                is_fallback=is_fallback,
+                            )
+                        )
+                continue
+
+            # Strategy B: Adaptive column index mapping
+            cells = [c.get_text(strip=True) for c in row.find_all(["td", "th"])]
+            if len(cells) < 3:
+                continue
+
+            raw_comm = None
+            if "commodity" in col_map and col_map["commodity"] < len(cells):
+                raw_comm = cells[col_map["commodity"]]
+            elif len(cells) >= 2:
+                raw_comm = cells[1]
+
+            if not raw_comm or len(raw_comm) < 2:
+                continue
+
+            raw_unit = "kg"
+            if "unit" in col_map and col_map["unit"] < len(cells):
+                raw_unit = cells[col_map["unit"]] or "kg"
+            elif len(cells) >= 3:
+                raw_unit = cells[2] or "kg"
+
+            column_targets = [
+                ("retail_avg", "retail_avg"),
+                ("wholesale_avg", "wholesale_avg"),
+                ("wholesale_min", "wholesale_min"),
+                ("wholesale_max", "wholesale_max"),
+            ]
+
+            for key, price_type in column_targets:
+                if key in col_map and col_map[key] < len(cells):
+                    price_val = self._convert_num(cells[col_map[key]])
+                    if price_val is not None and price_val > 0:
+                        observations.append(
+                            RawObservation(
+                                source_code=self.source_code,
+                                market_name=market_name,
+                                raw_commodity_name=raw_comm,
+                                raw_unit=raw_unit,
+                                raw_price=price_val,
+                                price_type=price_type,
+                                observation_date=obs_date,
+                                completeness_score=0.90 if is_fallback else 1.0,
+                                is_fallback=is_fallback,
+                            )
+                        )
+
+        return observations
 
     def collect(self) -> List[RawObservation]:
-        """Harvest observations from live bulletin or fallback fixture."""
+        """Harvest observations from live bulletin or fallback fixture with adaptive DOM parsing."""
         html_content, is_fallback, _, _ = self._fetch_html()
         soup = BeautifulSoup(html_content, "html.parser")
 
@@ -110,47 +270,20 @@ class DAMLiveCollector(BaseCollector):
         observations: List[RawObservation] = []
         market_sections = soup.find_all("div", class_="market-section")
 
-        for section in market_sections:
-            market_name = section.get("data-market", "Unknown Market").strip()
-            rows = section.find_all("tr", class_="item-row")
+        if market_sections:
+            for section in market_sections:
+                market_name = section.get("data-market", "Unknown Market").strip()
+                table = section.find("table")
+                if table:
+                    observations.extend(self._parse_table_rows(table, market_name, obs_date, is_fallback))
+                else:
+                    # Look for tr.item-row directly in section
+                    pass
+        else:
+            # Fallback to any tables in the document
+            for table in soup.find_all("table"):
+                market_name = table.get("data-market", "Karwan Bazar")
+                observations.extend(self._parse_table_rows(table, market_name, obs_date, is_fallback))
 
-            for row in rows:
-                comm_elem = row.find(class_="commodity-name")
-                unit_elem = row.find(class_="unit-name")
-                if not comm_elem or not unit_elem:
-                    continue
-
-                raw_comm = comm_elem.get_text(strip=True)
-                raw_unit = unit_elem.get_text(strip=True)
-
-                price_mappings = [
-                    ("price-retail-avg", "retail_avg"),
-                    ("price-wholesale-avg", "wholesale_avg"),
-                    ("price-wholesale-min", "wholesale_min"),
-                    ("price-wholesale-max", "wholesale_max"),
-                ]
-
-                for css_class, price_type in price_mappings:
-                    cell = row.find(class_=css_class)
-                    if not cell:
-                        continue
-                    try:
-                        price_val = float(cell.get_text(strip=True))
-                    except ValueError:
-                        continue
-
-                    observations.append(
-                        RawObservation(
-                            source_code=self.source_code,
-                            market_name=market_name,
-                            raw_commodity_name=raw_comm,
-                            raw_unit=raw_unit,
-                            raw_price=price_val,
-                            price_type=price_type,
-                            observation_date=obs_date,
-                            completeness_score=0.90 if is_fallback else 1.0,
-                            is_fallback=is_fallback,
-                        )
-                    )
-
+        logger.info(f"DAM Collector harvested {len(observations)} observations (Fallback={is_fallback})")
         return observations
