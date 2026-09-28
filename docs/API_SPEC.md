@@ -510,3 +510,235 @@ Returns three pre-defined Bangladeshi household market basket presets ready for 
 - **Channel Imputation**: Missing channel observations are filled with the cross-channel average; online imputed at +8% premium when absent.
 - **7-Day Inflation Shift**: Δ% = (Total_today − Total_t7) / Total_t7 × 100, using 14-day trailing window per commodity.
 - **Performance**: <15ms end-to-end via single-pass SQL aggregation.
+
+---
+
+### `GET /api/v1/basket/saved`
+Retrieves all persistent household baskets configured by the user, complete with real-time 3-channel market totals and 7-day / 30-day personal CPI shifts.
+
+**Response (`200 OK`):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Middle-Class Weekly Essentials",
+    "bangla_name": "সাপ্তাহিক পারিবারিক বাজার",
+    "description": "Standard weekly grocery run for a 4-member middle-class household.",
+    "item_count": 6,
+    "created_at": "2026-09-28T02:00:00Z",
+    "updated_at": "2026-09-28T02:00:00Z",
+    "current_retail_total": 1280.0,
+    "current_wholesale_total": 1095.0,
+    "current_online_total": 1390.0,
+    "max_savings_bdt": 185.0,
+    "best_channel": "🏪 পাইকারি বাজার",
+    "shift_7d_pct": 3.8,
+    "shift_30d_pct": 7.4
+  }
+]
+```
+
+---
+
+### `POST /api/v1/basket/saved`
+Creates a new persistent household market basket with normalized line items.
+
+**Request Payload:**
+```json
+{
+  "name": "My Weekly Grocery",
+  "bangla_name": "আমার সাপ্তাহিক বাজার",
+  "description": "Family groceries for 4 members",
+  "items": [
+    {"commodity_id": 1, "quantity": 10.0, "unit": "kg"},
+    {"commodity_id": 2, "quantity": 2.0, "unit": "kg"},
+    {"commodity_id": 5, "quantity": 2.0, "unit": "liter"},
+    {"commodity_id": 7, "quantity": 2.0, "unit": "kg"}
+  ]
+}
+```
+
+**Response (`201 Created`):**
+```json
+{
+  "id": 2,
+  "name": "My Weekly Grocery",
+  "bangla_name": "আমার সাপ্তাহিক বাজার",
+  "description": "Family groceries for 4 members",
+  "created_at": "2026-09-28T04:15:00Z",
+  "updated_at": "2026-09-28T04:15:00Z",
+  "calculation": {
+    "benchmark_total": 1640.0,
+    "wholesale_total": 1415.0,
+    "retail_total": 1640.0,
+    "online_total": 1780.0,
+    "best_channel": "🏪 পাইকারি বাজার",
+    "max_savings_bdt": 225.0,
+    "savings_explanation": "পাইকারি বাজার থেকে কিনলে আপনার ৳২২৫ বাঁচবে।",
+    "cost_shift_7d_pct": 4.2,
+    "cost_shift_7d_bdt": 66.0,
+    "item_details": [...],
+    "smart_saving_tips": [...]
+  },
+  "items": [
+    {
+      "id": 5,
+      "commodity_id": 1,
+      "canonical_name": "Rice (Miniket)",
+      "bangla_name": "মিনিকেট চাল",
+      "quantity": 10.0,
+      "unit": "kg",
+      "quantity_normalized": 10.0,
+      "standard_unit": "kg",
+      "unit_price": 72.0,
+      "line_total": 720.0
+    }
+  ]
+}
+```
+
+---
+
+### `GET /api/v1/basket/saved/{id}/trend`
+Computes the 30-day personal Consumer Price Index (CPI) inflation trajectory, historical price extrema, and volatility metrics ($CV\%$) for a specific saved basket.
+
+**Response (`200 OK`):**
+```json
+{
+  "basket_id": 1,
+  "basket_name": "Middle-Class Weekly Essentials",
+  "bangla_name": "সাপ্তাহিক পারিবারিক বাজার",
+  "item_count": 6,
+  "current_cost": 1280.0,
+  "baseline_30d_avg": 1210.5,
+  "inflation_30d_pct": 5.74,
+  "inflation_7d_pct": 3.80,
+  "cheapest_date": "2026-08-30",
+  "cheapest_cost": 1180.0,
+  "peak_date": "2026-09-25",
+  "peak_cost": 1310.0,
+  "volatility_cv": 3.42,
+  "trend_points": [
+    {
+      "date": "2026-08-30",
+      "retail_total": 1180.0,
+      "wholesale_total": 1010.0,
+      "online_total": 1285.0,
+      "is_anomaly_day": false
+    },
+    {
+      "date": "2026-09-28",
+      "retail_total": 1280.0,
+      "wholesale_total": 1095.0,
+      "online_total": 1390.0,
+      "is_anomaly_day": false
+    }
+  ],
+  "academic_narrative": "Over the past 30 days, this consumer basket demonstrated a moderate personal inflation increase of +5.74% (baseline avg: ৳1,210.50). The basket reached its lowest expenditure of ৳1,180.00 on 2026-08-30 and peaked at ৳1,310.00 on 2026-09-25. The 30-day Coefficient of Variation stands at 3.42%."
+}
+```
+
+---
+
+## 11. Spatial Arbitrage & Highway Transit Corridors API
+
+### `GET /api/v1/locations/arbitrage`
+Evaluates freight-adjusted inter-district spatial arbitrage opportunities between surplus production hubs (Bogura, Rangpur, Jashore, Rajshahi, Dinajpur) and deficit consumption hubs (Dhaka, Chattogram, Sylhet).
+
+Incorporates realistic highway circuity ($\kappa = 1.25$), commercial truck cruising speed ($45\text{ km/h}$), intermediate transit waypoints, and river crossing toll buffers (Bangabandhu Jamuna Bridge, Padma Multipurpose Bridge).
+
+**Query Parameters:**
+- `commodity_id` (required, string/int): Canonical commodity ID or slug (e.g., `1` or `onion-local`).
+- `date` (optional, string `YYYY-MM-DD`): Target observation date (defaults to latest available date).
+
+**Response (`200 OK`):**
+```json
+{
+  "commodity_id": 2,
+  "canonical_name": "Onion (Local)",
+  "bangla_name": "দেশি পেঁয়াজ",
+  "unit": "kg",
+  "observation_date": "2026-09-28",
+  "spatial_dispersion_index": 0.1845,
+  "inter_district_cv_pct": 18.45,
+  "production_hubs": ["Bogura", "Rangpur", "Jashore", "Rajshahi", "Dinajpur"],
+  "consumption_hubs": ["Dhaka", "Chattogram", "Sylhet"],
+  "routes": [
+    {
+      "source_district": "Bogura",
+      "destination_district": "Dhaka",
+      "source_market": "Raja Bazar Bogura",
+      "destination_market": "Karwan Bazar",
+      "source_price": 64.0,
+      "destination_price": 98.0,
+      "gross_spread_bdt": 34.0,
+      "distance_km": 228.4,
+      "estimated_freight_cost_bdt": 6.11,
+      "net_arbitrage_margin_bdt": 27.89,
+      "roi_percentage": 39.78,
+      "economic_feasibility": "Highly Feasible",
+      "waypoints": [
+        [24.8465, 89.3770],
+        [24.4534, 89.7006],
+        [24.3980, 89.7800],
+        [24.2513, 89.9167],
+        [24.0023, 90.4264],
+        [23.8103, 90.4125]
+      ],
+      "transit_hours_estimated": 6.3,
+      "toll_and_buffer_cost_bdt": 0.50,
+      "freight_breakdown": {
+        "base_freight": 5.61,
+        "toll_buffer": 0.50,
+        "total_freight": 6.11,
+        "gross_spread": 34.0,
+        "net_margin": 27.89
+      },
+      "corridor_name": "বগুড়া ➔ ঢাকা উত্তরবঙ্গ হাইওয়ে (N5 Jamuna Corridor)"
+    },
+    {
+      "source_district": "Jashore",
+      "destination_district": "Dhaka",
+      "source_market": "Boro Bazar Jashore",
+      "destination_market": "Karwan Bazar",
+      "source_price": 70.0,
+      "destination_price": 98.0,
+      "gross_spread_bdt": 28.0,
+      "distance_km": 204.2,
+      "estimated_freight_cost_bdt": 5.78,
+      "net_arbitrage_margin_bdt": 22.22,
+      "roi_percentage": 29.32,
+      "economic_feasibility": "Highly Feasible",
+      "waypoints": [
+        [23.1664, 89.2081],
+        [23.4400, 89.4200],
+        [23.6071, 89.8429],
+        [23.4900, 90.1600],
+        [23.4500, 90.2600],
+        [23.6500, 90.3500],
+        [23.8103, 90.4125]
+      ],
+      "transit_hours_estimated": 5.3,
+      "toll_and_buffer_cost_bdt": 0.60,
+      "freight_breakdown": {
+        "base_freight": 5.18,
+        "toll_buffer": 0.60,
+        "total_freight": 5.78,
+        "gross_spread": 28.0,
+        "net_margin": 22.22
+      },
+      "corridor_name": "যশোর ➔ ঢাকা পদ্মা এক্সপ্রেসওয়ে (N8 Corridor)"
+    }
+  ],
+  "recommendation": "Spatial arbitrage between surplus production hubs and metropolitan consumption hubs is economically viable on 12 of 15 tracked highway corridors."
+}
+```
+
+**Field Descriptions:**
+- `economic_feasibility`:
+  - `Highly Feasible`: Net margin $M_{\text{net}} \ge 6.00\text{ BDT/kg}$.
+  - `Marginal`: $2.00 \le M_{\text{net}} < 6.00\text{ BDT/kg}$.
+  - `Infeasible`: $M_{\text{net}} < 2.00\text{ BDT/kg}$.
+- `transit_hours_estimated`: Truck transit duration calculated as $\frac{d_{\text{road}}}{45} + \text{Buffer Hours}$.
+- `toll_and_buffer_cost_bdt`: Critical river crossing and toll fee per kilogram (e.g. ৳0.50 for Bangabandhu Jamuna Bridge, ৳0.60 for Padma Multipurpose Bridge).
+- `waypoints`: Sequential latitude/longitude coordinate pairs along the designated national highway corridor polyline, optimized for direct Leaflet `<Polyline>` rendering.

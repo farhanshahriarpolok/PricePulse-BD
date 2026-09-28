@@ -1,125 +1,167 @@
-# PricePulse BD — Live Demonstration Script (Viva Defense Walkthrough)
-**Duration:** 5 to 7 Minutes  
-**Target Audience:** Final Year CSE Examination Committee & External Examiners  
-**Presenter:** Farhan Shahriar Polok (Student ID: 2021-CSE-048)  
+# PricePulse BD — Commercial Live Demonstration Script
+**Duration:** 6 to 8 Minutes  
+**Audience:** Technical Evaluation Committee, Enterprise Observers, and Civic Tech Stakeholders  
+**Presenter:** Farhan Shahriar Polok (Lead Researcher & Engineer)  
+**System Version:** `v2.0.0` (National Production Release)
 
 ---
 
 ## Pre-Demo Checklist (T-Minus 5 Minutes)
-1. Ensure the Python virtual environment is ready:
+1. Ensure the Python virtual environment is active:
    ```powershell
    .\venv\Scripts\Activate.ps1
    ```
-2. Verify seeded database and demo history are present:
+2. Run automated environment validation:
    ```powershell
-   python scripts/generate_demo_history.py
+   python run_system.py --test
    ```
-3. Launch the unified system orchestrator:
+   *(Confirm 4/4 checks pass: Python Runtime, SQLite WAL, Data Fixtures, REST API)*.
+3. Launch the unified platform runner:
    ```powershell
    python run_system.py
    ```
-   *(Access frontend dashboard at `http://localhost:3000` or single-port unified server at `http://localhost:8000`)*.
-4. Have the browser open in full screen (F11) with zoom set to 100%.
+   *(Frontend live at `http://localhost:3000`, FastAPI gateway at `http://localhost:8000`)*.
+4. Have the web browser set to full screen (`F11`) with zoom set to 100%.
+5. (Optional) Launch Android Studio emulator or connect physical Android device running `android/` debug build.
 
 ---
 
-## Step 1: System Launch & Macro Market Pulse (Time: 0:00 - 1:00)
+## Step 1: Market Pulse & 7d Sparkline Cards (Top Mover Hero Card)
+**Time: 0:00 - 1:15**
 
-### What to Click:
-- Open the landing page (`http://localhost:3000`).
-- Ensure the **Market Pulse** tab is active in the top navigation bar.
+### What to Click & Show:
+- Navigate to the **Market Pulse** landing page (`http://localhost:3000`).
+- Point to the **Top Mover Hero Card** displaying the staple experiencing the highest 24h / 7d relative volatility.
+- Hover over the 7-day sparkline curve to reveal the dynamic tooltip displaying daily modal price deviations.
+- Demonstrate bilingual search in the top search bar:
+  1. Type Bengali Unicode: `পেঁয়াজ` $\to$ instant modal resolution to **Local Onion (দেশি পেঁয়াজ)** in $< 15\text{ ms}$.
+  2. Clear and type English phonetic: `onion` $\to$ identical canonical entity resolution.
+  3. Press `Ctrl + K` to demonstrate keyboard navigation.
 
 ### Spoken Script:
-> *"Respected committee members, this is PricePulse BD—a location-aware multi-source market price intelligence platform for essential commodities in Bangladesh.*
+> *"Good day, everyone. This is PricePulse BD—a sovereign, local-first commodity market intelligence and anomaly detection platform for Bangladesh.
 >
-> *At the top of the interface, you can see our real-time system status indicator connected to our local-first FastAPI backend with SQLite Write-Ahead Logging. The top KPI cards summarize current market health across 4 core monitored staples: Coarse Rice, Local Onion, Potato, and Soybean Oil.*
+> On our landing dashboard, you see real-time market telemetry monitoring 21 canonical essential staples across 64 administrative districts and 78 verified markets. At the top, our Top Mover Hero Card immediately identifies which staple is under severe price pressure today, complete with a 7-day sparkline price trajectory.
 >
-> *Notice our macro market health index and retail spread: physical retail prices currently trade at a 15.4% average markup over primary wholesale terminal markets, while online grocery delivery averages an additional 4.2% markup. The system actively flags that 1 commodity currently exhibits a critical price anomaly."*
+> South Asian agricultural data is notoriously fragmented across languages and scripts. Watch as I query in Bengali Unicode: 'পেঁয়াজ'—the system performs NFKC normalization and canonical alias resolution in under 15 milliseconds. If I switch to phonetic English 'onion', the exact same canonical record resolves instantly, displaying wholesale, wet-market retail, and online channels with zero ambiguity."*
 
 ---
 
-## Step 2: Bilingual Realtime Price Search (Time: 1:00 - 2:15)
+## Step 2: Consumer Bazaar Basket (3-Channel Savings & 30d CPI Trend)
+**Time: 1:15 - 2:30**
 
-### What to Click:
-- In the search bar on the Market Pulse view, type: `পেঁয়াজ` (Bengali Unicode).
-- Observe the instant price resolution card appear with channel breakdown.
-- Next, clear and type: `onion` (English phonetic).
-- Press the keyboard shortcut `Ctrl + K` to demonstrate quick keyboard-driven search navigation.
+### What to Click & Show:
+- Click on the **Bazaar Basket** tab in the navigation bar.
+- Add staple commodities to the interactive shopping basket:
+  - Coarse Rice: `10 kg`
+  - Local Onion: `2 kg`
+  - Soybean Oil: `2 liters`
+  - Broiler Chicken: `2 kg`
+- Highlight the **3-Channel Cost Comparison Matrix**:
+  - Wholesale Terminal Hub (Kawran / Khatunganj)
+  - Wet Market Retail
+  - Online Super-shop (Chaldal)
+- Point to the **Smart Savings Card**: highlights total household savings (e.g., ৳140–৳220 saved vs retail baseline).
+- Click **"আমার বাজার সংরক্ষণ করুন" (Save Basket)** to save the customized basket.
+- Click on **"ব্যক্তিগত মূল্যস্ফীতি ট্রেন্ড" (30-Day Personal CPI Trend)** to view the personal inflation graph and volatility index ($CV\%$).
 
 ### Spoken Script:
-> *"A primary obstacle in South Asian civic informatics is orthographic fragmentation. Consumers and market enumerators query products in both Bengali script and English phonetic transliterations.*
+> *"Next, we look at the Consumer Bazaar Basket engine. Traditional government price indices report aggregate macro inflation, which does not reflect the actual out-of-pocket reality for a family purchasing their weekly staples.
 >
-> *Watch as I search in standard Bengali script: `পেঁয়াজ`. The backend normalizer executes Unicode NFKC sanitization and alias dictionary resolution within 15 milliseconds, mapping it to the canonical 'Local Onion' entity.*
+> In the Bazaar Basket view, consumers configure their family's typical grocery items. Our calculus engine instantaneously runs a multi-channel price comparison: wholesale hubs, wet-market retail, and online grocery delivery.
 >
-> *Now I type `onion` in English. The exact same canonical entity resolves seamlessly. The card immediately displays today's modal price of 98.0 BDT/kg, showing the channel breakdown: wholesale terminal price at 85 BDT/kg versus urban physical retail at 98 BDT/kg, marked with an active 'CRITICAL SPIKE' alert badge."*
+> For this representative 4-person weekly basket, the system calculates a direct ৳185 saving if staples are sourced through wholesale cooperatives rather than local corner shops. Consumers can save their customized baskets permanently. Our personal CPI trend tracker computes a tailored 30-day inflation rate and Coefficient of Variation for this exact household diet, delivering clear, actionable consumer advocacy."*
 
 ---
 
-## Step 3: Anomaly Monitor & Natural Language Explanation (Time: 2:15 - 3:30)
+## Step 3: Market Stress Test Sandbox (Dynamic Shock Slider without DB Mutation)
+**Time: 2:30 - 3:45**
 
-### What to Click:
-- Click on the **Anomaly Monitor** tab in the navigation bar.
-- Point to the active alert card for **Local Onion (দেশি পেঁয়াজ)**.
-- Highlight the **Plain-Language Explanation** callout box at the bottom of the card.
+### What to Click & Show:
+- Click on the **Market Stress Test** tab in the navigation bar.
+- Select **Local Onion (দেশি পেঁয়াজ)** from the commodity dropdown.
+- Point out the current equilibrium baseline ($65.2\text{ BDT/kg}$, $14$-day SMA, historical $CV = 2.8\%$).
+- Drag the **Simulated Shock Slider** from `0%` to `+50%`:
+  - Observe the simulated price immediately jump from $65\text{ BDT/kg}$ to $98\text{ BDT/kg}$.
+  - The calculated Z-score surges dynamically to $+17.98$.
+  - The status badge transitions from `NORMAL` $\to$ `CRITICAL SPIKE`.
+  - The deterministic natural language engine generates an auditable justification sentence in real time.
+- Emphasize that `pricepulse.db` is **not modified**—the simulation operates strictly in ephemeral sandbox memory.
 
 ### Spoken Script:
-> *"Now we transition to our explainable statistical anomaly detection engine.*
+> *"A hallmark of PricePulse BD's analytical robustness is our Market Stress Test Sandbox. Policy makers and market analysts frequently need to evaluate: 'What happens to consumer prices if an export tariff or fuel price hike increases landed costs by 40%?'
 >
-> *Unlike opaque deep learning models or black-box neural networks where predictions cannot be legally audited, PricePulse BD uses a parametric Compound Anomaly Decision Rule: an alert triggers if and only if both the statistical Z-score threshold (|Z| >= 1.5) and the economic percentage departure (|Delta%| >= 10%) are breached simultaneously.*
+> Watch as I drag this shock slider to +50% for Local Onion. The interface instantly recomputes the 14-day rolling moving average, standard deviation, and Z-score in-memory. The Z-score surges to +17.98, breaching our compound threshold (|Z| >= 2.5 and |Delta%| >= 10%), triggering a Critical Spike alert.
 >
-> *Here, Local Onion is flagged under a 'CRITICAL SPIKE' tier. The current market price of 98.0 BDT/kg represents a +50.3% departure from its 14-day rolling moving average of 65.2 BDT/kg, yielding a statistical Z-score of +17.98.*
->
-> *Crucially, our deterministic natural language engine automatically synthesizes an auditable sentence: 'ALERT: Local Onion has surged by 50.3% above its 14-day baseline of 65.2 BDT/kg... This sharp movement violates historically low volatility (CV: 2.8%), indicating artificial supply restriction or severe hoarding.' This enables non-technical market directors or regulatory inspectors to immediately take enforcement action."*
+> Crucially, our architecture enforces strict sandbox isolation: this simulation runs entirely on ephemeral memory. The SQLite ground-truth database remains pristine. Furthermore, the explanation text is generated through deterministic mathematical synthesis, completely free of cloud LLMs or non-auditable hallucinations."*
 
 ---
 
-## Step 4: Commodity Explorer & 30-Day Historical Trend (Time: 3:30 - 4:30)
+## Step 4: 64-District Leaflet Map with Highway Transit Corridors
+**Time: 3:45 - 5:00**
 
-### What to Click:
-- Click on the **Commodity Explorer** tab.
-- Select **Local Onion** from the commodity dropdown.
-- Toggle the historical chart view to examine the 30-day chronological curve against the 14-day SMA baseline.
-- Hover over the data points between Day 25 and Day 30 to display interactive tooltip metrics.
-
-### Spoken Script:
-> *"Under the Commodity Explorer tab, we visualize the temporal price trajectory rendered via Recharts.*
->
-> *The solid indigo curve represents daily observed market prices, while the dashed amber curve traces the dynamically smoothed 14-day Simple Moving Average baseline. Observe how the price remained stable between 64 and 66 BDT/kg during the first 25 days with negligible volatility.*
->
-> *On Day 26, a simulated cross-border supply shock occurs: the price abruptly breaks out from the baseline corridor, indicated by red pulsating anomaly markers. The statistical summary panel below computes the live rolling metrics: standard deviation, Z-score, and historical minimum and maximum price points."*
-
----
-
-## Step 5: Bangladesh Interactive Price Map & Spatial Spread (Time: 4:30 - 5:30)
-
-### What to Click:
+### What to Click & Show:
 - Click on the **Bangladesh Map** tab.
-- Select **Local Onion** as the commodity filter.
-- Zoom in and pan across Bangladesh on the Leaflet map.
-- Click on the district markers for **Pabna** (cheapest farm-gate hub) and **Dhaka** (highest consumption center).
-- Point to the Spatial Spread KPI callout card on the left panel.
+- Select **Local Onion** or **Potato** as the commodity filter.
+- Observe the nationwide 64-district choropleth colored by average market price.
+- Toggle the **"Highway Transit Corridors" (হাইওয়ে ট্রানজিট করিডোর)** switch on the map toolbar.
+- Point to the animated highway polylines connecting northern farm gates to metropolitan consumption centers:
+  1. **N5 Jamuna Corridor (Bogura/Rangpur $\to$ Dhaka):** Click polyline to open the glassmorphic Arbitrage Drawer.
+     - Waypoints through Sirajganj, Bangabandhu Jamuna Bridge, Tangail, Gazipur.
+     - Distance: $228\text{ km}$, Transit Duration: $6.3\text{ h}$ (at $45\text{ km/h}$ cruise + $1.2\text{ h}$ bridge buffer).
+     - Freight Breakdown: Base loading ৳1.50 + Mileage ৳4.10 + Jamuna Toll Buffer ৳0.50 = ৳6.10/kg.
+     - Feasibility Badge: **Highly Feasible** (Net Margin $\ge 6.00\text{ BDT/kg}$).
+  2. **N8 Padma Corridor (Jashore $\to$ Dhaka):** Click polyline to show Mawa Expressway & Padma Bridge waypoints, $0.8\text{ h}$ buffer, ৳0.60 toll buffer.
 
 ### Spoken Script:
-> *"Market prices in Bangladesh are profoundly spatial. In this view, we render an interactive Leaflet geospatial map using zero-cost OpenStreetMap tiles and simplified Bangladesh district GeoJSON polygon boundaries.*
+> *"Agricultural prices in Bangladesh are inherently spatial. Under the Bangladesh Map tab, we render a complete 64-district Leaflet choropleth using vector boundaries and 78 market nodes.
 >
-> *The system dynamically computes the spatial spread across regional wholesale hubs: Pabna is highlighted in green as the cheapest national market at 62.0 BDT/kg (near the producing farm gates), while Kawran Bazar in Dhaka is highlighted in red at 98.0 BDT/kg.*
+> Notice our interactive Highway Transit Corridor layer. Instead of assuming naive straight-line flight paths, PricePulse BD models actual national highway topography with empirical circuity (kappa = 1.25).
 >
-> *The spatial analytics engine calculates an inter-district geographic markup of 58.1% (a 36.0 BDT/kg spread). When markups exceed our 35% threshold, the system flags a spatial transmission inefficiency, pointing directly to exorbitant transit extortion or localized intermediary hoarding."*
+> When I click the N5 Jamuna Corridor from Bogura to Dhaka, the drawer displays the exact route: distance of 228 kilometers, estimated 6.3 hours transit time at 45 km/h commercial cruising speed, and a freight cost breakdown including fixed loading fees, mileage wear, and the Bangabandhu Jamuna Bridge toll buffer of ৳0.50/kg.
+>
+> Because the wholesale price difference between Bogura and Dhaka exceeds total freight by over ৳8.00/kg, the corridor is classified as 'Highly Feasible' with an estimated commercial ROI of 32%. This enables fair supply chain routing and uncovers localized middleman arbitrage."*
 
 ---
 
-## Step 6: Data Provenance Verification & Viva Shield Mode (Time: 5:30 - 6:30)
+## Step 5: Upstream Source Health Telemetry & Zero-Downtime Fallback
+**Time: 5:00 - 6:00**
 
-### What to Click:
-- Click on the **Data Provenance** tab (or click the 'Audit Provenance' button on any observation card).
-- Inspect the four-factor confidence score breakdown (Source: 0.90, Alias: 0.90, Freshness: 1.00, Completeness: 1.00 -> Composite Score: 0.94).
-- Open terminal and show that `pricepulse.db` operates in full local WAL mode without requiring any internet connection.
+### What to Click & Show:
+- Click on the **System Health** indicator in the navbar or open `/api/v1/health` and `/api/v1/sources/health`.
+- Show the 4 upstream data source telemetry cards:
+  1. **TCB Daily Bulletins** (Trading Corporation of Bangladesh)
+  2. **DAM Live Market Sheet** (Department of Agricultural Marketing)
+  3. **Press Field Spot Reports** (Prothom Alo & Daily Star field roundups)
+  4. **Chaldal Online Catalog** (Digital e-grocery)
+- Highlight the **Zero-Downtime Resilience Fallback**: demonstrate that when upstream network connections are unavailable, collectors gracefully fall back to verified cached bulletins and offline fixtures without crashing or blocking the event loop.
 
 ### Spoken Script:
-> *"Finally, we address data integrity and audit provenance. In civic governance, an unverified number is worse than no number at all.*
+> *"A persistent issue with civic scrapers is upstream volatility: government web portals frequently encounter downtime, DOM layout restructuring, or network drops.
 >
-> *Our Provenance Drawer displays the complete lineage of each quote: raw unparsed input, publisher authority rating, semantic match certainty, temporal freshness decay, and structural attribute completeness. Every observation carries a normalized confidence metric C in [0.0, 1.0].*
+> In our Source Health telemetry panel, PricePulse BD continuously monitors all four ingestion channels. Our collectors feature adaptive DOM selectors, regex pattern transliteration matrices, and exponential retry backoff with randomized jitter.
 >
-> *Furthermore, as demonstrated here, the entire system is 'local-first'—built on SQLite WAL concurrency, FastAPI, and React. If internet connectivity drops during an inspection or viva defense, PricePulse BD operates at 100% functionality from local storage with zero cloud latency.*
+> If a source endpoint becomes temporarily unreachable, the pipeline falls back seamlessly to immutable cached bulletins and local fixtures. The user-facing dashboard never experiences a white-screen crash or unhandled 500 error. Every single price quote carries a four-factor confidence score rating authority, freshness, and match certainty."*
+
+---
+
+## Step 6: Native Android Client Offline Mirroring & Audit Lineage
+**Time: 6:00 - 7:00**
+
+### What to Click & Show:
+- Showcase the **Native Android Client** (`android/`):
+  - Launch the app in offline mode (airplane mode enabled).
+  - Open the **Bazaar Basket** screen in Jetpack Compose: demonstrates instantaneous loading from local Room SQLite database in $< 15\text{ ms}$.
+  - Demonstrate the custom Compose Canvas bezier trend chart with smooth 120 FPS touch-drag crosshairs.
+- On the web dashboard, open the **Data Provenance Drawer** on any observation card to display the complete mathematical confidence score breakdown:
+  $$C = 0.40 \cdot C_{\text{src}} + 0.25 \cdot C_{\text{alias}} + 0.20 \cdot C_{\text{fresh}} + 0.15 \cdot C_{\text{comp}}$$
+
+### Spoken Script:
+> *"To conclude our demonstration, we highlight our zero-latency offline client and cryptographic data lineage.
 >
-> *Thank you, respected examiners. I now welcome your questions."*
+> For mobile field officers and consumers in areas with intermittent cellular coverage, our Native Android Client is written entirely in modern Kotlin with Jetpack Compose and Room SQLite. Because data is synchronized locally, cold-start queries execute in under 15 milliseconds, and our custom Compose Canvas chart delivers a silky 120 frames per second without third-party chart bloat.
+>
+> Finally, every number in PricePulse BD is fully traceable. In our Data Provenance drawer, inspectors can audit the source authority, alias match confidence, temporal freshness decay, and field completeness score. 
+>
+> PricePulse BD is fully built, backed by 236 passing automated tests, completely local-first, and ready for deployment. Thank you, and I look forward to your questions."*
+

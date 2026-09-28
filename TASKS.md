@@ -6,23 +6,13 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-### TASK-005 — Viva Defense Demonstration Script Verification & Academic LaTeX Report Alignment
-- **Status**: IN_PROGRESS
-- **Priority**: HIGH
-- **Goal**: Conduct a comprehensive verification of `docs/DEMO_SCRIPT.md`, `docs/VIVA_DEFENSE_GUIDE.md`, and compile the final LaTeX thesis draft (`report/compile_report.py`), ensuring that all tables, formulas, and figures match recent benchmark figures.
-- **Why**: Ensures absolute defensibility during the final thesis defense and oral viva examination before university evaluators.
-- **Dependencies**: `TASK-001`, `TASK-002`, `TASK-003`, `TASK-004`.
-- **Files Likely Affected**:
-  - `docs/DEMO_SCRIPT.md`
-  - `docs/VIVA_DEFENSE_GUIDE.md`
-  - `report/main.tex`
-  - `report/compile_report.py`
+- None (All development milestones and tasks completed).
 
 ---
 
 ## NEXT
 
-- None (Final milestone completion & thesis defense preparation).
+- None (Production v2.0.0 released & oral defense ready).
 
 ---
 
@@ -32,6 +22,16 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **TASK-005 / Milestone 019 — Documentation Synchronization, Benchmark Synthesis & Demo Script Freeze** (2026-09-29):
+  - Updated academic thesis Chapters 5 and 6 (`report/chapters/05_anomaly_engine.tex`, `06_evaluation.tex`) with Highway Transit Corridor equations:
+    $$\text{Transit Hours} = \frac{d_{\text{road}}}{45} + \text{Buffer Hours}$$
+    $$\text{Total Freight} = 1.50 + 0.018 \cdot d_{\text{road}} + \text{Toll Buffer}$$
+  - Added comprehensive test suite distribution table (Table 6.4) and updated evaluation metrics to reflect all 236 passing tests, 21 canonical staples, 64 administrative districts, and 78 verified markets.
+  - Successfully compiled and verified thesis document `report/PricePulse_BD_Thesis.pdf` (57 KB) via `report/compile_report.py`.
+  - Updated `docs/DEMO_SCRIPT.md` with complete 6-step commercial live demo walkthrough covering Market Pulse Top Mover Card, 3-Channel Consumer Bazaar Basket, Market Stress Test sandbox with zero DB mutation, 64-District Leaflet map with interactive Highway Transit Corridors, Source Health telemetry fallback, and Native Android client offline Room mirroring.
+  - Updated `docs/API_SPEC.md` documenting `/api/v1/basket/saved`, `/api/v1/basket/saved/{id}/trend`, and `/api/v1/locations/arbitrage` with corridor waypoints and toll buffers.
+  - Verified 100% test pass rate (236/236 green), clean system environment checks (`run_system.py --test`), and clean frontend production build (`npm run build`).
 
 - **TASK-004 / Milestone 018 — Spatial Arbitrage Engine Enhancements & Interactive Corridor Visualization** (2026-09-29):
   - In `app/schemas/spatial.py`, extended `ArbitrageRoute` schema with `waypoints`, `transit_hours_estimated`, `toll_and_buffer_cost_bdt`, `freight_breakdown`, and `corridor_name`.

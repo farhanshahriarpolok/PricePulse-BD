@@ -155,17 +155,36 @@ The effective highway transit distance between production hub $s$ and consumptio
 d_{\text{road}}(s, d) = \kappa \cdot 2 R \arcsin \left( \sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_s) \cos(\phi_d) \sin^2\left(\frac{\Delta \lambda}{2}\right)} \right)
 \end{equation}
 
-where $R = 6371\text{ km}$, $\phi$ denotes latitude, and $\lambda$ denotes longitude. Freight overhead per kilogram is calibrated according to national carrier surveys:
+where $R = 6371\text{ km}$, $\phi$ denotes latitude, and $\lambda$ denotes longitude. 
+
+To model real-world logistics delay and driver resting requirements over Bangladesh's national highway grid, the estimated transit duration incorporates an average commercial carrier cruising speed of $45\text{ km/h}$ alongside bridge crossing queue and peri-urban congestion delays:
 
 \begin{equation}
-C_{\text{freight}}(s, d) = C_{\text{fixed}} + \beta \cdot d_{\text{road}}(s, d) = 1.50 + 0.018 \cdot d_{\text{road}}(s, d) \quad (\text{BDT/kg})
+\text{Transit Hours}(s, d) = \frac{d_{\text{road}}(s, d)}{45} + \text{Buffer Hours}
 \end{equation}
 
-The net arbitrage margin $M_{\text{net}}$ and economic feasibility classification are given by:
+Freight overhead per kilogram is calibrated according to national carrier surveys, incorporating base handling costs, distance-dependent fuel and tire wear, and specific river crossing toll buffers:
 
 \begin{equation}
-M_{\text{net}}(s, d) = \left( P_d - P_s \right) - C_{\text{freight}}(s, d)
+\text{Total Freight}(s, d) = 1.50 + 0.018 \cdot d_{\text{road}}(s, d) + \text{Toll Buffer} \quad (\text{BDT/kg})
 \end{equation}
 
-When $M_{\text{net}} \ge 6.00\text{ BDT/kg}$, commercial transfer is flagged as \textit{Highly Feasible}. When $2.00 \le M_{\text{net}} < 6.00$, the corridor is designated as \textit{Marginal}. When $M_{\text{net}} < 2.00$, inter-district transport is economically infeasible due to transport cost barriers.
+where $C_{\text{base}} = 1.50\text{ BDT/kg}$ represents fixed loading and terminal arat commission, $\beta = 0.018\text{ BDT/kg}\cdot\text{km}$ denotes variable road freight, and $\text{Toll Buffer}$ explicitly accounts for major critical transit bottlenecks:
+\begin{itemize}
+    \item \textbf{Bangabandhu Jamuna Bridge Corridor (N5):} $\text{Toll Buffer} = 0.50\text{ BDT/kg}$, $\text{Buffer Hours} = 1.2\text{--}1.5\text{ h}$ connecting the Rajshahi and Rangpur agricultural belts with Dhaka.
+    \item \textbf{Padma Multipurpose Bridge Corridor (N8):} $\text{Toll Buffer} = 0.60\text{ BDT/kg}$, $\text{Buffer Hours} = 0.8\text{ h}$ connecting Jashore and the southwestern agricultural cluster with the capital.
+    \item \textbf{Trans-National Arterials (N5-N1):} Connecting northern hubs to Chattogram port markets via Dhaka-Chittagong Expressway, Kanchpur, and Meghna bridges ($\text{Toll Buffer} = 0.75\text{--}0.85\text{ BDT/kg}$, $\text{Buffer Hours} = 1.8\text{--}2.2\text{ h}$).
+\end{itemize}
+
+The net arbitrage margin $M_{\text{net}}$ and commercial Return on Investment (ROI) are determined by:
+
+\begin{equation}
+M_{\text{net}}(s, d) = \left( P_d - P_s \right) - \text{Total Freight}(s, d)
+\end{equation}
+
+\begin{equation}
+\text{ROI}(s, d) = \frac{M_{\text{net}}(s, d)}{P_s + \text{Total Freight}(s, d)} \times 100\%
+\end{equation}
+
+When $M_{\text{net}} \ge 6.00\text{ BDT/kg}$, commercial transfer is flagged as \textit{Highly Feasible}. When $2.00 \le M_{\text{net}} < 6.00$, the corridor is designated as \textit{Marginal}. When $M_{\text{net}} < 2.00$, inter-district transport is economically infeasible due to freight cost barriers.
 

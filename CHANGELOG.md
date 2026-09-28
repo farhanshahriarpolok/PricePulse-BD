@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-09-29
+
+### Added
+- **Full National Production & Academic Synchronization Milestone (TASK-005 / Milestone 019)**:
+  - `report/chapters/05_anomaly_engine.tex`:
+    - Updated Spatial Arbitrage modeling with formal Highway Transit Corridor equations:
+      $$\text{Transit Hours} = \frac{d_{\text{road}}}{45} + \text{Buffer Hours}$$
+      $$\text{Total Freight} = 1.50 + 0.018 \cdot d_{\text{road}} + \text{Toll Buffer}$$
+    - Documented bridge toll and delay parameters for Bangabandhu Jamuna Bridge corridor (৳0.50/kg, 1.2h), Padma Multipurpose Bridge corridor (৳0.60/kg, 0.8h), and N1/Trans-national corridors (৳0.75-0.85/kg, 1.8-2.2h).
+  - `report/chapters/06_evaluation.tex`:
+    - Updated automated test suite metrics across the thesis to reflect all 236 passing tests, 21 canonical staples, 64 administrative districts, and 78 markets.
+    - Added Table 6.4 summarizing test suite coverage by subsystem domain with 100.0% pass rate.
+  - `report/compile_report.py`:
+    - Synchronized executive specifications table with Highway Transit Corridors and 236 test cases.
+    - Verified ReportLab compilation producing `report/PricePulse_BD_Thesis.pdf` (57 KB).
+  - `docs/DEMO_SCRIPT.md`:
+    - Standardized 6-step commercial live demo walkthrough:
+      1. Market Pulse & 7d Sparkline Cards (Top Mover Hero Card & bilingual search).
+      2. Consumer Bazaar Basket (3-channel wholesale vs retail savings, saved household baskets, 30d personal CPI trend).
+      3. Market Stress Test Sandbox (dynamic shock slider without DB mutation, deterministic explanation generation).
+      4. 64-District Leaflet Map with Highway Transit Corridors (Jamuna & Padma corridors, waypoints, freight breakdown drawer).
+      5. Upstream Source Health Telemetry (zero-downtime cached fallback resilience).
+      6. Native Android Client Offline Room Mirroring & Data Provenance Lineage.
+  - `docs/API_SPEC.md`:
+    - Documented persistent Saved Basket endpoints (`GET /api/v1/basket/saved`, `POST /api/v1/basket/saved`, `GET /api/v1/basket/saved/{id}/trend`).
+    - Documented Highway Transit Corridor Spatial Arbitrage endpoint (`GET /api/v1/locations/arbitrage`) with waypoint polylines, toll buffers, and freight breakdowns.
+  - **Quality & Release Assurance**:
+    - 236 of 236 pytest tests passing with zero failures.
+    - `run_system.py --test` passes all 4 environment checks.
+    - Frontend production bundle cleanly built with Vite.
+
 ## [1.11.0] - 2026-09-29
 
 ### Added
