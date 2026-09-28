@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-09-29
+
+### Added
+- **Android Native Client Room Offline Saved Basket Mirroring**:
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/Entities.kt`: Added `SavedBasketEntity` and `SavedBasketItemEntity` with auto-generated primary keys and foreign key constraints mirroring FastAPI schemas.
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/Daos.kt`: Added `BasketDao` with reactive `Flow<List<SavedBasketEntity>>`, basket item flows, atomic inserts, and cascade deletions.
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/PricePulseDatabase.kt`: Bumped Room database schema to `version = 2` and registered `SavedBasketEntity`, `SavedBasketItemEntity`, and `basketDao()`.
+  - `android/app/src/main/java/com/pricepulse/bd/data/repository/OfflinePriceRepository.kt`: Exposed `savedBaskets` Flow, `getItemsForBasket()`, `saveBasketLocally()`, and `deleteBasketLocally()` for offline mobile shopping.
+
+### Changed
+- **Runtime & API Documentation Sanitization**:
+  - `run_system.py`: Sanitized orchestrator console banner to "National Commodity Price Intelligence & Cost of Living Platform" and updated startup comments.
+  - `app/api/v1/endpoints/simulation.py`: Sanitized endpoint tags to "Market Stress Test", summary to "Simulate Market Supply Shock & Policy Stress Test", and description with zero student/viva disclaimers.
+
 ## [1.8.0] - 2026-09-29
 
 ### Added

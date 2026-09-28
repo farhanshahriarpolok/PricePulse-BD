@@ -1,8 +1,8 @@
 """
 app/api/v1/endpoints/simulation.py
 ==================================
-Viva Defense Live Simulation Sandbox REST endpoint.
-Allows examiners and thesis evaluators to interactively inject synthetic shocks,
+Market Stress Test & Economic Scenario Engine REST endpoint.
+Allows policy analysts and consumers to interactively inject synthetic shocks,
 tariffs, and transport disruptions to observe real-time anomaly recalculations
 and explainable natural language outputs without altering ground-truth records.
 """
@@ -26,17 +26,17 @@ from app.schemas.simulation import (
 from app.schemas.anomaly import MetricBreakdown
 from app.services.anomaly_engine import anomaly_engine
 
-router = APIRouter(prefix="/simulation", tags=["Simulation Sandbox"])
+router = APIRouter(prefix="/simulation", tags=["Market Stress Test"])
 
 
 @router.post(
     "/inject-shock",
     response_model=SimulationResponse,
-    summary="Inject Shock into Commodity Time Series",
+    summary="Simulate Market Supply Shock & Policy Stress Test",
     description=(
-        "Simulates sudden supply disruption, import tariff hikes, or freight blockades "
-        "on canonical commodity price series. Computes on-the-fly Rolling 14-day SMA, "
-        "Z-scores, Volatility CV, and plain-language academic explanation."
+        "Simulate macro supply disruptions, import tariff shifts, and freight shocks "
+        "on commodity price baselines. Computes on-the-fly Rolling 14-day SMA, "
+        "Z-scores, Volatility CV, and explainable algorithmic market explanations."
     ),
 )
 def inject_shock(

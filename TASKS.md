@@ -12,15 +12,16 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ## NEXT
 
 ### TASK-002 — Android Client Offline Synchronization & Saved Basket Mirroring
-- **Status**: PLANNED
+- **Status**: IN_PROGRESS (Room Entities, DAO & Repository layer implemented; Compose Screen next)
 - **Priority**: HIGH
 - **Goal**: Extend the native Android client Room database to store user-defined bazaar baskets locally, mirror the FastAPI `/api/v1/basket/saved` schema, and display the 3-channel cost comparison in Jetpack Compose.
 - **Why**: Fulfills the project requirement for dual-platform (Web + Android) parity and offline-first mobile utility for shoppers visiting physical wet markets.
 - **Dependencies**: `TASK-001` completion.
 - **Files Likely Affected**:
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/Daos.kt`
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/Entities.kt`
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/PricePulseDatabase.kt`
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/Daos.kt` (Done)
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/Entities.kt` (Done)
+  - `android/app/src/main/java/com/pricepulse/bd/data/local/PricePulseDatabase.kt` (Done)
+  - `android/app/src/main/java/com/pricepulse/bd/data/repository/OfflinePriceRepository.kt` (Done)
   - `android/app/src/main/java/com/pricepulse/bd/ui/screens/BasketScreen.kt`
 
 ### TASK-003 — Automated Daily Ingestion Resilience & Live TCB/Chaldal Scraper Hardening
@@ -68,6 +69,13 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Milestone 015 & Patch 014 — Terminal/API Sanitization & Android Room Offline Mirroring** (2026-09-29):
+  - Completely sanitized `run_system.py` banner and comments, removing all undergraduate/viva references.
+  - Sanitized `app/api/v1/endpoints/simulation.py` tags, summary, and description to "Market Stress Test & Policy Stress Test".
+  - Implemented `SavedBasketEntity`, `SavedBasketItemEntity`, and `BasketDao` in Android Room database (`PricePulseDatabase` v2).
+  - Exposed offline basket caching flows and persistence helpers in `OfflinePriceRepository.kt`.
+  - Verified 100% green test suite (233/233 tests passing), `run_system.py --test`, and clean Vite production build.
 
 - **Milestone 014 — Production Rebranding, Consumer UI Cleansing & Live Storefront Harvester Engine** (2026-09-29):
   - Rebranded "Viva Simulator" to "Market Stress Test & Economic Scenario Engine" across navigation and scenario testbed.

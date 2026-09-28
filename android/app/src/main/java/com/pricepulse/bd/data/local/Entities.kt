@@ -42,3 +42,24 @@ data class AnomalyEntity(
     val explanation: String,
     val detectedAt: Long = System.currentTimeMillis()
 )
+
+@Entity(tableName = "saved_baskets")
+data class SavedBasketEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val name: String,
+    val banglaName: String = "",
+    val description: String = "",
+    val updatedAt: String = ""
+)
+
+@Entity(tableName = "saved_basket_items")
+data class SavedBasketItemEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val basketId: Int,
+    val commodityId: Int,
+    val quantity: Double,
+    val unit: String
+)
+

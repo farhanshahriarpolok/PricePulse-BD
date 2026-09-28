@@ -44,3 +44,31 @@ interface AnomalyDao {
     @Query("DELETE FROM anomalies")
     suspend fun clearAnomalies()
 }
+
+@Dao
+interface BasketDao {
+    @Query("SELECT * FROM saved_baskets ORDER BY id DESC")
+    fun getSavedBaskets(): Flow<List<SavedBasketEntity>>
+
+    @Query("SELECT * FROM saved_baskets WHERE id = :basketId")
+    suspend fun getBasketById(basketId: Int): SavedBasketEntity?
+
+    @Query("SELECT * FROM saved_basket_items WHERE basketId = :basketId")
+    fun getItemsForBasket(basketId: Int): Flow<List<SavedBasketItemEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBasket(basket: SavedBasketEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBasketItems(items: List<SavedBasketItemEntity>)
+
+    @Query("DELETE FROM saved_baskets WHERE id = :basketId")
+    suspend fun deleteBasket(basketId: Int)
+
+    @Query("DELETE FROM saved_basket_items WHERE basketId = :basketId")
+    suspend fun deleteBasketItems(basketId: Int)
+
+    @Query("DELETE FROM saved_baskets")
+    suspend fun clearAllBaskets()
+}
+

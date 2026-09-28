@@ -18,8 +18,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 def print_banner():
     banner = r"""
 =============================================================================
-  PricePulse BD — Market Intelligence & Anomaly Detection System
-  Undergraduate CSE Final Year Research Project (2026)
+  PricePulse BD — National Commodity Price Intelligence & Cost of Living Platform
   Local-First Architecture | SQLite WAL | FastAPI | React 18 + Leaflet
 =============================================================================
 """
@@ -170,7 +169,7 @@ def main():
         with SessionLocal() as session:
             seed_demo_history(session)
 
-    # Make sure demo history is present for defense
+    # Make sure calibrated 30-day market history is present
     ensure_demo_history()
 
     import uvicorn

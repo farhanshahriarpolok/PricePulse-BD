@@ -9,9 +9,11 @@ import androidx.room.RoomDatabase
     entities = [
         CommodityEntity::class,
         PriceObservationEntity::class,
-        AnomalyEntity::class
+        AnomalyEntity::class,
+        SavedBasketEntity::class,
+        SavedBasketItemEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class PricePulseDatabase : RoomDatabase() {
@@ -19,6 +21,7 @@ abstract class PricePulseDatabase : RoomDatabase() {
     abstract fun commodityDao(): CommodityDao
     abstract fun observationDao(): ObservationDao
     abstract fun anomalyDao(): AnomalyDao
+    abstract fun basketDao(): BasketDao
 
     companion object {
         @Volatile

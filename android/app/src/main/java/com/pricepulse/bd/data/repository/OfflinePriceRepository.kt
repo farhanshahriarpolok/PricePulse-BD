@@ -5,6 +5,8 @@ import com.pricepulse.bd.data.api.RetrofitClient
 import com.pricepulse.bd.data.local.CommodityEntity
 import com.pricepulse.bd.data.local.PriceObservationEntity
 import com.pricepulse.bd.data.local.AnomalyEntity
+import com.pricepulse.bd.data.local.SavedBasketEntity
+import com.pricepulse.bd.data.local.SavedBasketItemEntity
 import com.pricepulse.bd.data.local.PricePulseDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,11 +16,13 @@ class OfflinePriceRepository(context: Context) {
     private val commodityDao = db.commodityDao()
     private val observationDao = db.observationDao()
     private val anomalyDao = db.anomalyDao()
+    private val basketDao = db.basketDao()
     private val api = RetrofitClient.apiService
 
-    // Reactive Flow from Room
+    // Reactive Flows from Room
     val cachedCommodities: Flow<List<CommodityEntity>> = commodityDao.getAllCommodities()
     val activeAnomalies: Flow<List<AnomalyEntity>> = anomalyDao.getActiveAnomalies()
+    val savedBaskets: Flow<List<SavedBasketEntity>> = basketDao.getSavedBaskets()
 
     suspend fun refreshCommodities(): Result<Int> {
         return try {
@@ -75,4 +79,32 @@ class OfflinePriceRepository(context: Context) {
     fun getObservationsForCommodity(commodityId: Int): Flow<List<PriceObservationEntity>> {
         return observationDao.getObservationsForCommodity(commodityId)
     }
+
+    fun getItemsForBasket(basketId: Int): Flow<List<SavedBasketItemEntity>> {
+        return basketDao.getItemsForBasket(basketId)
+    }
+
+    suspend fun saveBasketLocally(
+        name: String,
+        banglaName: String = "",
+        description: String = "",
+        items: List<SavedBasketItemEntity>
+    ): Long {
+        val basket = SavedBasketEntity(
+            name = name,
+            banglaName = banglaName,
+            description = description,
+            updatedAt = System.currentTimeMillis().toString()
+        )
+        val basketId = basketDao.insertBasket(basket)
+        val itemsWithId = items.map { it.copy(basketId = basketId.toInt()) }
+        basketDao.insertBasketItems(itemsWithId)
+        return basketId
+    }
+
+    suspend fun deleteBasketLocally(basketId: Int) {
+        basketDao.deleteBasketItems(basketId)
+        basketDao.deleteBasket(basketId)
+    }
 }
+
