@@ -23,6 +23,15 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Milestone 021 — Visual Identity, Custom Vector Assets & Mass-Consumer UI Media Polish** (2026-09-29):
+  - Designed and deployed brand identity suite: `frontend/public/logo.svg` (market scale + pulse + leaf motif), `frontend/public/favicon.svg` (pixel-perfect 32x32 SVG), and `frontend/public/og-image.svg` (1200x630 OpenGraph preview banner).
+  - Enriched `frontend/index.html` with SVG favicon and standard OpenGraph / Twitter card metadata.
+  - Implemented bespoke vector illustration system `frontend/src/components/media/CommodityIcon.jsx` covering all staple categories and individual commodity signatures.
+  - Integrated `CommodityIcon` into `CommodityCard.jsx` (hero and standard cards), `CategoryFilter.jsx` (filter chips), and `BazaarBasketView.jsx` (basket line items).
+  - Refined `Navbar.jsx` with vector `logo.svg` and live animated pulse dot indicator.
+  - Verified visual rendering via Playwright MCP headless audit screenshot (`scripts/qa_snapshots/10_media_polish.png`).
+  - Maintained 100% test pass rate across all 236 pytest tests and clean Vite production build.
+
 - **Milestone 020 — Mass-Consumer Localization Overhaul, Bilingual Toggle, Expanded Taxonomy & Browser E2E Audit** (2026-09-29):
   - Fixed white-screen tab crashes: resolved undefined property access in `ChannelComparisonCard.jsx` and `HistoricalTrendChart.jsx` (`.toFixed(2)` on undefined variables), rectified response unnesting in `ComparisonView.jsx`, and wrapped all tabs in React `<ErrorBoundary>`.
   - Implemented bilingual localization dictionary (`frontend/src/i18n/translations.js`) with default natural, colloquial Bangla (`bn`) and added `[বাংলা | EN]` toggle button in `Navbar.jsx` with persistent `localStorage` preference.

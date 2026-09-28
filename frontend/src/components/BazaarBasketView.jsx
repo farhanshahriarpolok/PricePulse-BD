@@ -39,6 +39,7 @@ import {
   deleteSavedBasket,
   getSavedBasketTrend,
 } from '../api/endpoints';
+import CommodityIcon from './media/CommodityIcon';
 
 // ─── Unit options available for selection ────────────────────────────────────
 const UNITS = [
@@ -621,9 +622,12 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                       return (
                         <tr key={item.id} className="bb-table-row">
                           <td className="bb-td-name">
-                            <div className="bb-item-name-block">
-                              <span className="bb-item-bn">{item.bangla_name}</span>
-                              <span className="bb-item-en">{item.commodity_name}</span>
+                            <div className="flex items-center gap-2.5">
+                              <CommodityIcon name={item.commodity_name} className="w-7 h-7 flex-shrink-0" />
+                              <div className="bb-item-name-block">
+                                <span className="bb-item-bn">{item.bangla_name}</span>
+                                <span className="bb-item-en">{item.commodity_name}</span>
+                              </div>
                             </div>
                             {!item.matched && (
                               <span className="bb-unmatched-badge">

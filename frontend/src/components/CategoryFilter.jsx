@@ -1,21 +1,20 @@
 import React from 'react';
 import { 
-  Grid, 
-  Wheat, 
-  Carrot, 
-  Beef, 
-  Egg, 
-  Flame, 
-  ShoppingBag 
-} from 'lucide-react';
+  VegetableIcon, 
+  GrainIcon, 
+  MeatFishIcon, 
+  DairyEggIcon, 
+  OilSpiceIcon, 
+  AllStaplesIcon 
+} from './media/CommodityIcon';
 
 export const CATEGORIES = [
-  { id: 'all', label: 'All Items', icon: Grid },
-  { id: 'grains', label: 'Grains & Pulses', icon: Wheat, matchKeys: ['grain', 'cereal', 'pulse', 'rice', 'dal', 'flour'] },
-  { id: 'vegetables', label: 'Vegetables', icon: Carrot, matchKeys: ['vegetable', 'potato', 'onion', 'chilli', 'garlic'] },
-  { id: 'protein', label: 'Meat & Fish', icon: Beef, matchKeys: ['meat', 'fish', 'poultry', 'chicken', 'beef', 'mutton', 'seafood'] },
-  { id: 'dairy_eggs', label: 'Dairy & Eggs', icon: Egg, matchKeys: ['dairy', 'egg', 'milk'] },
-  { id: 'spices_oils', label: 'Spices & Oils', icon: Flame, matchKeys: ['spice', 'oil', 'salt', 'sugar', 'mustard'] },
+  { id: 'all', label: 'All Items', icon: AllStaplesIcon },
+  { id: 'grains', label: 'Grains & Pulses', icon: GrainIcon, matchKeys: ['grain', 'cereal', 'pulse', 'rice', 'dal', 'flour'] },
+  { id: 'vegetables', label: 'Vegetables', icon: VegetableIcon, matchKeys: ['vegetable', 'potato', 'onion', 'chilli', 'garlic'] },
+  { id: 'protein', label: 'Meat & Fish', icon: MeatFishIcon, matchKeys: ['meat', 'fish', 'poultry', 'chicken', 'beef', 'mutton', 'seafood'] },
+  { id: 'dairy_eggs', label: 'Dairy & Eggs', icon: DairyEggIcon, matchKeys: ['dairy', 'egg', 'milk'] },
+  { id: 'spices_oils', label: 'Spices & Oils', icon: OilSpiceIcon, matchKeys: ['spice', 'oil', 'salt', 'sugar', 'mustard'] },
 ];
 
 export function matchesCategory(item, categoryId) {
@@ -39,7 +38,7 @@ export default function CategoryFilter({
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none my-4">
       {CATEGORIES.map((cat) => {
-        const Icon = cat.icon;
+        const IconComponent = cat.icon;
         const isSelected = selectedCategory === cat.id;
         const count = itemsCountMap[cat.id];
 
@@ -53,7 +52,7 @@ export default function CategoryFilter({
                 : 'bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
             }`}
           >
-            <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
+            <IconComponent className="w-4 h-4 flex-shrink-0" />
             <span>{cat.label}</span>
             {count !== undefined && (
               <span

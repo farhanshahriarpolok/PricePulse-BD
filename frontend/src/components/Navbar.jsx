@@ -50,11 +50,13 @@ export default function Navbar({
     <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Header */}
+          {/* Brand Header with Vector Logo */}
           <div className="flex items-center space-x-3 cursor-pointer select-none" onClick={() => setActiveTab('pulse')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-              <Activity className="w-5 h-5 text-white" />
-            </div>
+            <img 
+              src="/logo.svg" 
+              alt="PricePulse BD Logo" 
+              className="w-10 h-10 object-contain drop-shadow-md transition-transform hover:scale-105" 
+            />
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-xl font-bold tracking-tight text-white font-outfit">PricePulse</span>
@@ -103,6 +105,15 @@ export default function Navbar({
 
           {/* System Status & Ingestion Trigger */}
           <div className="flex items-center space-x-2">
+            {/* Live Indicator Dot */}
+            <div className="hidden sm:flex items-center space-x-1.5 px-2 py-1 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-400 font-mono select-none">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="font-semibold tracking-wider text-[10px]">LIVE</span>
+            </div>
+
             {/* Language Toggle Button */}
             <button
               onClick={onToggleLang}

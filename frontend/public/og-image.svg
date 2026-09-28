@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" fill="none">
+  <defs>
+    <linearGradient id="ogBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#061A14" />
+    </linearGradient>
+    <linearGradient id="ogGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+    <linearGradient id="ogPulse" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+    <pattern id="ogGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" stroke-width="0.8" stroke-opacity="0.6" />
+    </pattern>
+    <filter id="ogGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" fill="url(#ogBg)" />
+  <rect width="1200" height="630" fill="url(#ogGrid)" />
+
+  <!-- Ambient Glow Orbs -->
+  <circle cx="200" cy="150" r="280" fill="#047857" fill-opacity="0.12" filter="url(#ogGlow)" />
+  <circle cx="1050" cy="480" r="320" fill="#0D9488" fill-opacity="0.15" filter="url(#ogGlow)" />
+  <circle cx="900" cy="180" r="200" fill="#F59E0B" fill-opacity="0.08" filter="url(#ogGlow)" />
+
+  <!-- Outer Frame -->
+  <rect x="24" y="24" width="1152" height="582" rx="20" stroke="#1E293B" stroke-width="2" />
+
+  <!-- Top Badge Header -->
+  <rect x="70" y="65" width="230" height="40" rx="20" fill="#064E3B" fill-opacity="0.6" stroke="#059669" stroke-width="1.5" />
+  <circle cx="92" cy="85" r="5" fill="#34D399" />
+  <text x="110" y="90" font-family="'Inter', sans-serif" font-size="14" font-weight="700" fill="#6EE7B7" letter-spacing="1">CIVIC TECH BD • LIVE</text>
+
+  <!-- Main Logo Emblem -->
+  <g transform="translate(70, 130)">
+    <rect x="0" y="0" width="88" height="88" rx="22" fill="#0F172A" stroke="#10B981" stroke-width="2" />
+    <path d="M44 20 V64 M34 64 H54" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M22 30 L44 26 L66 30" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" />
+    <path d="M44 20 C52 10 66 12 68 22 C58 24 50 23 44 20 Z" fill="#10B981" />
+    <path d="M12 52 H26 L32 40 L40 60 L46 36 L52 56 L58 48 L64 52 H76" stroke="url(#ogPulse)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="46" cy="36" r="3.5" fill="#FCD34D" />
+  </g>
+
+  <!-- Brand Typography -->
+  <text x="180" y="180" font-family="'Outfit', sans-serif" font-size="54" font-weight="800" fill="#FFFFFF" letter-spacing="-1">PricePulse <tspan fill="#10B981">BD</tspan></text>
+  <text x="182" y="212" font-family="'Inter', sans-serif" font-size="18" font-weight="500" fill="#94A3B8">National Commodity Price Intelligence &amp; Cost of Living Platform</text>
+
+  <!-- Large Bangla Title Banner -->
+  <text x="70" y="300" font-family="'Inter', sans-serif" font-size="44" font-weight="700" fill="#F8FAFC">বাংলাদেশ নিত্যপ্রয়োজনীয় বাজারদর ও সাশ্রয় ট্র্যাকার</text>
+  <text x="70" y="345" font-family="'Inter', sans-serif" font-size="22" font-weight="400" fill="#CBD5E1">৬৪ জেলা • পাইকারি ও খুচরা বাজার • লাইভ এলার্ট • ১০০% ওপেন ও নির্ভরযোগ্য</text>
+
+  <!-- Feature Pillar Cards -->
+  <g transform="translate(70, 400)">
+    <!-- Card 1 -->
+    <rect x="0" y="0" width="245" height="150" rx="16" fill="#0F172A" fill-opacity="0.8" stroke="#334155" stroke-width="1.5" />
+    <circle cx="36" cy="36" r="16" fill="#064E3B" />
+    <path d="M30 36 L34 40 L42 32" stroke="#34D399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="64" y="42" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">৩৪+ নিত্যপণ্য</text>
+    <text x="24" y="80" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#94A3B8">চাল, ডাল, তেল, সবজি, মাছ ও মাংসের পাইকারি-খুচরা রিয়েল রেট</text>
+    <text x="24" y="125" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#10B981">DAM &amp; TCB গ্রাউন্ড ট্রুথ →</text>
+
+    <!-- Card 2 -->
+    <rect x="270" y="0" width="245" height="150" rx="16" fill="#0F172A" fill-opacity="0.8" stroke="#334155" stroke-width="1.5" />
+    <circle cx="306" cy="36" r="16" fill="#0F766E" />
+    <path d="M306 28 V44 M298 36 H314" stroke="#2DD4BF" stroke-width="2.5" stroke-linecap="round" />
+    <text x="334" y="42" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">বাজার বাস্কেট</text>
+    <text x="294" y="80" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#94A3B8">সাপ্তাহিক ও মাসিক বাজারের খরচ হিসাব এবং সাশ্রয়ী দোকান পরামর্শ</text>
+    <text x="294" y="125" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#2DD4BF">৩-চ্যানেল সেভিংস →</text>
+
+    <!-- Card 3 -->
+    <rect x="540" y="0" width="245" height="150" rx="16" fill="#0F172A" fill-opacity="0.8" stroke="#334155" stroke-width="1.5" />
+    <circle cx="576" cy="36" r="16" fill="#78350F" />
+    <path d="M576 28 L584 44 H568 Z" stroke="#FBBF24" stroke-width="2" stroke-linejoin="round" />
+    <text x="604" y="42" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">দাম বৃদ্ধি সতর্কতা</text>
+    <text x="564" y="80" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#94A3B8">স্বাভাবিক গড় দামের চেয়ে আকস্মিক মূল্যবৃদ্ধি স্বয়ংক্রিয়ভাবে শনাক্ত</text>
+    <text x="564" y="125" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#FBBF24">Z-Score |Z| ≥ 1.5 →</text>
+
+    <!-- Card 4 -->
+    <rect x="810" y="0" width="245" height="150" rx="16" fill="#0F172A" fill-opacity="0.8" stroke="#334155" stroke-width="1.5" />
+    <circle cx="846" cy="36" r="16" fill="#1E293B" />
+    <path d="M846 26 L854 34 L846 42 L838 34 Z" stroke="#60A5FA" stroke-width="2" stroke-linejoin="round" />
+    <text x="874" y="42" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">৬৪ জেলা ম্যাপ</text>
+    <text x="834" y="80" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#94A3B8">উৎপাদন এলাকা থেকে পরিবহন করিডোর ও জেলাভিত্তিক দামের ফারাক</text>
+    <text x="834" y="125" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#60A5FA">১২টি হাইওয়ে করিডোর →</text>
+  </g>
+</svg>

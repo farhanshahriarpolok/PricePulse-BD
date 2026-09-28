@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-09-29
+
+### Added
+- **Visual Identity, Custom Vector Assets & Mass-Consumer UI Media Polish (Milestone 021)**:
+  - `frontend/public/logo.svg`: Designed official modern vector brand emblem featuring an integrated market scale, pulse graph wave, and emerald agricultural leaf motif.
+  - `frontend/public/favicon.svg`: High-contrast pixel-perfect 32x32 SVG favicon for web and mobile browsers.
+  - `frontend/public/og-image.svg`: Bespoke 1200x630 OpenGraph and Twitter social card banner with live commodity metrics and localized branding.
+  - `frontend/index.html`: Fully updated with `favicon.svg` link and complete OpenGraph and Twitter card meta tags.
+  - `frontend/src/components/media/CommodityIcon.jsx`: Created handcrafted vector illustration system for all staple categories (Vegetables, Grains & Pulses, Meat & Fish, Dairy & Eggs, Oils & Spices) with individual commodity signature dispatching.
+  - `frontend/src/components/CommodityCard.jsx`: Embedded bespoke `CommodityIcon` in both hero and standard card variants.
+  - `frontend/src/components/CategoryFilter.jsx`: Replaced generic icon placeholders with matching custom vector emblems.
+  - `frontend/src/components/BazaarBasketView.jsx`: Rendered bespoke commodity vector icons in basket line items.
+  - `frontend/src/components/Navbar.jsx`: Refined brand header with new vector `logo.svg` and added a pulse dot indicator beside the bilingual `[বাংলা | EN]` switcher.
+  - Verified visual asset rendering with Playwright MCP headless audit snapshot (`scripts/qa_snapshots/10_media_polish.png`).
+
 ## [2.0.0] - 2026-09-29
 
 ### Added

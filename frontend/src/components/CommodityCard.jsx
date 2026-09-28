@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import MiniSparkline from './MiniSparkline';
 import { getCategoryTheme } from '../utils/categoryTheme';
+import CommodityIcon from './media/CommodityIcon';
 
 /**
  * Helper to compute refined severity badge and styles.
@@ -118,22 +119,25 @@ export default function CommodityCard({
               </span>
             </div>
 
-            <div>
-              <div className="flex items-baseline gap-2.5">
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-outfit tracking-tight group-hover:text-rose-400 transition-colors">
-                  {item.canonical_name}
-                </h3>
-                <span className="text-sm font-medium text-slate-400 font-bengali">
-                  ({item.bangla_name})
-                </span>
+            <div className="flex items-start gap-4">
+              <CommodityIcon category={item.category} name={item.canonical_name} className="w-12 h-12 flex-shrink-0 mt-0.5" />
+              <div>
+                <div className="flex items-baseline gap-2.5">
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-outfit tracking-tight group-hover:text-rose-400 transition-colors">
+                    {item.canonical_name}
+                  </h3>
+                  <span className="text-sm font-medium text-slate-400 font-bengali">
+                    ({item.bangla_name})
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  Experiencing elevated market pressure with an empirical 7-day surge of{' '}
+                  <span className="font-bold text-rose-400 font-mono">
+                    {pctChange > 0 ? `+${pctChange.toFixed(1)}%` : `${pctChange.toFixed(1)}%`}
+                  </span>
+                  . Injected wholesale supply friction detected at central terminal markets.
+                </p>
               </div>
-              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                Experiencing elevated market pressure with an empirical 7-day surge of{' '}
-                <span className="font-bold text-rose-400 font-mono">
-                  {pctChange > 0 ? `+${pctChange.toFixed(1)}%` : `${pctChange.toFixed(1)}%`}
-                </span>
-                . Injected wholesale supply friction detected at central terminal markets.
-              </p>
             </div>
 
             {/* Micro Channel Split */}
@@ -225,13 +229,16 @@ export default function CommodityCard({
         </div>
       </div>
 
-      {/* 2. Title Section */}
-      <div>
-        <h4 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug">
-          {item.canonical_name}
-        </h4>
-        <div className="text-[11px] text-slate-400 font-bengali mt-0.5">
-          {item.bangla_name}
+      {/* 2. Title Section with bespoke commodity icon */}
+      <div className="flex items-center gap-3">
+        <CommodityIcon category={item.category} name={item.canonical_name} className="w-8 h-8 flex-shrink-0" />
+        <div className="min-w-0 flex-1">
+          <h4 className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug truncate">
+            {item.canonical_name}
+          </h4>
+          <div className="text-[11px] text-slate-400 font-bengali mt-0.5 truncate">
+            {item.bangla_name}
+          </div>
         </div>
       </div>
 
