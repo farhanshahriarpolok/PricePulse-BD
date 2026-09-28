@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Activity, 
   TrendingUp, 
@@ -13,7 +13,8 @@ import {
   Download,
   Sliders,
   ShoppingBasket,
-  Globe
+  Globe,
+  ChevronDown
 } from 'lucide-react';
 import { getTranslation } from '../i18n/translations';
 
@@ -33,25 +34,45 @@ export default function Navbar({
   onToggleLang,
 }) {
   const t = (k) => getTranslation(k, lang);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreRef = useRef(null);
 
-  const navItems = [
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (moreRef.current && !moreRef.current.contains(event.target)) {
+        setIsMoreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 5 Essential Consumer Tabs
+  const primaryNavItems = [
     { id: 'pulse', label: t('nav_pulse'), icon: Activity },
     { id: 'basket', label: t('nav_basket'), icon: ShoppingBasket, count: basketCount, isBasket: true },
     { id: 'compare', label: t('nav_compare'), icon: GitCompare },
-    { id: 'explorer', label: t('nav_explorer'), icon: TrendingUp },
     { id: 'anomalies', label: t('nav_anomalies'), icon: AlertTriangle, count: anomalyCount },
-    { id: 'simulator', label: t('nav_simulator'), icon: Sliders },
     { id: 'map', label: t('nav_map'), icon: MapPin },
+  ];
+
+  // Secondary technical views moved to 'More' dropdown
+  const secondaryNavItems = [
+    { id: 'explorer', label: t('nav_explorer'), icon: TrendingUp },
+    { id: 'simulator', label: t('nav_simulator'), icon: Sliders },
     { id: 'sources', label: t('nav_sources'), icon: Server },
     { id: 'provenance', label: t('nav_provenance'), icon: ShieldCheck },
   ];
 
+  const isSecondaryActive = secondaryNavItems.some((item) => item.id === activeTab);
+
   return (
-    <header className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-md">
+    <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between min-h-[72px] py-2">
           {/* Brand Header with Vector Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer select-none" onClick={() => setActiveTab('pulse')}>
+          <div className="flex items-center space-x-3 cursor-pointer select-none py-1" onClick={() => setActiveTab('pulse')}>
             <img 
               src="/logo.svg" 
               alt="PricePulse BD Logo" 
@@ -68,24 +89,24 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Desktop Navigation Links (>= lg screen) */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navItems.map((item) => {
+          {/* Desktop Navigation Links (>= lg screen): 5 Primary Tabs + More Dropdown */}
+          <nav className="hidden lg:flex items-center space-x-1.5">
+            {primaryNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`relative flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  className={`relative flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                     isActive
                       ? item.isBasket
-                        ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
-                        : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent'
+                        ? 'bg-amber-500/15 text-amber-400 border border-amber-500/40 shadow-sm'
+                        : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 shadow-sm'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/70 border border-transparent'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${
+                  <Icon className={`w-4 h-4 ${
                     isActive
                       ? item.isBasket ? 'text-amber-400' : 'text-emerald-400'
                       : 'text-slate-400'
@@ -101,6 +122,47 @@ export default function Navbar({
                 </button>
               );
             })}
+
+            {/* More / অন্যান্য Dropdown */}
+            <div className="relative" ref={moreRef}>
+              <button
+                onClick={() => setIsMoreOpen(!isMoreOpen)}
+                className={`flex items-center space-x-1 px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  isSecondaryActive
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 shadow-sm'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/70 border-transparent'
+                }`}
+              >
+                <span>{t('nav_more')}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isMoreOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1.5 z-50 animate-fadeIn">
+                  {secondaryNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setIsMoreOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-2.5 px-3 py-2 text-xs font-medium transition-colors text-left ${
+                          isActive
+                            ? 'bg-emerald-500/20 text-emerald-300'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* System Status & Ingestion Trigger */}
@@ -177,8 +239,8 @@ export default function Navbar({
         )}
 
         {/* Mobile & Tablet Navigation Row (< lg screen) */}
-        <div className="flex lg:hidden overflow-x-auto py-2 space-x-1 border-t border-slate-800/80 scrollbar-none">
-          {navItems.map((item) => {
+        <div className="flex lg:hidden overflow-x-auto py-2.5 space-x-1.5 border-t border-slate-800/80 scrollbar-none">
+          {[...primaryNavItems, ...secondaryNavItems].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (

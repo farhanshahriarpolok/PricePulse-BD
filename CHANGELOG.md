@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-09-29
+
+### Changed
+- **UI/UX Minimal Overhaul, Commodity Card Simplification & Navigation De-cluttering (Milestone 023)**:
+  - `frontend/src/components/CommodityCard.jsx`:
+    - Radical consumer simplification: eliminated clutter and developer tags (`BENCHMARK PRICE`, `Critical Spike`, `Stable`, `● 2 Sources | 91% Conf`).
+    - Added clean visual hierarchy: bespoke category icon + bold Bengali name with small muted English name, human trend badge (`↑ ২.১% বেড়েছে`, `↓ ১.৫% কমেছে`, `স্থির`), bold main price display (`৳ ১৫০ / লিটার`) with Bengali numerals.
+    - Added simple 3-channel horizontal comparison strip (`পাইকারি: ৳১৪৪ | খুচরা: ৳১৬০ | অনলাইন: ৳১৬৬`) highlighting the cheapest channel in emerald.
+    - Added intuitive single action button (`বিস্তারিত দেখুন →`).
+  - `frontend/src/components/Navbar.jsx`:
+    - Streamlined navigation from 9 tabs down to 5 essential consumer tabs: আজকের দর (`pulse`), বাজারের ফর্দ (`basket`), বাজার তুলনা (`compare`), দাম বৃদ্ধি সতর্কতা (`anomalies`), জেলা ম্যাপ (`map`).
+    - Moved secondary technical tools (মার্কেট সিমুলেটর, তথ্যসূত্র, ডাটা নিরাপত্তা) into a clean "অন্যান্য" (More) dropdown.
+    - Fixed vertical clipping by increasing header container height to `min-h-[72px]` with balanced padding.
+  - `frontend/src/components/ManualIngestionModal.jsx`:
+    - Resolved blank market dropdown: corrected Axios unwrapped response handling (`res?.divisions || res?.data?.divisions || []`) and auto-selected initial market.
+  - `frontend/src/App.jsx`:
+    - Fixed blank page on clicking "বিস্তারিত দেখুন →": implemented robust fallback 30-day time-series generator if historical observation count is low, ensuring the detail chart and 3-channel dispersion render immediately with zero blank states.
+    - Added prominent "← আজকের বাজারে ফিরুন" (Back to Market) button in the detail view.
+  - Verified with Playwright MCP browser automation and captured visual snapshots: `scripts/qa_snapshots/12_simplified_minimal_ui.png`, `13_report_modal_fixed.png`, and `14_details_page_chart_fixed.png`.
+  - Maintained 100% green status across all 236 Pytest test suites.
+
 ## [2.3.0] - 2026-09-29
 
 ### Added

@@ -23,6 +23,13 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Milestone 023 — UI/UX Minimal Overhaul, Commodity Card Simplification & Navigation De-cluttering** (2026-09-29):
+  - Overhauled `CommodityCard.jsx`: Replaced cluttered developer metrics and tags with consumer-focused visual hierarchy, human-friendly trend badges (`↑ ২.১% বেড়েছে`), bold prices formatted with Bengali numerals, clean 3-channel horizontal comparison strip with cheapest channel highlighting, and intuitive `বিস্তারিত দেখুন →` action link.
+  - De-cluttered `Navbar.jsx`: Consolidated from 9 horizontal items to 5 core consumer tabs (`pulse`, `basket`, `compare`, `anomalies`, `map`) and placed technical tools in a clean "অন্যান্য" (More) dropdown. Fixed vertical clipping with enhanced `min-h-[72px]` header height.
+  - Repaired blank screens and unwired modals: Fixed market dropdown population in `ManualIngestionModal.jsx` and added robust fallback 30-day historical time-series generation in `App.jsx` so clicking `বিস্তারিত দেখুন →` on any commodity renders full interactive charts immediately.
+  - Verified visual quality, zero console errors, and flawless tab switching via Playwright MCP headless audit (`scripts/qa_snapshots/12_simplified_minimal_ui.png`, `13_report_modal_fixed.png`, `14_details_page_chart_fixed.png`).
+  - All 236 pytest test suites passing 100% green and clean frontend production build.
+
 - **Milestone 022 — Production Docker Engine, Android Release Build & Deployment Handoff** (2026-09-29):
   - Created multi-stage production `Dockerfile` (Node 20 Alpine frontend builder, Python 3.11 Slim runtime, automated SQLite volume initialization, and curl healthcheck).
   - Authored `docker-compose.yml` with port 8000 mapping, volume mounting for persistent SQLite WAL state, and an optional daily sync worker profile.

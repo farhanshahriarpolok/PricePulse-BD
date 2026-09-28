@@ -40,7 +40,14 @@ export default function ManualIngestionModal({ isOpen, onClose, commodities = []
     if (isOpen) {
       getLocationHierarchy()
         .then((res) => {
-          setHierarchy(res.data?.divisions || []);
+          const divs = res?.divisions || res?.data?.divisions || [];
+          setHierarchy(divs);
+          // Auto select first market once hierarchy loaded
+          const mkts = [];
+          divs.forEach((d) => (d.districts || []).forEach((dist) => (dist.markets || []).forEach((m) => mkts.push(m))));
+          if (mkts.length > 0 && !marketId) {
+            setMarketId(mkts[0].id);
+          }
         })
         .catch((err) => {
           console.error('Failed to load locations', err);
@@ -110,8 +117,8 @@ export default function ManualIngestionModal({ isOpen, onClose, commodities = []
       };
 
       const res = await submitManualObservation(payload);
-      setSuccessData(res.data);
-      if (onSuccess) onSuccess(res.data);
+      setSuccessData(res?.data || res);
+      if (onSuccess) onSuccess(res?.data || res);
     } catch (err) {
       console.error(err);
       const detail = err.response?.data?.error?.message || err.response?.data?.detail || 'Failed to submit observation';

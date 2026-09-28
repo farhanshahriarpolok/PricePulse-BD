@@ -21,6 +21,7 @@ export const translations = {
     nav_map: 'জেলাভিত্তিক ম্যাপ',
     nav_sources: 'উৎস ও তথ্যসূত্র',
     nav_provenance: 'ডাটা নিরাপত্তা',
+    nav_more: 'অন্যান্য',
 
     // Common Actions
     btn_sync_live: 'লাইভ আপডেট',
@@ -98,6 +99,7 @@ export const translations = {
     nav_map: 'District Map',
     nav_sources: 'Source Health',
     nav_provenance: 'Data Audit',
+    nav_more: 'More',
 
     // Common Actions
     btn_sync_live: 'Sync Live',
