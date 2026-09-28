@@ -30,16 +30,19 @@ class DAMLiveCollector(BaseCollector):
     source_type = "government"
     reliability_score = 0.95
 
-    # Public DAM daily bulletin portal URL
-    DEFAULT_LIVE_URL = "http://www.dam.gov.bd/daily-market-price"
+    # Public DAM daily bulletin portal URLs
+    DEFAULT_LIVE_URL = "https://market.dam.gov.bd/market_daily_price_report?L=B"
+    FALLBACK_LIVE_URLS = [
+        "https://market.dam.gov.bd/",
+    ]
 
     def __init__(
         self,
         live_url: Optional[str] = None,
         fixture_path: Optional[Path] = None,
         target_date: Optional[date] = None,
-        timeout_seconds: float = 3.0,
-        max_retries: int = 2,
+        timeout_seconds: float = 12.0,
+        max_retries: int = 1,
         base_delay: float = 0.5,
     ):
         self.live_url = live_url or self.DEFAULT_LIVE_URL
@@ -64,48 +67,57 @@ class DAMLiveCollector(BaseCollector):
     def _fetch_html(self) -> Tuple[str, bool, float, Optional[str]]:
         """
         Attempt to fetch live HTML via HTTP with exponential backoff retry jitter.
+        Supports SSL bypass for government self-signed certs and multi-endpoint fallback.
         Returns: (html_content, is_fallback, latency_ms, error_msg)
         """
         start_time = time.perf_counter()
         last_error: Optional[str] = None
+        candidate_urls = [self.live_url] + [u for u in self.FALLBACK_LIVE_URLS if u != self.live_url]
 
-        for attempt in range(self.max_retries + 1):
-            if attempt > 0:
-                delay = self.base_delay * (2 ** attempt) + random.uniform(0.0, 0.5)
-                logger.info(f"DAM harvest retry attempt {attempt}/{self.max_retries} backing off for {delay:.2f}s")
-                time.sleep(delay)
-            else:
-                time.sleep(random.uniform(0.05, 0.15))
+        for target_url in candidate_urls:
+            for attempt in range(self.max_retries + 1):
+                if attempt > 0:
+                    delay = self.base_delay * (2 ** attempt) + random.uniform(0.0, 0.5)
+                    logger.info(f"DAM harvest retry attempt {attempt}/{self.max_retries} backing off for {delay:.2f}s")
+                    time.sleep(delay)
+                else:
+                    time.sleep(random.uniform(0.05, 0.15))
 
-            try:
-                with httpx.Client(timeout=self.timeout, follow_redirects=True) as client:
-                    headers = {"User-Agent": "PricePulse-BD-Researcher/1.0 (+http://localhost:8000)"}
-                    resp = client.get(self.live_url, headers=headers)
-                    latency_ms = (time.perf_counter() - start_time) * 1000.0
+                try:
+                    with httpx.Client(timeout=self.timeout, follow_redirects=True, verify=False) as client:
+                        headers = {
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        }
+                        resp = client.get(target_url, headers=headers)
+                        latency_ms = (time.perf_counter() - start_time) * 1000.0
 
-                    if resp.status_code == 200 and len(resp.text) > 50:
-                        source_health_service.record_attempt(
-                            source_code=self.source_code,
-                            latency_ms=latency_ms,
-                            success=True,
-                            is_fallback=False,
-                        )
-                        return resp.text, False, latency_ms, None
-                    else:
-                        last_error = f"HTTP {resp.status_code}: Live endpoint returned non-200"
-                        logger.warning(f"DAM Live Collector: {last_error}")
-            except httpx.ConnectTimeout as exc:
-                last_error = f"ConnectTimeout: {exc}"
-                logger.warning(f"DAM Live Collector connect timeout on attempt {attempt}: {exc}")
-            except httpx.ConnectError as exc:
-                last_error = f"DNS / ConnectError: {exc}"
-                logger.warning(f"DAM Live Collector DNS/network error on attempt {attempt}: {exc}")
-            except httpx.HTTPStatusError as exc:
-                last_error = f"HTTPStatusError {exc.response.status_code}: {exc}"
-                logger.warning(f"DAM Live Collector HTTP error on attempt {attempt}: {exc}")
-            except Exception as exc:
-                last_error = f"{exc.__class__.__name__}: {exc}"
-                logger.warning(f"DAM Live Collector network error on attempt {attempt}: {exc}")
+                        if resp.status_code == 200 and len(resp.text) > 200:
+                            # Verify page has real commodity price rows or tables
+                            test_soup = BeautifulSoup(resp.text, "html.parser")
+                            has_price_content = (
+                                len(test_soup.find_all(class_="item-row")) > 0
+                                or any(
+                                    any(k in t.get_text() for k in ["পণ্যের নাম", "খুচরা", "পাইকারি"])
+                                    and len(t.find_all("tr")) >= 3
+                                    for t in test_soup.find_all("table")
+                                )
+                            )
+                            if has_price_content:
+                                source_health_service.record_attempt(
+                                    source_code=self.source_code,
+                                    latency_ms=latency_ms,
+                                    success=True,
+                                    is_fallback=False,
+                                )
+                                return resp.text, False, latency_ms, None
+                            else:
+                                last_error = "Page retrieved but lacked tabular commodity price rows"
+                        else:
+                            last_error = f"HTTP {resp.status_code}: Endpoint returned non-200"
+                except Exception as exc:
+                    last_error = f"{exc.__class__.__name__}: {exc}"
+                    logger.debug(f"DAM Live Collector network error on {target_url} (attempt {attempt}): {exc}")
 
         # Fallback to local verified fixture
         latency_ms = (time.perf_counter() - start_time) * 1000.0
@@ -284,6 +296,15 @@ class DAMLiveCollector(BaseCollector):
             for table in soup.find_all("table"):
                 market_name = table.get("data-market", "Karwan Bazar")
                 observations.extend(self._parse_table_rows(table, market_name, obs_date, is_fallback))
+
+        if not observations and not is_fallback and self.fixture_path.exists():
+            logger.warning("DAM live response contained no parseable commodity rows; falling back to fixture")
+            is_fallback = True
+            with open(self.fixture_path, "r", encoding="utf-8") as f:
+                fix_soup = BeautifulSoup(f.read(), "html.parser")
+                for table in fix_soup.find_all("table"):
+                    market_name = table.get("data-market", "Karwan Bazar")
+                    observations.extend(self._parse_table_rows(table, market_name, obs_date, is_fallback=True))
 
         logger.info(f"DAM Collector harvested {len(observations)} observations (Fallback={is_fallback})")
         return observations

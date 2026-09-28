@@ -67,7 +67,18 @@ class IngestionPipeline:
 
         # Substring match
         stmt_sub = select(Market).where(Market.name.ilike(f"%{cleaned}%"))
-        return self.db.scalars(stmt_sub).first()
+        res = self.db.scalars(stmt_sub).first()
+        if res:
+            return res
+
+        # Canonical aliases for national / Dhaka benchmarks
+        cleaned_lower = cleaned.lower()
+        if any(k in cleaned_lower for k in ["dhaka", "benchmark", "karwan", "কাওরান", "কারওয়ান", "tcb", "national", "press", "prothom", "jugantor"]):
+            stmt_karwan = select(Market).where(Market.name == "Karwan Bazar")
+            return self.db.scalars(stmt_karwan).first()
+
+        # Fallback to first market in database
+        return self.db.scalars(select(Market)).first()
 
     def _resolve_commodity_entity(self, canonical_name: str) -> Optional[Commodity]:
         """Retrieve canonical Commodity model from database."""

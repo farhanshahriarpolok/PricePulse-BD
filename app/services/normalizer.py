@@ -94,6 +94,16 @@ class CommodityNormalizer:
         "0.5dozen": ("pc", 6.0),
         "১/২ডজন": ("pc", 6.0),
         "০.৫ডজন": ("pc", 6.0),
+        "প্যাকেট": ("kg", 1.0),
+        "প্যাঃ": ("kg", 1.0),
+        "কেজি প্যাঃ": ("kg", 1.0),
+        "কেজিপ্যাঃ": ("kg", 1.0),
+        "প্রতি কেজি": ("kg", 1.0),
+        "প্রতিকেজি": ("kg", 1.0),
+        "প্রতি লিটার": ("liter", 1.0),
+        "প্রতিলিটার": ("liter", 1.0),
+        "প্রতি হালি": ("pc", 4.0),
+        "প্রতিহালি": ("pc", 4.0),
     }
 
     def reload(self) -> None:
@@ -220,6 +230,15 @@ class CommodityNormalizer:
             return self.UNIT_MAP[trans_cleaned]
         if trans_raw in self.UNIT_MAP:
             return self.UNIT_MAP[trans_raw]
+
+        # Strip bulletin prefixes like "প্রতি " or "per "
+        prefix_stripped = re.sub(r"^(?:প্রতি|per)\s+", "", trans_raw).strip()
+        if prefix_stripped != trans_raw:
+            prefix_cleaned = self._clean_text(prefix_stripped).replace(" ", "")
+            if prefix_cleaned in self.UNIT_MAP:
+                return self.UNIT_MAP[prefix_cleaned]
+            if prefix_stripped in self.UNIT_MAP:
+                return self.UNIT_MAP[prefix_stripped]
 
         # Handle colloquial 'half' or 'হাফ' prefix (e.g. 'half dozen', 'হাফ ডজন')
         half_pattern = re.match(r"^(?:half|হাফ)\s*(.+)$", trans_raw)
