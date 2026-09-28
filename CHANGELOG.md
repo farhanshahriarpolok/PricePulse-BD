@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-09-29
+
+### Added
+- **Android Native Jetpack Compose Bazaar Basket & Room Integration**:
+  - `BasketScreen.kt`: Commercial-grade consumer shopping optimizer screen built with Jetpack Compose Material 3:
+    - Quick-select preset chips ("সাপ্তাহিক বাজার", "ব্যাচেলর বাস্কেট", "উইকেন্ড ফিস্ট") with one-tap populating.
+    - Active basket item cards with quantity stepper (`-`/`+`), customary units (`কেজি`, `হালি`, `লিটার`), and line total calculation.
+    - 3-Channel Cost Overview Hero Card comparing Local Wet Market Retail baseline, Wholesale Hub (with green savings pill), and Online Grocery.
+    - Saved Baskets Section reading reactive `offlineRepository.savedBaskets` Flow from local Room DB with 1-tap load and delete actions.
+    - Save Basket dialog persisting custom household baskets to Room DB for 100% offline market visits.
+  - `MainActivity.kt`: Integrated bottom `NavigationBar` with edge-to-edge `Scaffold` routing across `Pulse` (Home), `Anomalies`, `Basket`, and `Report`.
+
 ## [1.8.1] - 2026-09-29
 
 ### Added

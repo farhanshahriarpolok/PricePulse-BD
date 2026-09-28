@@ -5,37 +5,23 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## NOW
-- *No active execution tasks. TASK-001 completed successfully. Ready for TASK-002.*
-
----
-
-## NEXT
-
-### TASK-002 — Android Client Offline Synchronization & Saved Basket Mirroring
-- **Status**: IN_PROGRESS (Room Entities, DAO & Repository layer implemented; Compose Screen next)
-- **Priority**: HIGH
-- **Goal**: Extend the native Android client Room database to store user-defined bazaar baskets locally, mirror the FastAPI `/api/v1/basket/saved` schema, and display the 3-channel cost comparison in Jetpack Compose.
-- **Why**: Fulfills the project requirement for dual-platform (Web + Android) parity and offline-first mobile utility for shoppers visiting physical wet markets.
-- **Dependencies**: `TASK-001` completion.
-- **Files Likely Affected**:
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/Daos.kt` (Done)
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/Entities.kt` (Done)
-  - `android/app/src/main/java/com/pricepulse/bd/data/local/PricePulseDatabase.kt` (Done)
-  - `android/app/src/main/java/com/pricepulse/bd/data/repository/OfflinePriceRepository.kt` (Done)
-  - `android/app/src/main/java/com/pricepulse/bd/ui/screens/BasketScreen.kt`
 
 ### TASK-003 — Automated Daily Ingestion Resilience & Live TCB/Chaldal Scraper Hardening
-- **Status**: PLANNED
+- **Status**: IN_PROGRESS
 - **Priority**: HIGH
 - **Goal**: Harden autonomous harvesters (`tcb_collector.py`, `chaldal_collector.py`, `news_collector.py`) against upstream markup shifts, implement exponential backoff jitter, and verify graceful fallback to cached bulletins without pipeline halts.
 - **Why**: Guarantees live data integrity and continuous operation even when upstream government websites experience intermittent downtime.
-- **Dependencies**: `TASK-001` completion.
+- **Dependencies**: `TASK-001` and `TASK-002` completion.
 - **Files Likely Affected**:
   - `app/collectors/tcb_collector.py`
   - `app/collectors/chaldal_collector.py`
   - `app/collectors/news_collector.py`
   - `app/services/source_health.py`
   - `tests/test_tcb_and_news_collectors.py`
+
+---
+
+## NEXT
 
 ### TASK-004 — Spatial Arbitrage Engine Enhancements & Corridor Visualization Polish
 - **Status**: PLANNED
@@ -69,6 +55,12 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **TASK-002 / Milestone 016 — Android Native Basket Compose UI & Room Integration** (2026-09-29):
+  - Created `BasketScreen.kt` in Jetpack Compose Material 3 with preset basket quick-select chips, quantity adjustment steppers, line total calculations, and 3-channel cost comparison overview (Wholesale vs Retail vs Online).
+  - Integrated `BasketScreen` and bottom `NavigationBar` in `MainActivity.kt` with edge-to-edge Scaffold.
+  - Connected local Room DB reactive `savedBaskets` Flow with 1-tap load, save dialog, and cascade deletion.
+  - Verified 100% green test suite (233/233 tests passing) and clean frontend build.
 
 - **Milestone 015 & Patch 014 — Terminal/API Sanitization & Android Room Offline Mirroring** (2026-09-29):
   - Completely sanitized `run_system.py` banner and comments, removing all undergraduate/viva references.
