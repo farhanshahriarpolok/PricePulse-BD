@@ -89,7 +89,7 @@ class TestRealtimePriceService:
 
     def test_unknown_commodity_returns_none(self, db_session):
         service = RealtimePriceService(db=db_session)
-        res = service.get_realtime_price(query="nonexistent_alien_fruit")
+        res = service.get_realtime_price(query="synthetic motor oil 10w40")
         assert res is None
 
     def test_daily_pulse_summary(self, db_session):

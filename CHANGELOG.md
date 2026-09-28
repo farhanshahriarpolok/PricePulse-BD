@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-28
+
+### Added
+- **Full Market Basket Taxonomy Expansion (21 Canonical Commodities)**:
+  - Added 10 high-value proteins, dairy, fish, and staple commodities to `data/taxonomy/commodities.json`:
+    1. **Beef (Local with Bone)** [`গরুর মাংস (হাড়সহ)`] — base unit: kg
+    2. **Mutton / Goat Meat** [`খাসির মাংস`] — base unit: kg
+    3. **Rui Fish (Fresh 1-2 kg)** [`রুই মাছ`] — base unit: kg
+    4. **Pangas Fish** [`পাঙ্গাস মাছ`] — base unit: kg
+    5. **Hilsa Fish (Medium ~800g-1kg)** [`ইলিশ মাছ`] — base unit: kg
+    6. **Pasteurized Cow Milk** [`তরল দুধ (প্যাকেটজাত)`] — base unit: liter
+    7. **Green Chilli** [`কাঁচা মরিচ`] — base unit: kg
+    8. **Sugar (Refined White)** [`চিনি (সাদা)`] — base unit: kg
+    9. **Salt (Iodized)** [`লবণ (আয়োডিনযুক্ত)`] — base unit: kg
+    10. **Mustard Oil** [`সরিষার তেল`] — base unit: liter
+  - Support for customary Bengali packaging units: `২৫০ গ্রাম`, `আধা কেজি`, `১ পোয়া` (250g), `১ কেজি`, `হালি`, `মণ`, `সের`.
+  - Non-destructive DB schema migration in `scripts/init_db.py` and 30-day realistic trajectory synthesis in `scripts/generate_demo_history.py`.
+- **Automated Daily Ingestion & Scheduler Hardening**:
+  - `BackgroundSyncScheduler` enhanced with lifecycle management (`list_jobs()`, `stop()`).
+  - Standalone daily synchronization CLI utility `scripts/sync_daily_prices.py` for automated headless cron jobs.
+  - Resilient collector fallback handling upstream network failures and throttles.
+- **100% Interactive Web UI Polish (`frontend/`)**:
+  - `MarketTicker.jsx`: Horizontal scrolling marquee ticker bar with live pulse indicator, price movements (`↑`, `↓`, `=`), and click-to-inspect navigation.
+  - `CategoryFilter.jsx`: Dynamic category tabs ("All Items", "Grains & Pulses", "Vegetables", "Meat & Fish", "Dairy & Eggs", "Spices & Oils") with badge counters.
+  - `ExportDataModal.jsx`: Client-side dataset exporter supporting UTF-8 BOM CSV and formatted JSON formats for active pulse and commodity histories.
+  - Enhanced Anomaly Alert cards with quick inspection links.
+- **Commercial-Grade Material 3 Android App (`android/`)**:
+  - Refined theme tokens (`Color.kt`, `Theme.kt`) featuring Deep Emerald (`#059669`), Dark Slate (`#0F172A`), Amber (`#F59E0B`), and Rose (`#E11D48`).
+  - `MarketTickerBar.kt`: Horizontal scrolling live price marquee with animated pulsing status indicator.
+  - `HomeScreen.kt`: Real-time telemetry chip (`Live Engine API` vs `Offline Cache`), metric summary cards, category filter chips, and debounced search.
+  - `CommodityDetailScreen.kt`: Channel spread breakdown card (Wholesale vs Physical Retail vs E-Commerce) and lightweight Canvas baseline curve.
+  - `FieldReportScreen.kt`: Instant interactive metric unit conversion preview card (`হালি` -> `pc`, `২৫০ গ্রাম` -> `kg`, `মণ` -> `kg`).
+  - Graceful offline fallback: Displays cached observations with a prominent banner when backend is unreachable.
+- **Test Suite & Benchmark Verification**:
+  - Test suite expanded to 152 automated tests (`tests/test_expanded_basket.py`, `tests/test_daily_sync.py`) passing with 100% success rate.
+  - Benchmark runner script wrapper `scripts/run_all_benchmarks.py`.
+
 ## [1.2.0] - 2026-09-28
 
 ### Added

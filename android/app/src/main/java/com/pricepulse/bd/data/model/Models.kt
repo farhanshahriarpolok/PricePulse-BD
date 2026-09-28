@@ -28,6 +28,30 @@ data class PulseResponse(
     @SerializedName("freshness")       val freshness: String?,
 )
 
+data class PriceSummary(
+    @SerializedName("avg_price") val avgPrice: Double = 0.0,
+    @SerializedName("min_price") val minPrice: Double = 0.0,
+    @SerializedName("max_price") val maxPrice: Double = 0.0,
+    @SerializedName("sample_count") val sampleCount: Int = 1,
+)
+
+data class ChannelComparison(
+    @SerializedName("wholesale_avg") val wholesaleAvg: Double? = null,
+    @SerializedName("retail_avg") val retailAvg: Double? = null,
+    @SerializedName("online_avg") val onlineAvg: Double? = null,
+)
+
+data class DailyPulseItem(
+    @SerializedName("commodity_id") val commodityId: Int,
+    @SerializedName("canonical_name") val canonicalName: String,
+    @SerializedName("bangla_name") val banglaName: String = "",
+    @SerializedName("category") val category: String = "Staples",
+    @SerializedName("unit") val unit: String = "kg",
+    @SerializedName("price_status") val priceStatus: String = "Normal",
+    @SerializedName("price_summary") val priceSummary: PriceSummary = PriceSummary(),
+    @SerializedName("channels") val channels: ChannelComparison? = null,
+)
+
 // ---------------------------------------------------------------------------
 // Commodity catalog
 // ---------------------------------------------------------------------------

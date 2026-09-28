@@ -45,6 +45,14 @@ export default function AnomalyAlertCard({ anomaly, onSelectCommodity }) {
           <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${severityColors[anomaly_severity] || severityColors.Moderate}`}>
             {anomaly_severity} {anomaly_direction || 'Shift'}
           </span>
+          {onSelectCommodity && (
+            <button
+              onClick={onSelectCommodity}
+              className="px-3 py-1 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 text-xs font-semibold transition cursor-pointer"
+            >
+              Inspect History →
+            </button>
+          )}
         </div>
       </div>
 

@@ -46,3 +46,23 @@
 .leaflet-popup-tip {
   background: #1e293b !important;
 }
+
+/* Horizontal Ticker Marquee */
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  display: inline-flex;
+  width: max-content;
+  animation: ticker-scroll 45s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}

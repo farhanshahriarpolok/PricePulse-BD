@@ -25,6 +25,9 @@ import ProvenanceDrawer from './components/ProvenanceDrawer';
 import ComparisonView from './components/ComparisonView';
 import ManualIngestionModal from './components/ManualIngestionModal';
 import SourceHealthCard from './components/SourceHealthCard';
+import MarketTicker from './components/MarketTicker';
+import CategoryFilter, { matchesCategory, CATEGORIES } from './components/CategoryFilter';
+import ExportDataModal from './components/ExportDataModal';
 
 import {
   getDailyPulse,
@@ -55,6 +58,8 @@ export default function App() {
   const [anomaliesData, setAnomaliesData] = useState(null);
   const [spatialData, setSpatialData] = useState(null);
   const [activeProvenance, setActiveProvenance] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Fetch telemetry for upstream data providers
   const fetchSourceHealth = async () => {
@@ -168,6 +173,18 @@ export default function App() {
   }, [selectedCommodity]);
 
   const activeAnomalyCount = anomaliesData?.anomalies_detected || 0;
+  const allPulseItems = pulseData?.items || [];
+
+  const categoryCounts = CATEGORIES.reduce((acc, cat) => {
+    acc[cat.id] = cat.id === 'all'
+      ? allPulseItems.length
+      : allPulseItems.filter((item) => matchesCategory(item, cat.id)).length;
+    return acc;
+  }, {});
+
+  const displayedPulseItems = allPulseItems.filter((item) =>
+    matchesCategory(item, selectedCategory)
+  );
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
@@ -178,9 +195,20 @@ export default function App() {
         onRefresh={loadData}
         isRefreshing={isRefreshing}
         onOpenReportModal={() => setIsManualModalOpen(true)}
+        onOpenExportModal={() => setIsExportModalOpen(true)}
         onTriggerSync={handleTriggerSync}
         isSyncing={isSyncing}
         syncToast={syncToast}
+      />
+
+      {/* Horizontal Scrolling Live Market Ticker */}
+      <MarketTicker
+        items={allPulseItems}
+        onSelectItem={(item) => {
+          const matched = commodities.find((x) => x.id === item.commodity_id);
+          if (matched) setSelectedCommodity(matched);
+          setActiveTab('explorer');
+        }}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -197,6 +225,22 @@ export default function App() {
               }}
             />
 
+            {/* Category Filter Chips */}
+            <div className="flex items-center justify-between mt-6 mb-2">
+              <div>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider font-outfit">
+                  Filter by Category
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-slate-400">
+                Showing {displayedPulseItems.length} of {allPulseItems.length} items
+              </span>
+            </div>
+            <CategoryFilter
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              itemsCountMap={categoryCounts}
+            />
 
             {/* Daily Staples Grid */}
             <div className="mb-8">
@@ -210,52 +254,58 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {pulseData?.items?.map((item) => (
-                  <div
-                    key={item.commodity_id}
-                    onClick={() => {
-                      const c = commodities.find((x) => x.id === item.commodity_id);
-                      if (c) setSelectedCommodity(c);
-                      setActiveTab('explorer');
-                    }}
-                    className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 hover:border-emerald-500/50 cursor-pointer transition shadow-sm hover:shadow-emerald-950/20 group"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-                        {item.category}
-                      </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        item.price_status === 'High'
-                          ? 'bg-rose-500/20 text-rose-300'
-                          : item.price_status === 'Elevated'
-                          ? 'bg-amber-500/20 text-amber-300'
-                          : 'bg-emerald-500/20 text-emerald-300'
-                      }`}>
-                        {item.price_status}
-                      </span>
-                    </div>
-
-                    <div className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
-                      {item.canonical_name}
-                    </div>
-                    <div className="text-xs text-slate-400 mb-3 font-bengali">
-                      {item.bangla_name}
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-700/60 flex items-baseline justify-between">
-                      <div>
-                        <span className="text-xs text-slate-400">Avg Benchmark:</span>
-                        <div className="text-xl font-bold font-outfit text-white">
-                          BDT {item.price_summary.avg_price.toFixed(2)}
-                          <span className="text-xs font-normal text-slate-400"> /{item.unit}</span>
-                        </div>
+              {displayedPulseItems.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {displayedPulseItems.map((item) => (
+                    <div
+                      key={item.commodity_id}
+                      onClick={() => {
+                        const c = commodities.find((x) => x.id === item.commodity_id);
+                        if (c) setSelectedCommodity(c);
+                        setActiveTab('explorer');
+                      }}
+                      className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 hover:border-emerald-500/50 cursor-pointer transition shadow-sm hover:shadow-emerald-950/20 group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                          {item.category}
+                        </span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          item.price_status === 'High'
+                            ? 'bg-rose-500/20 text-rose-300'
+                            : item.price_status === 'Elevated'
+                            ? 'bg-amber-500/20 text-amber-300'
+                            : 'bg-emerald-500/20 text-emerald-300'
+                        }`}>
+                          {item.price_status}
+                        </span>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+
+                      <div className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                        {item.canonical_name}
+                      </div>
+                      <div className="text-xs text-slate-400 mb-3 font-bengali">
+                        {item.bangla_name}
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-700/60 flex items-baseline justify-between">
+                        <div>
+                          <span className="text-xs text-slate-400">Avg Benchmark:</span>
+                          <div className="text-xl font-bold font-outfit text-white">
+                            BDT {item.price_summary?.avg_price ? item.price_summary.avg_price.toFixed(2) : '0.00'}
+                            <span className="text-xs font-normal text-slate-400"> /{item.unit}</span>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center rounded-xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
+                  No commodities found in this category. Select "All Items" to view the full market basket.
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -486,6 +536,15 @@ export default function App() {
         onSuccess={() => {
           loadData();
         }}
+      />
+
+      {/* Export Market Intelligence Modal */}
+      <ExportDataModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        pulseItems={allPulseItems}
+        selectedCommodity={selectedCommodity}
+        commodityHistory={commodityHistory}
       />
 
       {/* Footer */}

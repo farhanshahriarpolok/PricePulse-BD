@@ -45,6 +45,22 @@ class BackgroundSyncScheduler:
             self._loop_task.cancel()
             logger.info("BackgroundSyncScheduler cancelled.")
 
+    def stop(self) -> None:
+        """Alias for shutdown to provide standardized lifecycle control."""
+        self.shutdown()
+
+    def list_jobs(self) -> list[Dict[str, Any]]:
+        """Return list of active / registered scheduler jobs."""
+        jobs = []
+        if self._running:
+            jobs.append({
+                "id": "periodic_harvest_job",
+                "name": "Periodic Price Harvest",
+                "interval_seconds": self.interval_seconds,
+                "status": "running"
+            })
+        return jobs
+
     async def _periodic_loop(self) -> None:
         """Periodic loop executing harvests at regular intervals."""
         while self._running:

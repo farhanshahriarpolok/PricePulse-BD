@@ -11,7 +11,8 @@ import {
   PlusCircle,
   Server,
   CheckCircle,
-  Radio
+  Radio,
+  Download
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -21,6 +22,7 @@ export default function Navbar({
   onRefresh, 
   isRefreshing = false,
   onOpenReportModal,
+  onOpenExportModal,
   onTriggerSync,
   isSyncing = false,
   syncToast = null,
@@ -91,6 +93,16 @@ export default function Navbar({
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span>{isSyncing ? 'Syncing...' : 'Sync Live Data'}</span>
+            </button>
+
+            {/* Export Data Button */}
+            <button
+              onClick={onOpenExportModal}
+              title="Export Market Intelligence Data (CSV / JSON)"
+              className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold border border-slate-700 transition-all"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Export</span>
             </button>
 
             {/* Primary Action Button */}

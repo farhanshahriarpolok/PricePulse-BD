@@ -26,7 +26,7 @@ class CommodityNormalizer:
     # Unit conversion rules: mapping to (base_unit, multiplier_to_base)
     # Price per base unit = raw_price / multiplier_to_base
     UNIT_MAP: dict[str, Tuple[str, float]] = {
-        # Mass units -> kg
+    # Mass units -> kg
         "kg": ("kg", 1.0),
         "কেজি": ("kg", 1.0),
         "কিলোগ্রাম": ("kg", 1.0),
@@ -45,6 +45,18 @@ class CommodityNormalizer:
         "gram": ("kg", 0.001),
         "gm": ("kg", 0.001),
         "g": ("kg", 0.001),
+        # Fraction / portion mass units
+        "আধা কেজি": ("kg", 0.5),
+        "adha kaji": ("kg", 0.5),
+        "half kg": ("kg", 0.5),
+        "পোয়া": ("kg", 0.25),
+        "poa": ("kg", 0.25),
+        "quarter kg": ("kg", 0.25),
+        "২৫০গ্রাম": ("kg", 0.25),
+        "250gm": ("kg", 0.25),
+        "250g": ("kg", 0.25),
+        "500gm": ("kg", 0.5),
+        "500g": ("kg", 0.5),
 
         # Volume units -> liter
         "liter": ("liter", 1.0),
@@ -57,6 +69,10 @@ class CommodityNormalizer:
         "মিলি": ("liter", 0.001),
         "ml": ("liter", 0.001),
         "milliliter": ("liter", 0.001),
+        "200ml": ("liter", 0.2),
+        "500ml": ("liter", 0.5),
+        "আধা লিটার": ("liter", 0.5),
+        "half liter": ("liter", 0.5),
 
         # Count units -> pc
         "piece": ("pc", 1.0),
@@ -104,7 +120,7 @@ class CommodityNormalizer:
         normalized = normalized.lower()
         # Collapse multiple spaces and trim punctuation
         normalized = re.sub(r"[\t\r\n]+", " ", normalized)
-        normalized = re.sub(r"[\(\)\[\],:\/]+", " ", normalized)
+        normalized = re.sub(r"[\(\)\[\],:\/_]+", " ", normalized)
         return " ".join(normalized.split())
 
     def _load_taxonomy(self) -> None:
@@ -167,9 +183,11 @@ class CommodityNormalizer:
         if cleaned in self._alias_index:
             return self._alias_index[cleaned]
 
-        # 2. Tokenized contains match across aliases
+        # 2. Tokenized / whole-phrase match across aliases (respecting word boundaries)
+        cleaned_padded = f" {cleaned} "
         for alias_key, item in self._alias_index.items():
-            if alias_key in cleaned or cleaned in alias_key:
+            alias_padded = f" {alias_key} "
+            if alias_padded in cleaned_padded or cleaned_padded in alias_padded:
                 return NormalizedCommodity(
                     canonical_name=item.canonical_name,
                     bangla_name=item.bangla_name,
