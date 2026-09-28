@@ -46,3 +46,15 @@ frontend/dist/
 frontend/.vite/
 node_modules/
 dist/
+
+# Android build artifacts and local machine config
+android/local.properties
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+android/.idea/
+android/**/*.apk
+android/**/*.aab
+android/**/*.jks
+android/**/*.keystore

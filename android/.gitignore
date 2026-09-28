@@ -1,0 +1,34 @@
+# Android Studio and Gradle build artifacts — never commit these
+*.iml
+.gradle/
+local.properties
+.idea/
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+app/build/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore files — never commit signing configs
+*.jks
+*.keystore
+
+# Generated files
+gen/
+out/
+
+# Proguard output
+proguard-output.txt
+mapping.txt
+seeds.txt
+usage.txt
