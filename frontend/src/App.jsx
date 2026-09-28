@@ -45,7 +45,23 @@ import {
 } from './api/endpoints';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('pulse');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (tabParam) return tabParam;
+      const hash = window.location.hash.replace('#', '');
+      if (hash.startsWith('basket')) return 'basket';
+      if (hash) return hash;
+    }
+    return 'pulse';
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.location.hash.startsWith(`#${activeTab}`)) {
+      window.history.replaceState(null, '', `#${activeTab}`);
+    }
+  }, [activeTab]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);

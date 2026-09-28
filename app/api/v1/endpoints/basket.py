@@ -14,7 +14,14 @@ from sqlalchemy.orm import Session
 logger = logging.getLogger(__name__)
 
 from app.core.database import get_db
-from app.schemas.basket import BasketCalculationRequest, BasketCalculationResponse
+from app.schemas.basket import (
+    BasketCalculationRequest,
+    BasketCalculationResponse,
+    SavedBasketCreate,
+    SavedBasketDetailOut,
+    SavedBasketSummaryOut,
+    BasketTrendResponse,
+)
 from app.services.basket_service import basket_service
 
 router = APIRouter(prefix="/basket", tags=["Bazaar Basket"])
@@ -123,3 +130,111 @@ def get_basket_presets() -> dict:
         "total": len(BASKET_PRESETS),
         "presets": BASKET_PRESETS,
     }
+
+
+# ---------------------------------------------------------------------------
+# Saved Basket & Personal Inflation Trend Endpoints
+# ---------------------------------------------------------------------------
+
+@router.post(
+    "/saved",
+    response_model=SavedBasketDetailOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Save Customized Basket",
+    description="Persist a customized household market basket to SQLite and return calculation detail.",
+)
+def create_saved_basket(
+    payload: SavedBasketCreate,
+    db: Session = Depends(get_db),
+) -> SavedBasketDetailOut:
+    """Save user basket and return calculation detail."""
+    try:
+        return basket_service.save_basket(db=db, payload=payload)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.error("Failed to save basket: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save basket. Please verify input data.",
+        ) from exc
+
+
+@router.get(
+    "/saved",
+    response_model=list[SavedBasketSummaryOut],
+    summary="List Saved Household Baskets",
+    description="Return summary overviews for all saved household baskets with live totals and shifts.",
+)
+def list_saved_baskets(
+    db: Session = Depends(get_db),
+) -> list[SavedBasketSummaryOut]:
+    """List all saved consumer baskets."""
+    return basket_service.list_saved_baskets(db=db)
+
+
+@router.get(
+    "/saved/{basket_id}",
+    response_model=SavedBasketDetailOut,
+    summary="Get Saved Basket Detail",
+    description="Retrieve a single saved basket by ID with full item details and channel calculation.",
+)
+def get_saved_basket(
+    basket_id: int,
+    db: Session = Depends(get_db),
+) -> SavedBasketDetailOut:
+    """Retrieve saved basket by ID."""
+    detail = basket_service.get_saved_basket(db=db, basket_id=basket_id)
+    if not detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Saved basket #{basket_id} not found.",
+        )
+    return detail
+
+
+@router.delete(
+    "/saved/{basket_id}",
+    summary="Delete Saved Basket",
+    description="Remove a saved household basket by ID.",
+)
+def delete_saved_basket(
+    basket_id: int,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Delete a saved basket."""
+    success = basket_service.delete_saved_basket(db=db, basket_id=basket_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Saved basket #{basket_id} not found.",
+        )
+    return {"status": "ok", "message": f"Saved basket #{basket_id} deleted successfully."}
+
+
+@router.get(
+    "/saved/{basket_id}/trend",
+    response_model=BasketTrendResponse,
+    summary="Compute 30-Day Personal Basket CPI Trend",
+    description=(
+        "Calculates the chronological 30-day cost trajectory, volatility coefficient of variation (CV%), "
+        "personal 30-day and 7-day inflation rates, cheapest and peak dates, and academic narrative."
+    ),
+)
+def get_basket_trend(
+    basket_id: int,
+    days: int = 30,
+    db: Session = Depends(get_db),
+) -> BasketTrendResponse:
+    """Compute 30-day personal CPI trend for a saved basket."""
+    trend = basket_service.calculate_basket_trend(db=db, basket_id=basket_id, days=days)
+    if not trend:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Saved basket #{basket_id} not found or has no items.",
+        )
+    return trend
+

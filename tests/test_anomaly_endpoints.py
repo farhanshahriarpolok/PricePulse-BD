@@ -26,6 +26,16 @@ class TestAnomalyEndpoints:
 
         # Onion price shock should be actively detected
         onion_anomalies = [a for a in data["anomalies"] if a["canonical_name"] == "Onion (Local)"]
+        if not onion_anomalies:
+            # Prior test (e.g. sync) may have inserted unshocked observations; restore calibrated demo series
+            from scripts.generate_demo_history import _run_generation
+            from app.core.database import SessionLocal
+            with SessionLocal() as s:
+                _run_generation(s)
+            response = client.get("/api/v1/anomalies/active")
+            data = response.json()
+            onion_anomalies = [a for a in data["anomalies"] if a["canonical_name"] == "Onion (Local)"]
+
         assert len(onion_anomalies) > 0
         onion_alert = onion_anomalies[0]
         assert onion_alert["is_anomaly"] is True

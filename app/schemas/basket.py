@@ -87,3 +87,102 @@ class BasketCalculationResponse(BaseModel):
         ...,
         description="Actionable Bengali-language procurement suggestions",
     )
+
+
+# ---------------------------------------------------------------------------
+# Saved Basket & Personal Inflation Tracking Schemas
+# ---------------------------------------------------------------------------
+
+class SavedBasketItemCreate(BaseModel):
+    """Line-item payload when saving a customized consumer basket."""
+
+    commodity_id: int = Field(..., description="Canonical commodity ID")
+    quantity: float = Field(..., gt=0, description="Quantity in customary unit")
+    unit: str = Field(..., description="Customary or metric unit label")
+
+
+class SavedBasketCreate(BaseModel):
+    """Payload for creating a persistent saved basket."""
+
+    name: str = Field(..., min_length=1, max_length=120, description="Name for the personal basket")
+    bangla_name: Optional[str] = Field(None, max_length=120, description="Bengali label (optional)")
+    description: Optional[str] = Field(None, max_length=255, description="Personal note or purpose")
+    items: list[SavedBasketItemCreate] = Field(..., min_length=1, description="Basket items")
+
+
+class SavedBasketItemOut(BaseModel):
+    """Detailed item output in a saved basket."""
+
+    id: int
+    commodity_id: int
+    canonical_name: str
+    bangla_name: str
+    quantity: float
+    unit: str
+    quantity_normalized: float
+    standard_unit: str
+    unit_price: float
+    line_total: float
+
+
+class SavedBasketSummaryOut(BaseModel):
+    """Summary overview of a saved household basket."""
+
+    id: int
+    name: str
+    bangla_name: Optional[str] = None
+    description: Optional[str] = None
+    item_count: int
+    created_at: str
+    updated_at: str
+    current_retail_total: float
+    current_wholesale_total: float
+    current_online_total: float
+    max_savings_bdt: float
+    best_channel: str
+    shift_7d_pct: float
+    shift_30d_pct: float
+
+
+class SavedBasketDetailOut(BaseModel):
+    """Full detail of a saved basket with items and channel breakdown."""
+
+    id: int
+    name: str
+    bangla_name: Optional[str] = None
+    description: Optional[str] = None
+    created_at: str
+    updated_at: str
+    calculation: BasketCalculationResponse
+    items: list[SavedBasketItemOut]
+
+
+class BasketTrendPoint(BaseModel):
+    """Single chronological day in the 30-day basket trajectory."""
+
+    date: str
+    retail_total: float
+    wholesale_total: float
+    online_total: float
+    is_anomaly_day: bool = False
+
+
+class BasketTrendResponse(BaseModel):
+    """30-day personal CPI inflation trajectory and volatility metrics."""
+
+    basket_id: int
+    basket_name: str
+    bangla_name: Optional[str] = None
+    item_count: int
+    current_cost: float
+    baseline_30d_avg: float
+    inflation_30d_pct: float
+    inflation_7d_pct: float
+    cheapest_date: str
+    cheapest_cost: float
+    peak_date: str
+    peak_cost: float
+    volatility_cv: float
+    trend_points: list[BasketTrendPoint]
+    academic_narrative: str
+

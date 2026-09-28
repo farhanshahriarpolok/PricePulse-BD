@@ -39,6 +39,8 @@ instance/
 .tasks/
 .system_generated/
 *.log
+chrome_*.png
+chrome_*.html
 
 # Node.js and Frontend dependencies / build artifacts
 frontend/node_modules/

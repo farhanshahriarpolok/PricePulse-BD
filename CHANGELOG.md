@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.0] - 2026-09-28
 
 ### Added
+- **Persistent Saved Baskets Engine & 30-Day Personal CPI Trend Trajectory**:
+  - `app/models/basket.py`: SQLAlchemy ORM models `SavedBasket` and `SavedBasketItem` with cascade deletion, tracking user-customized household shopping baskets and quantities.
+  - `app/schemas/basket.py`: Added `SavedBasketCreateIn`, `SavedBasketItemIn`, `SavedBasketSummaryOut`, `SavedBasketDetailOut`, `SavedBasketItemOut`, `BasketTrendPoint`, and `BasketTrendResponse` schemas.
+  - `app/services/basket_service.py`: Added `save_basket()`, `list_saved_baskets()`, `get_saved_basket()`, `delete_saved_basket()`, and `calculate_basket_trend()` with 30-day chronological price trajectory reconstruction, personal inflation percentage ($\Delta_{30d}\%$, $\Delta_{7d}\%$), coefficient of variation ($CV$), anomaly threshold tagging, and plain-language Bengali narrative synthesis.
+  - `app/api/v1/endpoints/basket.py`: Added REST endpoints:
+    - `POST /api/v1/basket/saved` — create persistent saved household basket.
+    - `GET /api/v1/basket/saved` — list all saved baskets with real-time price totals and 7d/30d inflation indicators.
+    - `GET /api/v1/basket/saved/{id}` — retrieve single saved basket with calculation and item details.
+    - `DELETE /api/v1/basket/saved/{id}` — delete saved basket.
+    - `GET /api/v1/basket/saved/{id}/trend` — 30-day cost trajectory, volatility metrics, and personal inflation analysis.
+  - `frontend/src/components/BazaarBasketView.jsx`: Added "Save Basket" modal, "My Saved Baskets" collection drawer with quick-load and delete actions, and full 30-day interactive Personal CPI Trend Modal featuring multi-channel cost trajectories, peak/cheapest markers, volatility index, and Bengali synthesis callouts.
+  - `tests/test_saved_baskets.py`: Comprehensive 10-test suite verifying saved basket persistence, custom unit handling (`পোয়া`), 404/422 validations, cascade deletion, and 30-day trend trajectory mathematics.
+- **Repository Control Layer & Governance Framework**:
+  - Established durable operational contracts: `AGENTS.md` (operational contract & invariants), `CLAUDE.md` (context entry point), `TASKS.md` (execution queue), and `BRAIN.md` (compressed project intelligence).
 - **Consumer "Bazaar Basket" & Cost of Living Tracker (Shopping Optimizer)**:
   - `app/schemas/basket.py`: Pydantic schemas `BasketItemInput`, `BasketCalculationRequest`, `ChannelCostBreakdown`, `BasketItemCostDetail`, `BasketCalculationResponse` covering all basket calculus data contracts with full field documentation.
   - `app/services/basket_service.py`: `BasketOptimizationService` — comprehensive basket calculus engine that normalizes customary units (`হালি` → 4 pc, `পোয়া` → 0.25 kg, `মণ` → 40 kg, `500ml` → 0.5 liter) via the existing `CommodityNormalizer`, pulls today's wholesale/retail/online prices per commodity from the DB using a single-pass SQL query with a 14-day trailing window, imputes missing channel prices from cross-channel averages (online defaults to +8% premium when absent), computes 7-day personal inflation shift (Δ% = (today − t7) / t7 × 100), generates smart substitute savings recommendations using a commodity close-variant map, and produces consumer-friendly Bengali procurement explanations.

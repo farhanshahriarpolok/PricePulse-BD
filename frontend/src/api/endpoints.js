@@ -76,4 +76,36 @@ export const calculateBasket = (payload) => apiClient.post('/basket/calculate', 
  */
 export const getBasketPresets = () => apiClient.get('/basket/presets');
 
+/**
+ * POST /basket/saved
+ * Save customized household basket to SQLite.
+ */
+export const saveBasket = (payload) => apiClient.post('/basket/saved', payload);
+
+/**
+ * GET /basket/saved
+ * List all saved household baskets.
+ */
+export const getSavedBaskets = () => apiClient.get('/basket/saved');
+
+/**
+ * GET /basket/saved/:id
+ * Retrieve single saved basket with calculation and item details.
+ */
+export const getSavedBasketDetail = (basketId) => apiClient.get(`/basket/saved/${basketId}`);
+
+/**
+ * DELETE /basket/saved/:id
+ * Remove a saved basket.
+ */
+export const deleteSavedBasket = (basketId) => apiClient.delete(`/basket/saved/${basketId}`);
+
+/**
+ * GET /basket/saved/:id/trend
+ * 30-day personal CPI trend, volatility metrics, and academic narrative.
+ */
+export const getSavedBasketTrend = (basketId, days = 30) =>
+  apiClient.get(`/basket/saved/${basketId}/trend`, { params: { days } });
+
+
 

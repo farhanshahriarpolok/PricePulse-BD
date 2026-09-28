@@ -23,11 +23,19 @@ from app.models.commodity import Commodity
 from app.models.location import Market
 from app.models.observation import PriceObservation
 from app.models.source import Source
+from app.models.basket import SavedBasket, SavedBasketItem
 from app.schemas.basket import (
     BasketCalculationRequest,
     BasketCalculationResponse,
     BasketItemCostDetail,
+    BasketItemInput,
     ChannelCostBreakdown,
+    SavedBasketCreate,
+    SavedBasketDetailOut,
+    SavedBasketItemOut,
+    SavedBasketSummaryOut,
+    BasketTrendPoint,
+    BasketTrendResponse,
 )
 from app.services.normalizer import commodity_normalizer
 
@@ -477,6 +485,15 @@ class BasketOptimizationService:
         return tips[:4]
 
     @staticmethod
+    def normalize_item(quantity: float, raw_unit: str) -> tuple[float, str]:
+        """Normalize customary unit to base metric quantity and standard unit string."""
+        try:
+            base_unit, multiplier = commodity_normalizer.normalize_unit(raw_unit)
+            return round(quantity * multiplier, 4), base_unit
+        except ValueError:
+            return quantity, raw_unit
+
+    @staticmethod
     def _empty_response() -> BasketCalculationResponse:
         """Return a zeroed response for an empty or unresolvable basket."""
         return BasketCalculationResponse(
@@ -491,6 +508,291 @@ class BasketOptimizationService:
             cost_shift_7d_bdt=0.0,
             item_details=[],
             smart_saving_tips=[],
+        )
+
+    # -----------------------------------------------------------------------
+    # Saved Basket & Personal Inflation Tracking Methods
+    # -----------------------------------------------------------------------
+
+    def save_basket(self, db: Session, payload: SavedBasketCreate) -> SavedBasketDetailOut:
+        """Persist a user's customized basket to SQLite and return calculation detail."""
+        # Validate that all commodities exist
+        commodity_ids = [item.commodity_id for item in payload.items]
+        existing_comms = {
+            c.id: c
+            for c in db.scalars(select(Commodity).where(Commodity.id.in_(commodity_ids))).all()
+        }
+        for item in payload.items:
+            if item.commodity_id not in existing_comms:
+                raise ValueError(f"Commodity with ID {item.commodity_id} not found in taxonomy.")
+
+        basket = SavedBasket(
+            name=payload.name.strip(),
+            bangla_name=payload.bangla_name.strip() if payload.bangla_name else None,
+            description=payload.description.strip() if payload.description else None,
+        )
+        db.add(basket)
+        db.flush()
+
+        for item in payload.items:
+            db_item = SavedBasketItem(
+                basket_id=basket.id,
+                commodity_id=item.commodity_id,
+                quantity=float(item.quantity),
+                unit=item.unit.strip(),
+            )
+            db.add(db_item)
+
+        db.commit()
+        db.refresh(basket)
+
+        detail = self.get_saved_basket(db, basket.id)
+        if not detail:
+            raise ValueError("Failed to retrieve created basket.")
+        return detail
+
+    def list_saved_baskets(self, db: Session) -> list[SavedBasketSummaryOut]:
+        """Return summary cards for all saved household baskets with live totals."""
+        baskets = list(
+            db.scalars(select(SavedBasket).order_by(SavedBasket.created_at.desc())).all()
+        )
+        summaries: list[SavedBasketSummaryOut] = []
+
+        for b in baskets:
+            if not b.items:
+                continue
+
+            calc_req = BasketCalculationRequest(
+                items=[
+                    BasketItemInput(
+                        commodity_id=item.commodity_id,
+                        quantity=item.quantity,
+                        raw_unit=item.unit,
+                    )
+                    for item in b.items
+                ]
+            )
+            calc_resp = self.calculate(request=calc_req, db=db)
+
+            # Compute 30d shift
+            cost_today = calc_resp.benchmark_total
+            cost_30d = 0.0
+            date_30d = date.today() - timedelta(days=30)
+            for item in b.items:
+                norm_q, _ = self.normalize_item(item.quantity, item.unit)
+                ch_30d = self._fetch_channel_prices(db, item.commodity_id, date_30d)
+                bench_30d = ch_30d.benchmark() or (calc_resp.benchmark_total / len(b.items))
+                cost_30d += bench_30d * norm_q
+
+            shift_30d_pct = (
+                round(((cost_today - cost_30d) / cost_30d) * 100.0, 2)
+                if cost_30d > 0
+                else 0.0
+            )
+
+            summaries.append(
+                SavedBasketSummaryOut(
+                    id=b.id,
+                    name=b.name,
+                    bangla_name=b.bangla_name,
+                    description=b.description,
+                    item_count=len(b.items),
+                    created_at=b.created_at.isoformat() if b.created_at else "",
+                    updated_at=b.updated_at.isoformat() if b.updated_at else "",
+                    current_retail_total=calc_resp.retail_total,
+                    current_wholesale_total=calc_resp.wholesale_total,
+                    current_online_total=calc_resp.online_total,
+                    max_savings_bdt=calc_resp.max_savings_bdt,
+                    best_channel=calc_resp.best_channel,
+                    shift_7d_pct=calc_resp.cost_shift_7d_pct,
+                    shift_30d_pct=shift_30d_pct,
+                )
+            )
+
+        return summaries
+
+    def get_saved_basket(self, db: Session, basket_id: int) -> Optional[SavedBasketDetailOut]:
+        """Fetch a saved basket by ID with full item details and channel calculation."""
+        basket = db.get(SavedBasket, basket_id)
+        if not basket:
+            return None
+
+        calc_req = BasketCalculationRequest(
+            items=[
+                BasketItemInput(
+                    commodity_id=item.commodity_id,
+                    quantity=item.quantity,
+                    raw_unit=item.unit,
+                )
+                for item in basket.items
+            ]
+        )
+        calc_resp = self.calculate(request=calc_req, db=db)
+
+        item_out_map = {d.commodity_id: d for d in calc_resp.item_details}
+        detailed_items: list[SavedBasketItemOut] = []
+
+        for db_item in basket.items:
+            detail = item_out_map.get(db_item.commodity_id)
+            c_name = detail.canonical_name if detail else f"Commodity #{db_item.commodity_id}"
+            b_name = detail.bangla_name if detail else c_name
+            norm_q = detail.quantity_normalized if detail else db_item.quantity
+            std_u = detail.standard_unit if detail else db_item.unit
+            u_p = detail.unit_price if detail else 0.0
+            l_t = detail.line_total if detail else 0.0
+
+            detailed_items.append(
+                SavedBasketItemOut(
+                    id=db_item.id,
+                    commodity_id=db_item.commodity_id,
+                    canonical_name=c_name,
+                    bangla_name=b_name,
+                    quantity=db_item.quantity,
+                    unit=db_item.unit,
+                    quantity_normalized=norm_q,
+                    standard_unit=std_u,
+                    unit_price=u_p,
+                    line_total=l_t,
+                )
+            )
+
+        return SavedBasketDetailOut(
+            id=basket.id,
+            name=basket.name,
+            bangla_name=basket.bangla_name,
+            description=basket.description,
+            created_at=basket.created_at.isoformat() if basket.created_at else "",
+            updated_at=basket.updated_at.isoformat() if basket.updated_at else "",
+            calculation=calc_resp,
+            items=detailed_items,
+        )
+
+    def delete_saved_basket(self, db: Session, basket_id: int) -> bool:
+        """Delete a saved basket by ID."""
+        basket = db.get(SavedBasket, basket_id)
+        if not basket:
+            return False
+        db.delete(basket)
+        db.commit()
+        return True
+
+    def calculate_basket_trend(
+        self, db: Session, basket_id: int, days: int = 30
+    ) -> Optional[BasketTrendResponse]:
+        """
+        Compute the chronological 30-day cost trajectory, volatility, and personal
+        inflation rate for a saved consumer basket.
+        """
+        basket = db.get(SavedBasket, basket_id)
+        if not basket or not basket.items:
+            return None
+
+        # Pre-normalize item quantities
+        items_norm = []
+        for item in basket.items:
+            norm_q, std_u = self.normalize_item(item.quantity, item.unit)
+            items_norm.append((item.commodity_id, norm_q, std_u))
+
+        today = date.today()
+        trend_points: list[BasketTrendPoint] = []
+        retail_costs: list[float] = []
+
+        for d in range(days - 1, -1, -1):
+            obs_date = today - timedelta(days=d)
+            daily_retail = 0.0
+            daily_wholesale = 0.0
+            daily_online = 0.0
+
+            for comm_id, norm_q, _ in items_norm:
+                ch = self._fetch_channel_prices(db, comm_id, obs_date)
+                bench_p = ch.benchmark() or 0.0
+                r_p = ch.retail or bench_p
+                w_p = ch.wholesale or (bench_p * 0.85 if bench_p else 0.0)
+                o_p = ch.online or (bench_p * 1.08 if bench_p else 0.0)
+
+                daily_retail += r_p * norm_q
+                daily_wholesale += w_p * norm_q
+                daily_online += o_p * norm_q
+
+            daily_retail = round(daily_retail, 2)
+            daily_wholesale = round(daily_wholesale, 2)
+            daily_online = round(daily_online, 2)
+
+            retail_costs.append(daily_retail)
+            trend_points.append(
+                BasketTrendPoint(
+                    date=obs_date.isoformat(),
+                    retail_total=daily_retail,
+                    wholesale_total=daily_wholesale,
+                    online_total=daily_online,
+                    is_anomaly_day=False,
+                )
+            )
+
+        if not trend_points:
+            return None
+
+        # Statistical metrics
+        avg_cost = round(sum(retail_costs) / len(retail_costs), 2)
+        variance = (
+            sum((c - avg_cost) ** 2 for c in retail_costs) / (len(retail_costs) - 1)
+            if len(retail_costs) > 1
+            else 0.0
+        )
+        std_dev = round(variance ** 0.5, 2)
+        cv = round((std_dev / avg_cost) * 100.0, 2) if avg_cost > 0 else 0.0
+
+        # Mark anomaly days (cost > mean + 1.5 * std_dev)
+        anomaly_threshold = avg_cost + 1.5 * std_dev
+        for pt in trend_points:
+            if pt.retail_total >= anomaly_threshold and std_dev > 1.0:
+                pt.is_anomaly_day = True
+
+        current_cost = trend_points[-1].retail_total
+        first_cost = trend_points[0].retail_total
+        cost_7d_ago = trend_points[-7].retail_total if len(trend_points) >= 7 else first_cost
+
+        inflation_30d = (
+            round(((current_cost - first_cost) / first_cost) * 100.0, 2)
+            if first_cost > 0
+            else 0.0
+        )
+        inflation_7d = (
+            round(((current_cost - cost_7d_ago) / cost_7d_ago) * 100.0, 2)
+            if cost_7d_ago > 0
+            else 0.0
+        )
+
+        cheapest_pt = min(trend_points, key=lambda x: x.retail_total)
+        peak_pt = max(trend_points, key=lambda x: x.retail_total)
+
+        b_name = basket.bangla_name or basket.name
+        narrative = (
+            f"পারিবারিক বাস্কেট '{b_name}'-এর ৩০ দিনের বিশ্লেষণ: "
+            f"বর্তমান খুচরা মোট খরচ ৳{current_cost:.2f}, যা ৩০ দিন আগের (৳{first_cost:.2f}) তুলনায় "
+            f"{inflation_30d:+.1f}% পরিবর্তিত হয়েছে (৭ দিনে {inflation_7d:+.1f}%)। "
+            f"সর্বনিম্ন খরচ ছিল {cheapest_pt.date} তারিখে (৳{cheapest_pt.retail_total:.2f}) "
+            f"এবং সর্বোচ্চ খরচ হয় {peak_pt.date} তারিখে (৳{peak_pt.retail_total:.2f})। "
+            f"বাস্কেটটির ভোলাটিলিটি ইনডেক্স CV={cv:.1f}%, যা "
+            f"{'উচ্চমূল্য অস্থিরতা নির্দেশ করে।' if cv >= 12.0 else 'তুলনামূলকভাবে স্থিতিশীল বাজার নির্দেশ করে।'}"
+        )
+
+        return BasketTrendResponse(
+            basket_id=basket.id,
+            basket_name=basket.name,
+            bangla_name=basket.bangla_name,
+            item_count=len(basket.items),
+            current_cost=current_cost,
+            baseline_30d_avg=avg_cost,
+            inflation_30d_pct=inflation_30d,
+            inflation_7d_pct=inflation_7d,
+            cheapest_date=cheapest_pt.date,
+            cheapest_cost=cheapest_pt.retail_total,
+            peak_date=peak_pt.date,
+            peak_cost=peak_pt.retail_total,
+            volatility_cv=cv,
+            trend_points=trend_points,
+            academic_narrative=narrative,
         )
 
 

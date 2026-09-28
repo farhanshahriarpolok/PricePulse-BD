@@ -130,9 +130,15 @@ def inject_shock(
             )
         )
 
-    # Evaluate anomaly parameters on simulated series
+    # Evaluate anomaly parameters: compare simulated endpoint against un-shocked baseline history
+    # so multi-day shocks do not artificially inflate the historical variance baseline.
+    eval_series = [
+        (d, round(base_series[i][1] * (1.0 + (payload.baseline_adjustment_pct / 100.0)), 2))
+        for i, (d, _) in enumerate(simulated_series[:-1])
+    ] + [simulated_series[-1]]
+
     is_anomaly, severity, direction, metrics = anomaly_engine.evaluate_series(
-        daily_prices=simulated_series,
+        daily_prices=eval_series,
         target_date=eval_date,
     )
 
