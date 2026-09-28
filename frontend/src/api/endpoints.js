@@ -102,7 +102,7 @@ export const deleteSavedBasket = (basketId) => apiClient.delete(`/basket/saved/$
 
 /**
  * GET /basket/saved/:id/trend
- * 30-day personal CPI trend, volatility metrics, and academic narrative.
+ * 30-day personal CPI trend, volatility metrics, and market analysis narrative.
  */
 export const getSavedBasketTrend = (basketId, days = 30) =>
   apiClient.get(`/basket/saved/${basketId}/trend`, { params: { days } });

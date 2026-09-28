@@ -35,6 +35,8 @@ from app.core.database import SessionLocal
 from app.services.ingestion import ingest_observations
 from app.collectors.dam_live_collector import DAMLiveCollector
 from app.collectors.chaldal_live_collector import ChaldalLiveCollector
+from app.collectors.tcb_collector import TCBCollector
+from app.collectors.news_collector import NewsCollector
 from app.services.source_health import record_health_event
 
 
@@ -47,12 +49,14 @@ def run_sync(source_filter: str | None = None) -> dict:
     sources = {
         "dam": ("DAM Live Bulletin", DAMLiveCollector),
         "chaldal": ("Chaldal Online Grocery", ChaldalLiveCollector),
+        "tcb": ("Trading Corporation of Bangladesh (TCB)", TCBCollector),
+        "news": ("National Press Market Roundups", NewsCollector),
     }
 
     if source_filter:
         sources = {k: v for k, v in sources.items() if k == source_filter.lower()}
         if not sources:
-            print(f"[ERROR] Unknown source '{source_filter}'. Valid: dam, chaldal")
+            print(f"[ERROR] Unknown source '{source_filter}'. Valid: dam, chaldal, tcb, news")
             sys.exit(1)
 
     with SessionLocal() as session:
@@ -111,9 +115,9 @@ def main():
     parser = argparse.ArgumentParser(description="PricePulse BD — Daily Price Sync CLI")
     parser.add_argument(
         "--source",
-        choices=["dam", "chaldal"],
+        choices=["dam", "chaldal", "tcb", "news"],
         default=None,
-        help="Run a single source collector (default: all sources)",
+        help="Run a single source collector (default: all sources: dam, chaldal, tcb, news)",
     )
     args = parser.parse_args()
     results = run_sync(args.source)

@@ -131,3 +131,23 @@ class SourceHealthService:
 
 
 source_health_service = SourceHealthService()
+
+
+def record_health_event(
+    session=None,
+    source_code: str = "",
+    status: str = "HEALTHY",
+    latency_ms: float = 0.0,
+    record_count: int = 0,
+    error_message: Optional[str] = None,
+) -> None:
+    """Helper to record a health event to the singleton SourceHealthService."""
+    success = status in ("HEALTHY", "DEGRADED")
+    is_fallback = (status == "DEGRADED")
+    source_health_service.record_attempt(
+        source_code=source_code,
+        latency_ms=latency_ms,
+        success=success,
+        is_fallback=is_fallback,
+        error_message=error_message,
+    )

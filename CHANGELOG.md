@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-09-29
+
+### Added
+- **Production Rebranding & Consumer UI Cleansing (Commercial Polish)**:
+  - Rebranded "Viva Simulator" to "Market Stress Test & Economic Scenario Engine" across navigation and scenario testbed.
+  - Set authoritative header brand subtitle: "National Market Price Intelligence & Basket Optimizer".
+  - Sanitized `frontend/index.html` with national title and meta description: "PricePulse BD — Bangladesh Commodity Price Intelligence & Cost of Living Tracker".
+  - Rephrased explainable alert justification to "Algorithmic Anomaly Detection Analysis" and basket narrative to "বাজার বিশ্লেষণ ও অর্থনৈতিক পর্যবেক্ষণ (Market Analysis & Insights)".
+  - Updated provenance panel and application footer to authoritative civic-tech standards: "National Commodity Market Intelligence & Cost of Living Platform".
+  - Verified 0 occurrences of academic or student disclaimers across all user-facing frontend code.
+- **Resilient Storefront Harvester Engine & Multi-Source Daily Sync**:
+  - Enhanced `ChaldalLiveCollector` in `app/collectors/chaldal_live_collector.py` with multi-format JSON catalog extraction (`items`, `products`, `data`), BeautifulSoup CSS selector DOM fallback for storefront cards, dynamic stock status filtering (`in_stock`, `stock_status`, `out_of_stock`), and package unit resolution.
+  - Enhanced `scripts/sync_daily_prices.py` to support all 4 primary sources: Department of Agricultural Marketing (`dam`), Chaldal Online Grocery (`chaldal`), Trading Corporation of Bangladesh (`tcb`), and Newspaper Press Roundups (`news`).
+  - Added `ingest_observations()` helper function in `app/services/ingestion.py` and `record_health_event()` telemetry dispatcher in `app/services/source_health.py`.
+
 ## [1.7.0] - 2026-09-28
 
 ### Added

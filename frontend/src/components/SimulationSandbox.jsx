@@ -178,16 +178,16 @@ export default function SimulationSandbox({ commodities = [] }) {
                 <Sliders className="w-5 h-5" />
               </div>
               <h2 className="text-xl font-bold text-white font-outfit tracking-tight">
-                Viva Defense Interactive Simulation Sandbox
+                Market Stress Test & Economic Scenario Engine
               </h2>
               <span className="px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full">
-                Live Examiner Testbed
+                Scenario Sandbox
               </span>
             </div>
             <p className="text-xs text-slate-300 mt-2 max-w-3xl leading-relaxed">
-              Dynamically stress-test the statistical anomaly detection engine. Adjust supply shocks, freight tariffs,
-              and volatility sliders to evaluate real-time Rolling SMA, Standard Deviation, Z-Scores, and explainable
-              natural language output generation without mutating canonical database records.
+              Simulate macro supply disruptions, fuel transport spikes, and import tariff shifts on commodity baselines.
+              Dynamically evaluate real-time Rolling SMA, Standard Deviation, Z-Scores, and algorithmic market explanations
+              without mutating canonical database records.
             </p>
           </div>
 

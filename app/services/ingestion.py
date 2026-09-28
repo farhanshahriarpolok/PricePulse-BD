@@ -184,3 +184,109 @@ class IngestionPipeline:
             updated=updated_count,
             skipped=skipped_count,
         )
+
+
+def ingest_observations(
+    db: Session,
+    raw_items: list[RawObservation],
+    collector: Optional[BaseCollector] = None,
+) -> tuple[int, int]:
+    """
+    Convenience helper function to ingest raw observations directly into SQLite.
+    Returns (inserted_count, updated_count).
+    """
+    if not raw_items:
+        return 0, 0
+
+    pipeline = IngestionPipeline(db)
+    if collector:
+        source = pipeline._get_or_create_source(collector)
+    else:
+        src_code = raw_items[0].source_code
+        stmt = select(Source).where(Source.code == src_code)
+        source = db.scalars(stmt).first()
+        if not source:
+            source = Source(
+                code=src_code,
+                name=src_code.replace("_", " ").title(),
+                source_type="market_report",
+                reliability_score=0.85,
+            )
+            db.add(source)
+            db.flush()
+
+    inserted_count = 0
+    updated_count = 0
+
+    for raw in raw_items:
+        market = pipeline._resolve_market(raw.market_name)
+        if not market:
+            continue
+
+        match = pipeline.normalizer.resolve_commodity(raw.raw_commodity_name)
+        if not match:
+            continue
+
+        commodity = pipeline._resolve_commodity_entity(match.canonical_name)
+        if not commodity:
+            continue
+
+        try:
+            norm_price, norm_unit = pipeline.normalizer.normalize_price(raw.raw_price, raw.raw_unit)
+        except ValueError:
+            continue
+
+        score = pipeline.scorer.compute(
+            source_reliability=source.reliability_score,
+            alias_weight=match.match_weight,
+            observation_date=raw.observation_date,
+            completeness_score=raw.completeness_score,
+        )
+
+        existing_stmt = select(PriceObservation).where(
+            PriceObservation.commodity_id == commodity.id,
+            PriceObservation.market_id == market.id,
+            PriceObservation.source_id == source.id,
+            PriceObservation.observation_date == raw.observation_date,
+            PriceObservation.price_type == raw.price_type,
+        )
+        existing_obs = db.scalars(existing_stmt).first()
+
+        if existing_obs:
+            if raw.is_fallback:
+                continue
+            if existing_obs.raw_name != raw.raw_commodity_name:
+                existing_obs.normalized_price = round(
+                    (existing_obs.normalized_price + norm_price) / 2.0, 2
+                )
+                existing_obs.confidence_score = max(existing_obs.confidence_score, score)
+                updated_count += 1
+            elif score >= existing_obs.confidence_score:
+                existing_obs.raw_name = raw.raw_commodity_name
+                existing_obs.raw_price = raw.raw_price
+                existing_obs.raw_unit = raw.raw_unit
+                existing_obs.normalized_price = norm_price
+                existing_obs.normalized_unit = norm_unit
+                existing_obs.confidence_score = score
+                updated_count += 1
+        else:
+            new_obs = PriceObservation(
+                commodity_id=commodity.id,
+                market_id=market.id,
+                source_id=source.id,
+                raw_name=raw.raw_commodity_name,
+                raw_price=raw.raw_price,
+                raw_unit=raw.raw_unit,
+                normalized_price=norm_price,
+                normalized_unit=norm_unit,
+                price_type=raw.price_type,
+                observation_date=raw.observation_date,
+                confidence_score=score,
+            )
+            db.add(new_obs)
+            db.flush()
+            inserted_count += 1
+
+    db.commit()
+    return inserted_count, updated_count
+

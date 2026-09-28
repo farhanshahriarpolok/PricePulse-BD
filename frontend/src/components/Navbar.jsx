@@ -36,7 +36,7 @@ export default function Navbar({
     { id: 'compare', label: 'Compare Markets', icon: GitCompare },
     { id: 'explorer', label: 'Commodity Explorer', icon: TrendingUp },
     { id: 'anomalies', label: 'Anomaly Monitor', icon: AlertTriangle, count: anomalyCount },
-    { id: 'simulator', label: 'Viva Simulator', icon: Sliders },
+    { id: 'simulator', label: 'Market Simulator', icon: Sliders },
     { id: 'map', label: 'Spatial Map', icon: MapPin },
     { id: 'sources', label: 'Source Health', icon: Server },
     { id: 'provenance', label: 'Data Provenance', icon: ShieldCheck },
@@ -56,7 +56,7 @@ export default function Navbar({
                 <span className="text-xl font-bold tracking-tight text-white font-outfit">PricePulse</span>
                 <span className="px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded">BD</span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">CSE Research Capstone • Live Intelligence</p>
+              <p className="text-[11px] text-slate-400 font-medium">National Market Price Intelligence & Basket Optimizer</p>
             </div>
           </div>
 

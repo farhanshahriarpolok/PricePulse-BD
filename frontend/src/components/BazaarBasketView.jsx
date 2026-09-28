@@ -1266,11 +1266,11 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                   <TrendChartSVG points={trendModal.trendData.trend_points || trendModal.trendData.points || []} />
                 </div>
 
-                {/* Economic / Academic Narrative */}
+                {/* Economic / Market Narrative */}
                 <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-4 space-y-1.5">
                   <div className="flex items-center space-x-2 text-xs font-bold text-amber-300">
                     <Lightbulb className="w-4 h-4" />
-                    <span>অর্থনৈতিক মূল্যায়ন ও পর্যবেক্ষণ (Academic Narrative)</span>
+                    <span>বাজার বিশ্লেষণ ও অর্থনৈতিক পর্যবেক্ষণ (Market Analysis & Insights)</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed font-sans">
                     {trendModal.trendData.academic_narrative || trendModal.trendData.narrative}

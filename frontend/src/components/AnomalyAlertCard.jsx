@@ -96,7 +96,7 @@ export default function AnomalyAlertCard({ anomaly, onSelectCommodity }) {
       <div className="p-3.5 rounded-xl bg-slate-900/90 border border-indigo-500/20 text-xs leading-relaxed text-slate-300 flex items-start gap-2.5">
         <Info className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
         <div>
-          <strong className="text-indigo-300 block mb-1">Explainable Academic Justification:</strong>
+          <strong className="text-indigo-300 block mb-1">Algorithmic Anomaly Detection Analysis:</strong>
           <p>{explanation}</p>
         </div>
       </div>

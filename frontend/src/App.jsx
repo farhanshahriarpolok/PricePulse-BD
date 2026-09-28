@@ -429,7 +429,7 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 4: VIVA DEFENSE SIMULATION SANDBOX */}
+        {/* TAB 4: MARKET STRESS TEST SCENARIO ENGINE */}
         {activeTab === 'simulator' && (
           <div>
             <SimulationSandbox commodities={commodities} />
@@ -526,7 +526,7 @@ export default function App() {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white font-outfit">Auditable Data Provenance & Architecture</h2>
-                <p className="text-xs text-slate-400">Undergraduate CSE Final Year Project • Transparent Local-First Pipeline</p>
+                <p className="text-xs text-slate-400">National Commodity Price Intelligence • Transparent Local-First Pipeline</p>
               </div>
             </div>
 
@@ -545,14 +545,14 @@ export default function App() {
 
               <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-700/60">
                 <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">Active Collectors</h4>
-                <p className="text-sm font-bold text-white">DAM Daily & Chaldal Retail</p>
+                <p className="text-sm font-bold text-white">DAM Daily, TCB & Chaldal Retail</p>
                 <p className="text-xs text-slate-400 mt-1">Deterministic bulletin extraction and package size metric normalization.</p>
               </div>
             </div>
 
             <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300 leading-relaxed">
-              <strong className="text-white block mb-1">Academic & Research Transparency:</strong>
-              PricePulse BD standardizes fragmented agricultural reports from the Department of Agricultural Marketing (DAM) and consumer grocery platforms. Every record is stored with verbatim raw prices and canonical metric conversions to prevent data tampering.
+              <strong className="text-white block mb-1">Verified Public Sources & Methodology:</strong>
+              PricePulse BD standardizes fragmented agricultural reports from the Department of Agricultural Marketing (DAM), Trading Corporation of Bangladesh (TCB), retail storefronts, and spot market briefs. Every record is stored with verbatim raw prices and canonical metric conversions to guarantee auditable data integrity.
             </div>
           </div>
         )}
@@ -582,7 +582,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800 bg-slate-900/80 py-4 text-center text-xs text-slate-500">
-        <p>PricePulse BD • CSE Final Year Project • Academic Research Platform</p>
+        <p>PricePulse BD • National Commodity Market Intelligence & Cost of Living Platform</p>
       </footer>
     </div>
   );
