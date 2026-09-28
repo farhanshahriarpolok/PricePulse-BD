@@ -23,6 +23,16 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Milestone 022 — Production Docker Engine, Android Release Build & Deployment Handoff** (2026-09-29):
+  - Created multi-stage production `Dockerfile` (Node 20 Alpine frontend builder, Python 3.11 Slim runtime, automated SQLite volume initialization, and curl healthcheck).
+  - Authored `docker-compose.yml` with port 8000 mapping, volume mounting for persistent SQLite WAL state, and an optional daily sync worker profile.
+  - Added `.dockerignore` for minimal, high-speed container builds.
+  - Bumped Android mobile client to `versionCode = 2` and `versionName = "2.3.0"` in `android/app/build.gradle.kts`.
+  - Built `scripts/build_android_apk.py` helper for Gradle packaging, artifact detection, SHA-256 calculation, and USB/sideload instructions.
+  - Created and executed `scripts/production_smoke_test.py` with 100% pass across all 6 core subsystem checks (Health, Taxonomy, Arbitrage Corridors, 3-Channel Basket, Saved Baskets CRUD, Static React SPA).
+  - Authored comprehensive Linux VPS deployment and operations handbook in `DEPLOYMENT.md`.
+  - Verified 100% green Pytest test suite (236/236 passing) and clean frontend production build.
+
 - **Milestone 021 — Visual Identity, Custom Vector Assets & Mass-Consumer UI Media Polish** (2026-09-29):
   - Designed and deployed brand identity suite: `frontend/public/logo.svg` (market scale + pulse + leaf motif), `frontend/public/favicon.svg` (pixel-perfect 32x32 SVG), and `frontend/public/og-image.svg` (1200x630 OpenGraph preview banner).
   - Enriched `frontend/index.html` with SVG favicon and standard OpenGraph / Twitter card metadata.

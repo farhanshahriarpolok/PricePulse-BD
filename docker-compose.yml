@@ -1,0 +1,42 @@
+services:
+  pricepulse-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pricepulse_bd_app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/data/pricepulse.db
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - pricepulse_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # Optional background synchronization worker (Activated via: docker compose --profile worker up -d)
+  pricepulse-sync-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pricepulse_bd_worker
+    restart: unless-stopped
+    profiles:
+      - worker
+    environment:
+      - DATABASE_URL=sqlite:////app/data/pricepulse.db
+    volumes:
+      - pricepulse_data:/app/data
+    command: ["python", "scripts/sync_daily_prices.py", "--all"]
+    depends_on:
+      pricepulse-app:
+        condition: service_healthy
+
+volumes:
+  pricepulse_data:
+    driver: local

@@ -26,6 +26,11 @@ async def lifespan(app: FastAPI):
         seed_locations(session)
         seed_commodities(session)
         seed_sources(session)
+        from app.models.observation import PriceObservation
+        obs_count = session.query(PriceObservation).count()
+        if obs_count < 50:
+            from scripts.generate_demo_history import seed_demo_history
+            seed_demo_history(session)
     # Start in-process background sync scheduler
     sync_scheduler.start()
     yield
@@ -102,6 +107,31 @@ def create_application() -> FastAPI:
 
     # Mount API v1 router under /api
     app.include_router(api_router, prefix="/api")
+
+    # Mount compiled React frontend static assets if available
+    dist_dir = settings.project_root / "frontend" / "dist"
+    if (dist_dir / "index.html").exists():
+        from fastapi.staticfiles import StaticFiles
+        from starlette.responses import FileResponse
+
+        assets_dir = dist_dir / "assets"
+        if assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def serve_spa(full_path: str):
+            # Pass through API requests, docs, and health checks
+            if (
+                full_path.startswith("api")
+                or full_path.startswith("docs")
+                or full_path.startswith("redoc")
+                or full_path == "health"
+            ):
+                return None
+            requested_file = dist_dir / full_path
+            if requested_file.is_file():
+                return FileResponse(requested_file)
+            return FileResponse(dist_dir / "index.html")
 
     return app
 

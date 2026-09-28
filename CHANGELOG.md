@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-09-29
+
+### Added
+- **Production Docker Engine, Android Release Build & Deployment Handoff (Milestone 022)**:
+  - `Dockerfile`: Created production multi-stage build container with Node 20 Alpine frontend builder, Python 3.11 Slim ASGI runner, automated SQLite WAL volume initialization (`/app/data`), and integrated curl healthcheck.
+  - `docker-compose.yml`: Configured single-command deployment stack with persistent database volume, port 8000 mapping, restart policies, and an optional daily sync worker profile.
+  - `.dockerignore`: Excluded Git, mobile code, reports, fixtures, and local test artifacts for optimized container caching.
+  - `app/main.py`: Enhanced startup lifespan to dynamically seed 35 commodities, 64 districts, and 30-day baseline observations on empty container storage, and mounted the compiled React static SPA with fallback routing.
+  - `android/app/build.gradle.kts`: Bumped `versionCode` to 2 and `versionName` to `"2.3.0"`, preserving `isMinifyEnabled = false` for safe Room and Retrofit runtime reflection.
+  - `scripts/build_android_apk.py`: Created release packaging helper script calculating APK file sizes, SHA-256 integrity checksums, and device sideloading instructions.
+  - `scripts/production_smoke_test.py`: Built automated 6-point production sanity verification suite covering API Health, 35-Commodity Taxonomy, 12 Highway Corridors, 3-Channel Basket Engine, Saved Baskets CRUD, and React SPA integrity.
+  - `DEPLOYMENT.md`: Authored comprehensive Linux VPS deployment handbook covering Docker Compose, Nginx SSL reverse proxy, cron sync, hot SQLite backups, and Android APK deployment.
+  - Quality verification: 236/236 Pytest tests passing 100% green and all 6 smoke tests passed.
+
 ## [2.2.0] - 2026-09-29
 
 ### Added

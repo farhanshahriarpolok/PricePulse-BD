@@ -1,0 +1,37 @@
+.git
+.gitignore
+.dockerignore
+.agents
+.gemini
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.env
+
+# Mobile App & Thesis Report builds
+android/
+report/
+docs/
+
+# Testing & Scratches
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+scripts/qa_snapshots/
+*.png
+*.jpg
+*.jpeg
+
+# Local DB artifacts
+*.db
+*.db-wal
+*.db-shm
+pricepulse.db*
+
+# Frontend node_modules (let container build cleanly)
+frontend/node_modules/
+frontend/.vite/
