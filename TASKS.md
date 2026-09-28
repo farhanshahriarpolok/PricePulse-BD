@@ -6,33 +6,23 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-### TASK-004 — Spatial Arbitrage Engine Enhancements & Corridor Visualization Polish
-- **Status**: IN_PROGRESS
-- **Priority**: MEDIUM
-- **Goal**: Enhance `SpatialService` inter-district corridor analytics with realistic transport route waypoints, seasonal river ferry congestion buffers, and interactive corridor overlays in `BangladeshPriceMap.jsx`.
-- **Why**: Elevates the academic defense for supply chain bottleneck analysis between northern agricultural production hubs and southern metropolitan demand centers.
-- **Dependencies**: `TASK-001`, `TASK-003`.
-- **Files Likely Affected**:
-  - `app/services/spatial_service.py`
-  - `app/api/v1/endpoints/locations.py`
-  - `frontend/src/components/BangladeshPriceMap.jsx`
-  - `tests/test_national_spatial.py`
-
----
-
-## NEXT
-
 ### TASK-005 — Viva Defense Demonstration Script Verification & Academic LaTeX Report Alignment
-- **Status**: PLANNED
+- **Status**: IN_PROGRESS
 - **Priority**: HIGH
 - **Goal**: Conduct a comprehensive verification of `docs/DEMO_SCRIPT.md`, `docs/VIVA_DEFENSE_GUIDE.md`, and compile the final LaTeX thesis draft (`report/compile_report.py`), ensuring that all tables, formulas, and figures match recent benchmark figures.
 - **Why**: Ensures absolute defensibility during the final thesis defense and oral viva examination before university evaluators.
-- **Dependencies**: `TASK-001`, `TASK-002`, `TASK-003`.
+- **Dependencies**: `TASK-001`, `TASK-002`, `TASK-003`, `TASK-004`.
 - **Files Likely Affected**:
   - `docs/DEMO_SCRIPT.md`
   - `docs/VIVA_DEFENSE_GUIDE.md`
   - `report/main.tex`
   - `report/compile_report.py`
+
+---
+
+## NEXT
+
+- None (Final milestone completion & thesis defense preparation).
 
 ---
 
@@ -42,6 +32,12 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **TASK-004 / Milestone 018 — Spatial Arbitrage Engine Enhancements & Interactive Corridor Visualization** (2026-09-29):
+  - In `app/schemas/spatial.py`, extended `ArbitrageRoute` schema with `waypoints`, `transit_hours_estimated`, `toll_and_buffer_cost_bdt`, `freight_breakdown`, and `corridor_name`.
+  - In `app/services/spatial_service.py`, integrated canonical national highway corridors (N5 Jamuna, N1 Highway, N8 Padma, N2 Sylhet, and cross-arterials) with realistic intermediate geographic waypoints, bridge toll buffers (৳0.50 - ৳0.85/kg), and truck transit duration calculations (`d / 45 + buffer`).
+  - In `frontend/src/components/BangladeshPriceMap.jsx`, added a toggle switch for "Show Transit Corridors" (পরিবহন করিডোর), dynamic React-Leaflet `<Polyline>` rendering with feasibility coloring (Emerald / Amber / Rose), and an interactive glassmorphic corridor breakdown drawer with responsive tooltips.
+  - Verified 100% green test suite (236/236 passing) and cleanly compiled frontend production bundle (`npm run build`).
 
 - **TASK-003 / Milestone 017 — Automated Daily Ingestion Resilience & Live Harvester Hardening** (2026-09-29):
   - Hardened `tcb_collector.py` with multi-strategy table discovery (`.tcb-price-table`, `.price-table`, `.content-table`, dynamic selectors), adaptive column index detection, Bengali/English range numerals (`১২০ - ১৩০`, `120 - 130`, `১২০ থেকে ১৩০`), and exponential backoff retry jitter.

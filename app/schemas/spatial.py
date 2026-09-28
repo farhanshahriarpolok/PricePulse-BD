@@ -56,6 +56,27 @@ class ArbitrageRoute(BaseModel):
     net_arbitrage_margin_bdt: float
     roi_percentage: float
     economic_feasibility: str
+    waypoints: List[List[float]] = Field(
+        default_factory=list,
+        description="Lat/Lng coordinate pairs defining the highway corridor polyline",
+    )
+    transit_hours_estimated: float = Field(
+        default=0.0,
+        description="Estimated truck transit duration including bridge crossing buffers",
+    )
+    toll_and_buffer_cost_bdt: float = Field(
+        default=0.0,
+        description="River crossing / bridge toll & bottleneck buffer cost in BDT/kg",
+    )
+    freight_breakdown: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Granular freight cost breakdown: base_freight, toll_buffer, net_margin",
+    )
+    corridor_name: Optional[str] = Field(
+        default=None,
+        description="Designated national highway corridor (e.g., N5 Jamuna, N1 Highway, N8 Padma)",
+    )
+
 
 
 class SpatialArbitrageResponse(BaseModel):

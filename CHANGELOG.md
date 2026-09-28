@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-09-29
+
+### Added
+- **Spatial Arbitrage Engine Enhancements & Interactive Transit Corridors (TASK-004)**:
+  - `app/schemas/spatial.py`:
+    - Extended `ArbitrageRoute` with `waypoints` (highway polyline coordinates), `transit_hours_estimated`, `toll_and_buffer_cost_bdt`, `freight_breakdown` (base freight, toll buffer, net margin), and `corridor_name`.
+  - `app/services/spatial_service.py`:
+    - Modeled realistic national highway transit corridors: N5 Jamuna (Bogura/Rangpur/Dinajpur/Rajshahi ➔ Dhaka), N1 Highway (Chattogram ➔ Dhaka), N8 Padma (Jashore/Barishal ➔ Dhaka), N2 Sylhet (Sylhet ➔ Dhaka), and cross-regional arterials.
+    - Integrated river crossing toll and bottleneck cost buffers (৳0.50 - ৳0.85/kg) and transit duration estimation (`d / 45 + buffer_hours`).
+  - `frontend/src/components/BangladeshPriceMap.jsx`:
+    - Added "Show Transit Corridors" (পরিবহন করিডোর) toggle switch in map header.
+    - Rendered dynamic React-Leaflet `<Polyline>` corridors with feasibility-driven color coding: Emerald (`Highly Feasible`), Amber (`Marginal`), Rose (`Infeasible`).
+    - Added responsive, interactive glassmorphic corridor breakdown drawer with highway distance, transit time in hours, gross spread, base freight vs bridge toll breakdown, net margin, and ROI.
+    - Interactive matrix table allows selecting and focusing corridors directly on the geospatial map.
+  - `tests/test_national_spatial.py`:
+    - Added `test_spatial_arbitrage_corridors_and_waypoints` validating polyline coordinates structure, transit duration, toll buffer injection, and N5 Jamuna corridor accuracy.
+
 ## [1.10.0] - 2026-09-29
 
 ### Added

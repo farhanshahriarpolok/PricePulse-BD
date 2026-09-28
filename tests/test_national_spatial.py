@@ -95,3 +95,38 @@ class TestSpatialDispersionAndArbitrage:
         assert top.estimated_freight_cost_bdt > 0.0
         assert top.net_arbitrage_margin_bdt == round(top.gross_spread_bdt - top.estimated_freight_cost_bdt, 2)
         assert top.economic_feasibility in ["Highly Feasible", "Marginal", "Infeasible (Transport Barrier)"]
+
+    def test_spatial_arbitrage_corridors_and_waypoints(self, spatial_db):
+        service = SpatialService()
+        arbitrage = service.get_spatial_arbitrage(spatial_db, "onion_local")
+        assert arbitrage is not None
+        assert len(arbitrage.routes) > 0
+
+        # Validate that all routes carry geographic polyline waypoints and transit breakdown
+        for route in arbitrage.routes:
+            assert isinstance(route.waypoints, list)
+            assert len(route.waypoints) >= 2
+            # Every waypoint must be a [lat, lon] pair
+            for pt in route.waypoints:
+                assert len(pt) == 2
+                assert 20.0 <= pt[0] <= 27.0  # Bangladesh latitude bounds
+                assert 88.0 <= pt[1] <= 93.0  # Bangladesh longitude bounds
+
+            assert route.transit_hours_estimated > 0.0
+            assert route.toll_and_buffer_cost_bdt > 0.0
+            assert route.corridor_name is not None
+            assert "base_freight" in route.freight_breakdown
+            assert "toll_buffer" in route.freight_breakdown
+            assert "total_freight" in route.freight_breakdown
+            assert "net_margin" in route.freight_breakdown
+
+        # Validate specific canonical N5 corridor: Bogura -> Dhaka
+        bogura_dhaka = next(
+            (r for r in arbitrage.routes if r.source_district == "Bogura" and r.destination_district == "Dhaka"),
+            None
+        )
+        if bogura_dhaka:
+            assert "N5" in bogura_dhaka.corridor_name
+            assert bogura_dhaka.toll_and_buffer_cost_bdt == 0.50
+            assert any(abs(pt[0] - 24.3980) < 0.01 for pt in bogura_dhaka.waypoints)  # Jamuna Bridge waypoint
+

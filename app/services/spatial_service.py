@@ -410,14 +410,241 @@ class SpatialService:
         dispersion_index = round(std_p / mean_p, 4) if mean_p > 0 else 0.0
         cv_pct = round(dispersion_index * 100.0, 2)
 
+        # Canonical national highway transit corridors with realistic waypoints and bridge toll buffers
+        national_corridors: Dict[tuple, dict] = {
+            ("Bogura", "Dhaka"): {
+                "name": "বগুড়া ➔ ঢাকা উত্তরবঙ্গ হাইওয়ে (N5 Jamuna Corridor)",
+                "waypoints": [
+                    [24.8465, 89.3770],  # Bogura
+                    [24.4534, 89.7006],  # Sirajganj West
+                    [24.3980, 89.7800],  # Bangabandhu Jamuna Bridge
+                    [24.2513, 89.9167],  # Tangail
+                    [24.0023, 90.4264],  # Gazipur
+                    [23.8103, 90.4125],  # Dhaka
+                ],
+                "toll_buffer": 0.50,
+                "buffer_hours": 1.2,
+            },
+            ("Rangpur", "Dhaka"): {
+                "name": "রংপুর ➔ ঢাকা উত্তরবঙ্গ আর্টারি (N5 Highway)",
+                "waypoints": [
+                    [25.7439, 89.2752],  # Rangpur
+                    [25.3288, 89.5414],  # Gobindaganj
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.2513, 89.9167],  # Tangail
+                    [24.0023, 90.4264],  # Gazipur
+                    [23.8103, 90.4125],  # Dhaka
+                ],
+                "toll_buffer": 0.50,
+                "buffer_hours": 1.4,
+            },
+            ("Dinajpur", "Dhaka"): {
+                "name": "দিনাজপুর ➔ ঢাকা নর্থ করিডোর (N502/N5)",
+                "waypoints": [
+                    [25.6217, 88.6355],  # Dinajpur
+                    [25.7439, 89.2752],  # Rangpur
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.2513, 89.9167],  # Tangail
+                    [23.8103, 90.4125],  # Dhaka
+                ],
+                "toll_buffer": 0.50,
+                "buffer_hours": 1.5,
+            },
+            ("Rajshahi", "Dhaka"): {
+                "name": "রাজশাহী ➔ ঢাকা বরেন্দ্র হাইওয়ে (N6/N5)",
+                "waypoints": [
+                    [24.3636, 88.6241],  # Rajshahi
+                    [24.4102, 88.9897],  # Natore
+                    [24.3833, 89.5333],  # Sirajganj
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.2513, 89.9167],  # Tangail
+                    [23.8103, 90.4125],  # Dhaka
+                ],
+                "toll_buffer": 0.50,
+                "buffer_hours": 1.3,
+            },
+            ("Jashore", "Dhaka"): {
+                "name": "যশোর ➔ ঢাকা পদ্মা এক্সপ্রেসওয়ে (N8 Corridor)",
+                "waypoints": [
+                    [23.1664, 89.2081],  # Jashore
+                    [23.4400, 89.4200],  # Magura
+                    [23.6071, 89.8429],  # Faridpur
+                    [23.4900, 90.1600],  # Bhanga Interchange
+                    [23.4500, 90.2600],  # Padma Bridge
+                    [23.6500, 90.3500],  # Mawa Expressway
+                    [23.8103, 90.4125],  # Dhaka
+                ],
+                "toll_buffer": 0.60,
+                "buffer_hours": 0.8,
+            },
+            ("Bogura", "Chattogram"): {
+                "name": "বগুড়া ➔ চট্টগ্রাম গ্রেট করিডোর (N5-N1 Arterial)",
+                "waypoints": [
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.0023, 90.4264],  # Gazipur
+                    [23.6800, 90.5200],  # Kanchpur
+                    [23.5900, 90.6200],  # Meghna Bridge
+                    [23.4607, 91.1809],  # Cumilla
+                    [23.0159, 91.3976],  # Feni
+                    [22.3569, 91.7832],  # Chattogram
+                ],
+                "toll_buffer": 0.80,
+                "buffer_hours": 2.0,
+            },
+            ("Rangpur", "Chattogram"): {
+                "name": "রংপুর ➔ চট্টগ্রাম ট্রান্স-ন্যাশনাল আর্টারি",
+                "waypoints": [
+                    [25.7439, 89.2752],  # Rangpur
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [23.6800, 90.5200],  # Kanchpur
+                    [23.4607, 91.1809],  # Cumilla
+                    [22.3569, 91.7832],  # Chattogram
+                ],
+                "toll_buffer": 0.85,
+                "buffer_hours": 2.2,
+            },
+            ("Dinajpur", "Chattogram"): {
+                "name": "দিনাজপুর ➔ চট্টগ্রাম উত্তর-দক্ষিণ করিডোর",
+                "waypoints": [
+                    [25.6217, 88.6355],  # Dinajpur
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [23.6800, 90.5200],  # Kanchpur
+                    [23.4607, 91.1809],  # Cumilla
+                    [22.3569, 91.7832],  # Chattogram
+                ],
+                "toll_buffer": 0.85,
+                "buffer_hours": 2.2,
+            },
+            ("Jashore", "Chattogram"): {
+                "name": "যশোর ➔ চট্টগ্রাম ইন্টার-রিজিওনাল করিডোর",
+                "waypoints": [
+                    [23.1664, 89.2081],  # Jashore
+                    [23.6071, 89.8429],  # Faridpur
+                    [23.4500, 90.2600],  # Padma Bridge
+                    [23.6800, 90.5200],  # Kanchpur
+                    [23.4607, 91.1809],  # Cumilla
+                    [22.3569, 91.7832],  # Chattogram
+                ],
+                "toll_buffer": 0.75,
+                "buffer_hours": 1.8,
+            },
+            ("Rajshahi", "Chattogram"): {
+                "name": "রাজশাহী ➔ চট্টগ্রাম বরেন্দ্র-বন্দর হাইওয়ে",
+                "waypoints": [
+                    [24.3636, 88.6241],  # Rajshahi
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [23.6800, 90.5200],  # Kanchpur
+                    [23.4607, 91.1809],  # Cumilla
+                    [22.3569, 91.7832],  # Chattogram
+                ],
+                "toll_buffer": 0.80,
+                "buffer_hours": 2.0,
+            },
+            ("Bogura", "Sylhet"): {
+                "name": "বগুড়া ➔ সিলেট নর্থ-ইস্ট লিঙ্ক",
+                "waypoints": [
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.2513, 89.9167],  # Tangail
+                    [24.4300, 90.7700],  # Kishoreganj
+                    [24.8949, 91.8687],  # Sylhet
+                ],
+                "toll_buffer": 0.60,
+                "buffer_hours": 1.5,
+            },
+            ("Rangpur", "Sylhet"): {
+                "name": "রংপুর ➔ সিলেট ইন্টার-ডিভিশনাল করিডোর",
+                "waypoints": [
+                    [25.7439, 89.2752],  # Rangpur
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.4300, 90.7700],  # Kishoreganj
+                    [24.8949, 91.8687],  # Sylhet
+                ],
+                "toll_buffer": 0.65,
+                "buffer_hours": 1.6,
+            },
+            ("Dinajpur", "Sylhet"): {
+                "name": "দিনাজপুর ➔ সিলেট পূর্বাঞ্চল রুট",
+                "waypoints": [
+                    [25.6217, 88.6355],  # Dinajpur
+                    [24.8465, 89.3770],  # Bogura
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.4300, 90.7700],  # Kishoreganj
+                    [24.8949, 91.8687],  # Sylhet
+                ],
+                "toll_buffer": 0.65,
+                "buffer_hours": 1.6,
+            },
+            ("Jashore", "Sylhet"): {
+                "name": "যশোর ➔ সিলেট ট্রান্স-পদ্মা এক্সপ্রেস রুট",
+                "waypoints": [
+                    [23.1664, 89.2081],  # Jashore
+                    [23.4500, 90.2600],  # Padma Bridge
+                    [23.9900, 90.6500],  # Narsingdi
+                    [24.8949, 91.8687],  # Sylhet
+                ],
+                "toll_buffer": 0.70,
+                "buffer_hours": 1.8,
+            },
+            ("Rajshahi", "Sylhet"): {
+                "name": "রাজশাহী ➔ সিলেট নর্থ রুট",
+                "waypoints": [
+                    [24.3636, 88.6241],  # Rajshahi
+                    [24.3980, 89.7800],  # Jamuna Bridge
+                    [24.4300, 90.7700],  # Kishoreganj
+                    [24.8949, 91.8687],  # Sylhet
+                ],
+                "toll_buffer": 0.65,
+                "buffer_hours": 1.6,
+            },
+        }
+
+        def _resolve_corridor_meta(src_d: str, dest_d: str, s_lat: float, s_lon: float, d_lat: float, d_lon: float) -> dict:
+            key = (src_d, dest_d)
+            if key in national_corridors:
+                return national_corridors[key]
+            # Dynamic intermediate waypoint generation for other district pairs
+            mid_lat = round((s_lat + d_lat) / 2.0 + 0.04, 4)
+            mid_lon = round((s_lon + d_lon) / 2.0 + 0.04, 4)
+            return {
+                "name": f"{src_d} ➔ {dest_d} ইন্টার-ডিস্ট্রিক্ট রুট",
+                "waypoints": [
+                    [s_lat, s_lon],
+                    [mid_lat, mid_lon],
+                    [d_lat, d_lon],
+                ],
+                "toll_buffer": 0.35,
+                "buffer_hours": 0.7,
+            }
+
         for src in prod_hubs:
             for dest in cons_hubs:
                 dist_km = self.haversine_distance(src["lat"], src["lon"], dest["lat"], dest["lon"])
-                # Freight cost model: 1.50 BDT fixed loading overhead + 0.018 BDT per kg per km
-                freight_cost = round(1.50 + dist_km * 0.018, 2)
+                meta = _resolve_corridor_meta(
+                    src["district"], dest["district"],
+                    src["lat"], src["lon"],
+                    dest["lat"], dest["lon"]
+                )
+
+                toll_buffer = meta["toll_buffer"]
+                buffer_hours = meta["buffer_hours"]
+
+                # Transit duration: 45 km/h average national highway truck speed + bridge crossing buffer
+                transit_hours = round(dist_km / 45.0 + buffer_hours, 1)
+
+                # Base freight: 1.50 BDT fixed loading overhead + 0.018 BDT per kg per km
+                base_freight = round(1.50 + dist_km * 0.018, 2)
+                total_freight = round(base_freight + toll_buffer, 2)
+
                 gross_spread = round(dest["price"] - src["price"], 2)
-                net_margin = round(gross_spread - freight_cost, 2)
-                invested = src["price"] + freight_cost
+                net_margin = round(gross_spread - total_freight, 2)
+                invested = src["price"] + total_freight
                 roi_pct = round((net_margin / invested) * 100.0, 2) if invested > 0 else 0.0
 
                 if net_margin >= 6.0:
@@ -426,6 +653,13 @@ class SpatialService:
                     feasibility = "Marginal"
                 else:
                     feasibility = "Infeasible (Transport Barrier)"
+
+                freight_breakdown = {
+                    "base_freight": base_freight,
+                    "toll_buffer": toll_buffer,
+                    "total_freight": total_freight,
+                    "net_margin": net_margin,
+                }
 
                 routes.append(
                     ArbitrageRoute(
@@ -437,10 +671,15 @@ class SpatialService:
                         destination_price=dest["price"],
                         gross_spread_bdt=gross_spread,
                         distance_km=dist_km,
-                        estimated_freight_cost_bdt=freight_cost,
+                        estimated_freight_cost_bdt=total_freight,
                         net_arbitrage_margin_bdt=net_margin,
                         roi_percentage=roi_pct,
                         economic_feasibility=feasibility,
+                        waypoints=meta["waypoints"],
+                        transit_hours_estimated=transit_hours,
+                        toll_and_buffer_cost_bdt=toll_buffer,
+                        freight_breakdown=freight_breakdown,
+                        corridor_name=meta["name"],
                     )
                 )
 
