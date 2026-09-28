@@ -154,9 +154,24 @@ def _run_generation(session):
         ("Mustard Oil",             240.0,  1.5, 15.0, 20.0),
         # High volatility
         ("Green Chilli",            120.0, 15.0, 20.0, 35.0),
+        # Expanded daily grocery essentials
+        ("Ginger (Local)",          210.0,  5.0, 25.0, 40.0),
+        ("Brinjal (Eggplant)",       60.0,  3.0, 10.0, 15.0),
+        ("Tomato",                   75.0,  4.0, 15.0, 25.0),
+        ("Papaya (Green)",           32.0,  1.5,  6.0, 10.0),
+        ("Cucumber",                 50.0,  3.0, 10.0, 18.0),
+        ("Carrot",                   65.0,  3.0, 12.0, 20.0),
+        ("Atta (Packaged)",          48.0,  0.5,  5.0,  7.0),
+        ("Maida (Packaged)",         62.0,  0.6,  6.0,  9.0),
+        ("Masur Dal (Fine)",        130.0,  1.5, 10.0, 15.0),
+        ("Deshi Chicken",           490.0,  8.0, 35.0, 60.0),
+        ("Tilapia Fish",            180.0,  5.0, 20.0, 30.0),
+        ("Soybean Oil (Loose)",     145.0,  0.5,  4.0,  6.0),
+        ("Dry Red Chilli",          380.0,  6.0, 30.0, 50.0),
+        ("Turmeric Powder",         320.0,  5.0, 25.0, 40.0),
     ]
 
-    print(f"-> Generating 30-day series for {len(CONFIGS) + 2} commodities...")
+    print(f"-> Generating 30-day series for {len(CONFIGS) + 3} commodities...")
 
     for day_offset in range(29, -1, -1):
         obs_date = today - timedelta(days=day_offset)

@@ -32,6 +32,26 @@ export default function BangladeshPriceMap({ spatialData, commodityName = 'Onion
   const [activeCorridor, setActiveCorridor] = useState(null);
 
   const defaultCenter = [23.8103, 90.4125]; // Dhaka center
+
+  // Fetch arbitrage freight opportunities
+  useEffect(() => {
+    if (spatialData?.commodity_id) {
+      getSpatialArbitrage(spatialData.commodity_id)
+        .then((data) => setArbitrageData(data))
+        .catch((err) => console.error('Arbitrage fetch error:', err));
+    }
+  }, [spatialData?.commodity_id]);
+
+  if (!spatialData) {
+    return (
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-sm font-medium text-slate-300">জেলাভিত্তিক বাজার তথ্য লোড হচ্ছে...</p>
+        <p className="text-xs text-slate-500 mt-1">Loading 64-district spatial market telemetry...</p>
+      </div>
+    );
+  }
+
   const districts = spatialData?.districts || [];
   const markets = spatialData?.markets || [];
   const spreadSummary = spatialData?.spread_summary || {};
@@ -53,15 +73,6 @@ export default function BangladeshPriceMap({ spatialData, commodityName = 'Onion
     if (feasibility === 'Marginal') return '#f59e0b'; // Amber
     return '#f43f5e'; // Rose / Red
   };
-
-  // Fetch arbitrage freight opportunities
-  useEffect(() => {
-    if (spatialData?.commodity_id) {
-      getSpatialArbitrage(spatialData.commodity_id)
-        .then((data) => setArbitrageData(data))
-        .catch((err) => console.error('Arbitrage fetch error:', err));
-    }
-  }, [spatialData?.commodity_id]);
 
   return (
     <div className="space-y-4 mb-6">

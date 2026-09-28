@@ -20,20 +20,25 @@ export default function HistoricalTrendChart({ historyData, commodityName, unit 
     );
   }
 
+  const toFixedSafe = (val, d = 2) => (val != null && !isNaN(val)) ? Number(val).toFixed(d) : '0.00';
+
   // Calculate 14-day rolling SMA on the client for smooth charting
   const formattedData = historyData.map((item, index, arr) => {
     // 14-day slice
     const sliceStart = Math.max(0, index - 13);
     const windowSlice = arr.slice(sliceStart, index + 1);
-    const windowAvg = windowSlice.reduce((sum, curr) => sum + curr.avg_price, 0) / windowSlice.length;
+    const validSlice = windowSlice.filter(x => x && x.avg_price != null && !isNaN(x.avg_price));
+    const windowAvg = validSlice.length > 0 
+      ? validSlice.reduce((sum, curr) => sum + Number(curr.avg_price), 0) / validSlice.length 
+      : (item?.avg_price || 0);
 
     return {
       date: item.date,
-      price: item.avg_price,
-      sma14: Number(windowAvg.toFixed(2)),
-      min: item.min_price,
-      max: item.max_price,
-      samples: item.sample_count,
+      price: item.avg_price != null ? Number(item.avg_price) : null,
+      sma14: Number(toFixedSafe(windowAvg, 2)),
+      min: item.min_price != null ? Number(item.min_price) : null,
+      max: item.max_price != null ? Number(item.max_price) : null,
+      samples: item.sample_count || 1,
     };
   });
 
@@ -49,15 +54,15 @@ export default function HistoricalTrendChart({ historyData, commodityName, unit 
           <div className="space-y-1">
             <p className="flex justify-between gap-4">
               <span className="text-emerald-400">Daily Average:</span>
-              <span className="font-bold text-white">BDT {pData.price.toFixed(2)}/{unit}</span>
+              <span className="font-bold text-white">BDT {toFixedSafe(pData.price, 2)}/{unit}</span>
             </p>
             <p className="flex justify-between gap-4">
               <span className="text-amber-400">14-Day SMA:</span>
-              <span className="font-bold text-white">BDT {pData.sma14.toFixed(2)}/{unit}</span>
+              <span className="font-bold text-white">BDT {toFixedSafe(pData.sma14, 2)}/{unit}</span>
             </p>
             <p className="flex justify-between gap-4 text-slate-400">
               <span>Spread Range:</span>
-              <span>{pData.min} – {pData.max} BDT</span>
+              <span>{pData.min != null ? pData.min : '--'} – {pData.max != null ? pData.max : '--'} BDT</span>
             </p>
           </div>
         </div>

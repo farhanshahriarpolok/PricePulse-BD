@@ -359,5 +359,208 @@
       {"alias": "mustard oil (pure)", "language": "en", "weight": 0.95},
       {"alias": "pure mustard oil", "language": "en", "weight": 0.92}
     ]
+  },
+  {
+    "canonical_name": "Ginger (Local)",
+    "bangla_name": "দেশি আদা",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "দেশি আদা", "language": "bn", "weight": 1.0},
+      {"alias": "আদা (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "আদা", "language": "bn", "weight": 0.90},
+      {"alias": "ginger", "language": "en", "weight": 0.95},
+      {"alias": "local ginger", "language": "en", "weight": 0.98},
+      {"alias": "ginger (local)", "language": "en", "weight": 1.0},
+      {"alias": "ada", "language": "phonetic", "weight": 0.90},
+      {"alias": "deshi ada", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Brinjal (Eggplant)",
+    "bangla_name": "বেগুন",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "বেগুন", "language": "bn", "weight": 1.0},
+      {"alias": "গোল বেগুন", "language": "bn", "weight": 0.95},
+      {"alias": "লম্বা বেগুন", "language": "bn", "weight": 0.95},
+      {"alias": "brinjal", "language": "en", "weight": 1.0},
+      {"alias": "eggplant", "language": "en", "weight": 0.98},
+      {"alias": "aubergine", "language": "en", "weight": 0.90},
+      {"alias": "begun", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Tomato",
+    "bangla_name": "টমেটো",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "টমেটো", "language": "bn", "weight": 1.0},
+      {"alias": "পাকা টমেটো", "language": "bn", "weight": 0.98},
+      {"alias": "দেশি টমেটো", "language": "bn", "weight": 0.95},
+      {"alias": "tomato", "language": "en", "weight": 1.0},
+      {"alias": "ripe tomato", "language": "en", "weight": 0.95},
+      {"alias": "tometo", "language": "phonetic", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Papaya (Green)",
+    "bangla_name": "কাঁচা পেঁপে",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "কাঁচা পেঁপে", "language": "bn", "weight": 1.0},
+      {"alias": "পেঁপে (কাঁচা)", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁপে", "language": "bn", "weight": 0.90},
+      {"alias": "green papaya", "language": "en", "weight": 1.0},
+      {"alias": "raw papaya", "language": "en", "weight": 0.98},
+      {"alias": "papaya", "language": "en", "weight": 0.90},
+      {"alias": "kacha pepe", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Cucumber",
+    "bangla_name": "শসা",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "শসা", "language": "bn", "weight": 1.0},
+      {"alias": "দেশি শসা", "language": "bn", "weight": 0.98},
+      {"alias": "ক্ষীরা", "language": "bn", "weight": 0.92},
+      {"alias": "cucumber", "language": "en", "weight": 1.0},
+      {"alias": "shosha", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Carrot",
+    "bangla_name": "গাজর",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "গাজর", "language": "bn", "weight": 1.0},
+      {"alias": "দেশি গাজর", "language": "bn", "weight": 0.95},
+      {"alias": "carrot", "language": "en", "weight": 1.0},
+      {"alias": "gajor", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Atta (Packaged)",
+    "bangla_name": "প্যাকেট আটা",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "প্যাকেট আটা", "language": "bn", "weight": 1.0},
+      {"alias": "আটা (প্যাকেট)", "language": "bn", "weight": 0.98},
+      {"alias": "আটা", "language": "bn", "weight": 0.90},
+      {"alias": "গম আটা", "language": "bn", "weight": 0.92},
+      {"alias": "wheat flour", "language": "en", "weight": 0.95},
+      {"alias": "atta", "language": "en", "weight": 0.95},
+      {"alias": "packaged atta", "language": "en", "weight": 1.0},
+      {"alias": "atta (packaged)", "language": "en", "weight": 1.0}
+    ]
+  },
+  {
+    "canonical_name": "Maida (Packaged)",
+    "bangla_name": "প্যাকেট ময়দা",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "প্যাকেট ময়দা", "language": "bn", "weight": 1.0},
+      {"alias": "ময়দা (প্যাকেট)", "language": "bn", "weight": 0.98},
+      {"alias": "ময়দা", "language": "bn", "weight": 0.90},
+      {"alias": "all purpose flour", "language": "en", "weight": 0.92},
+      {"alias": "white flour", "language": "en", "weight": 0.92},
+      {"alias": "maida", "language": "en", "weight": 0.95},
+      {"alias": "packaged maida", "language": "en", "weight": 1.0}
+    ]
+  },
+  {
+    "canonical_name": "Masur Dal (Fine)",
+    "bangla_name": "মসুর ডাল (চিকন)",
+    "category": "Pulses",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "মসুর ডাল (চিকন)", "language": "bn", "weight": 1.0},
+      {"alias": "চিকন মসুর ডাল", "language": "bn", "weight": 0.98},
+      {"alias": "দেশি মসুর ডাল", "language": "bn", "weight": 0.95},
+      {"alias": "lentil (fine)", "language": "en", "weight": 1.0},
+      {"alias": "fine red lentil", "language": "en", "weight": 0.95},
+      {"alias": "chikon masur dal", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Deshi Chicken",
+    "bangla_name": "দেশি মুরগি",
+    "category": "Meat & Poultry",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "দেশি মুরগি", "language": "bn", "weight": 1.0},
+      {"alias": "দেশী মুরগী", "language": "bn", "weight": 0.98},
+      {"alias": "মুরগি (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "দেশি মোরগ", "language": "bn", "weight": 0.92},
+      {"alias": "deshi chicken", "language": "en", "weight": 1.0},
+      {"alias": "local chicken", "language": "en", "weight": 0.95},
+      {"alias": "free range chicken", "language": "en", "weight": 0.90}
+    ]
+  },
+  {
+    "canonical_name": "Tilapia Fish",
+    "bangla_name": "তেলাপিয়া মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "তেলাপিয়া মাছ", "language": "bn", "weight": 1.0},
+      {"alias": "তেলাপিয়া", "language": "bn", "weight": 0.98},
+      {"alias": "মাছ (তেলাপিয়া)", "language": "bn", "weight": 0.95},
+      {"alias": "tilapia", "language": "en", "weight": 1.0},
+      {"alias": "tilapia fish", "language": "en", "weight": 1.0}
+    ]
+  },
+  {
+    "canonical_name": "Soybean Oil (Loose)",
+    "bangla_name": "খোলা সয়াবিন তেল",
+    "category": "Edible Oils",
+    "default_unit": "liter",
+    "aliases": [
+      {"alias": "খোলা সয়াবিন তেল", "language": "bn", "weight": 1.0},
+      {"alias": "খোলা তেল", "language": "bn", "weight": 0.95},
+      {"alias": "সয়াবিন তেল (খোলা)", "language": "bn", "weight": 0.98},
+      {"alias": "loose soybean oil", "language": "en", "weight": 1.0},
+      {"alias": "soybean oil (loose)", "language": "en", "weight": 1.0},
+      {"alias": "khola tel", "language": "phonetic", "weight": 0.92}
+    ]
+  },
+  {
+    "canonical_name": "Dry Red Chilli",
+    "bangla_name": "শুকনা মরিচ",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "শুকনা মরিচ", "language": "bn", "weight": 1.0},
+      {"alias": "শুকনো মরিচ", "language": "bn", "weight": 0.98},
+      {"alias": "লাল মরিচ (শুকনা)", "language": "bn", "weight": 0.95},
+      {"alias": "মরিচ (শুকনা)", "language": "bn", "weight": 0.95},
+      {"alias": "dry chilli", "language": "en", "weight": 1.0},
+      {"alias": "dry red chili", "language": "en", "weight": 1.0},
+      {"alias": "red chilli (dry)", "language": "en", "weight": 0.98},
+      {"alias": "shukna morich", "language": "phonetic", "weight": 0.95}
+    ]
+  },
+  {
+    "canonical_name": "Turmeric Powder",
+    "bangla_name": "হলুদ গুঁড়া",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {"alias": "হলুদ গুঁড়া", "language": "bn", "weight": 1.0},
+      {"alias": "হলুদের গুঁড়া", "language": "bn", "weight": 0.98},
+      {"alias": "গুঁড়া হলুদ", "language": "bn", "weight": 0.95},
+      {"alias": "হলুদ", "language": "bn", "weight": 0.88},
+      {"alias": "turmeric powder", "language": "en", "weight": 1.0},
+      {"alias": "turmeric", "language": "en", "weight": 0.90},
+      {"alias": "halud gura", "language": "phonetic", "weight": 0.95}
+    ]
   }
 ]

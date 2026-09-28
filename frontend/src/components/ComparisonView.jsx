@@ -33,7 +33,8 @@ export default function ComparisonView({ commodities = [], onSelectCommodity }) 
     getLocationHierarchy()
       .then((res) => {
         const distList = [];
-        (res.data?.divisions || []).forEach((div) => {
+        const divisions = res?.divisions || res?.data?.divisions || [];
+        divisions.forEach((div) => {
           (div.districts || []).forEach((dist) => {
             distList.push({ id: dist.id, name: dist.name, division: div.name });
           });
@@ -58,7 +59,8 @@ export default function ComparisonView({ commodities = [], onSelectCommodity }) 
 
     getComparisonData(params)
       .then((res) => {
-        setComparisonData(res.data?.items || []);
+        const items = res?.items || res?.data?.items || (Array.isArray(res) ? res : []);
+        setComparisonData(items);
       })
       .catch((err) => {
         console.error('Failed to fetch comparison data', err);

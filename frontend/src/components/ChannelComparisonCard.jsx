@@ -4,7 +4,13 @@ import { Layers, Store, ShoppingBag, Globe, ArrowRight } from 'lucide-react';
 export default function ChannelComparisonCard({ channels, unit = 'kg', priceStatus = 'Normal' }) {
   if (!channels) return null;
 
-  const { wholesale_avg, retail_avg, online_avg, spread_bdt, markup_percentage } = channels;
+  const toFixedSafe = (val, d = 2) => (val != null && !isNaN(val)) ? Number(val).toFixed(d) : null;
+
+  const wholesale_avg = channels.wholesale_avg ?? channels.cheapest_price ?? null;
+  const retail_avg = channels.retail_avg ?? channels.mean_market_price ?? null;
+  const online_avg = channels.online_avg ?? channels.highest_price ?? null;
+  const spread_bdt = channels.spread_bdt ?? channels.absolute_spread_bdt ?? null;
+  const markup_percentage = channels.markup_percentage ?? channels.percentage_spread ?? null;
 
   const tiers = [
     {
@@ -64,6 +70,7 @@ export default function ChannelComparisonCard({ channels, unit = 'kg', priceStat
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {tiers.map((tier, idx) => {
           const Icon = tier.icon;
+          const formattedPrice = toFixedSafe(tier.price, 2);
           return (
             <div
               key={idx}
@@ -76,7 +83,7 @@ export default function ChannelComparisonCard({ channels, unit = 'kg', priceStat
                 </div>
               </div>
               <div className="text-xl font-bold font-outfit text-white">
-                {tier.price ? `BDT ${tier.price.toFixed(2)}` : 'N/A'}
+                {formattedPrice ? `BDT ${formattedPrice}` : 'N/A'}
                 <span className="text-xs font-normal text-slate-400"> /{unit}</span>
               </div>
               <p className="text-[11px] text-slate-400 mt-1">{tier.sub}</p>
@@ -86,13 +93,17 @@ export default function ChannelComparisonCard({ channels, unit = 'kg', priceStat
       </div>
 
       {/* Spread Metric Strip */}
-      {spread_bdt !== null && (
+      {spread_bdt != null && !isNaN(spread_bdt) && (
         <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-slate-300">
             <span className="text-slate-400">Inter-Channel Gap:</span>
-            <span className="font-semibold text-white">BDT {spread_bdt.toFixed(2)}/{unit}</span>
-            <span className="text-slate-500">•</span>
-            <span>Markup: <strong className="text-amber-400">+{markup_percentage}%</strong></span>
+            <span className="font-semibold text-white">BDT {toFixedSafe(spread_bdt, 2)}/{unit}</span>
+            {markup_percentage != null && !isNaN(markup_percentage) && (
+              <>
+                <span className="text-slate-500">•</span>
+                <span>Markup: <strong className="text-amber-400">+{toFixedSafe(markup_percentage, 1)}%</strong></span>
+              </>
+            )}
           </div>
           <div className="text-[11px] text-slate-400">
             Comparing primary wholesale auction vs weighted retail retail/delivery

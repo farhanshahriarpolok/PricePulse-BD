@@ -23,7 +23,13 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
-- **TASK-005 / Milestone 019 — Documentation Synchronization, Benchmark Synthesis & Demo Script Freeze** (2026-09-29):
+- **Milestone 020 — Mass-Consumer Localization Overhaul, Bilingual Toggle, Expanded Taxonomy & Browser E2E Audit** (2026-09-29):
+  - Fixed white-screen tab crashes: resolved undefined property access in `ChannelComparisonCard.jsx` and `HistoricalTrendChart.jsx` (`.toFixed(2)` on undefined variables), rectified response unnesting in `ComparisonView.jsx`, and wrapped all tabs in React `<ErrorBoundary>`.
+  - Implemented bilingual localization dictionary (`frontend/src/i18n/translations.js`) with default natural, colloquial Bangla (`bn`) and added `[বাংলা | EN]` toggle button in `Navbar.jsx` with persistent `localStorage` preference.
+  - Replaced academic/statistical jargon with consumer-friendly wording across all views (e.g. "আজকের নিত্যপণ্যের বাজারদর", "বাজার বাস্কেট", "দাম বৃদ্ধি সতর্কতা", "জেলাভিত্তিক ম্যাপ", "মার্কেট সিমুলেটর").
+  - Expanded national essential staples taxonomy (`data/taxonomy/commodities.json`) from 21 to 35 commodities (adding ginger, eggplant, tomato, papaya, cucumber, carrot, atta, maida, fine masur dal, deshi chicken, tilapia, loose oil, dry red chilli, turmeric powder) with grounded historical market baselines.
+  - Performed comprehensive headless Playwright MCP E2E audit navigating through all 9 tabs (`pulse`, `basket`, `compare`, `explorer`, `anomalies`, `simulator`, `map`, `sources`, `provenance`), asserting 0 console errors/exceptions, and archiving verified visual snapshots in `scripts/qa_snapshots/`.
+  - Maintained 100% test pass rate across all 236 pytest tests.
   - Updated academic thesis Chapters 5 and 6 (`report/chapters/05_anomaly_engine.tex`, `06_evaluation.tex`) with Highway Transit Corridor equations:
     $$\text{Transit Hours} = \frac{d_{\text{road}}}{45} + \text{Buffer Hours}$$
     $$\text{Total Freight} = 1.50 + 0.018 \cdot d_{\text{road}} + \text{Toll Buffer}$$
