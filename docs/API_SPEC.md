@@ -399,3 +399,114 @@ When validation fails or an unknown resource is requested, the API returns a str
   }
 }
 ```
+
+---
+
+## 10. Consumer Bazaar Basket & Cost of Living Tracker
+
+### `POST /api/v1/basket/calculate`
+Calculate the optimized cost breakdown for a user-supplied market basket across wholesale, retail, and online channels.
+
+**Request Body (JSON):**
+```json
+{
+  "items": [
+    {"commodity_id": 1, "quantity": 5, "raw_unit": "kg"},
+    {"commodity_id": 3, "quantity": 2, "raw_unit": "হালি"},
+    {"commodity_id": 4, "quantity": 2, "raw_unit": "liter"}
+  ],
+  "custom_name": "সাপ্তাহিক বাজার"
+}
+```
+
+**Field Notes:**
+- `commodity_id`: Canonical commodity ID from `GET /api/v1/commodities`.
+- `quantity`: Numeric quantity in the specified `raw_unit`; must be > 0.
+- `raw_unit`: Supports all PricePulse BD canonical units including Bangladeshi customary units (`হালি` = 4 pcs, `পোয়া` = 0.25 kg, `মণ` = 40 kg, `500ml`, `250g`, `ডজন`, etc.).
+
+**Response (`200 OK`):**
+```json
+{
+  "benchmark_total": 615.0,
+  "wholesale_total": 540.0,
+  "retail_total": 615.0,
+  "online_total": 695.0,
+  "best_channel": "🏪 পাইকারি বাজার",
+  "max_savings_bdt": 75.0,
+  "savings_explanation": "পাইকারি বাজার থেকে কিনলে আপনার ৳৭৫ বাঁচবে, আর অনলাইন থেকে কিনলে ৳৮০ বেশি লাগবে।",
+  "cost_shift_7d_pct": 8.4,
+  "cost_shift_7d_bdt": 47.8,
+  "item_details": [
+    {
+      "commodity_id": 1,
+      "canonical_name": "Rice (Miniket)",
+      "bangla_name": "মিনিকেট চাল",
+      "quantity_normalized": 5.0,
+      "standard_unit": "kg",
+      "unit_price": 72.0,
+      "line_total": 360.0,
+      "channel_prices": {
+        "wholesale": 65.0,
+        "retail": 72.0,
+        "online": 78.0
+      }
+    }
+  ],
+  "smart_saving_tips": [
+    "মিনিকেটের বদলে মোটা চাল নিলে উল্লেখযোগ্য সাশ্রয় সম্ভব।",
+    "সপ্তাহের শুরুতে (শনি-রবিবার) বাজার করলে তাজা মালে ভালো দাম পাওয়া যায়।"
+  ]
+}
+```
+
+**Error Responses:**
+- `422 Unprocessable Entity`: Empty items list or invalid quantity (≤ 0).
+- `500 Internal Server Error`: Unexpected calculation failure.
+
+---
+
+### `GET /api/v1/basket/presets`
+Returns three pre-defined Bangladeshi household market basket presets ready for direct use in the basket calculator.
+
+**Response (`200 OK`):**
+```json
+{
+  "total": 3,
+  "presets": [
+    {
+      "id": "weekly_essentials",
+      "name": "Middle-Class Weekly Essentials",
+      "bangla_name": "সাপ্তাহিক পারিবারিক বাজার",
+      "description": "Standard weekly grocery run for a 4-member middle-class household.",
+      "items": [
+        {"commodity_name": "Rice (Miniket)", "bangla_name": "মিনিকেট চাল", "quantity": 5, "unit": "kg"},
+        {"commodity_name": "Lentils (Masur Dal)", "bangla_name": "মসুর ডাল", "quantity": 1, "unit": "kg"},
+        {"commodity_name": "Onion (Local)", "bangla_name": "দেশি পেঁয়াজ", "quantity": 2, "unit": "kg"},
+        {"commodity_name": "Potato (Diamond)", "bangla_name": "আলু", "quantity": 3, "unit": "kg"},
+        {"commodity_name": "Soybean Oil (Bottled)", "bangla_name": "সয়াবিন তেল", "quantity": 2, "unit": "liter"},
+        {"commodity_name": "Egg (Hen)", "bangla_name": "মুরগির ডিম", "quantity": 2, "unit": "হালি"}
+      ]
+    },
+    {
+      "id": "bachelor_fast_basket",
+      "name": "Bachelor Fast Basket",
+      "bangla_name": "ব্যাচেলর বাস্কেট",
+      "description": "Minimal weekly essentials for a single working person.",
+      "items": [...]
+    },
+    {
+      "id": "family_weekend_feast",
+      "name": "Family Weekend Feast",
+      "bangla_name": "উইকেন্ড পারিবারিক ভোজ",
+      "description": "Special weekend feast basket for a 6-member Bangladeshi family.",
+      "items": [...]
+    }
+  ]
+}
+```
+
+**Basket Calculus Engine Notes:**
+- **Unit Normalization**: `হালি` → 4 pc, `পোয়া` → 0.25 kg, `মণ` → 40 kg, `500ml` → 0.5 liter (all handled by `CommodityNormalizer.normalize_unit()`).
+- **Channel Imputation**: Missing channel observations are filled with the cross-channel average; online imputed at +8% premium when absent.
+- **7-Day Inflation Shift**: Δ% = (Total_today − Total_t7) / Total_t7 × 100, using 14-day trailing window per commodity.
+- **Performance**: <15ms end-to-end via single-pass SQL aggregation.

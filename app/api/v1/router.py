@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     observations,
     system,
     simulation,
+    basket,
 )
 
 api_router = APIRouter(prefix="/v1")
@@ -24,4 +25,5 @@ api_router.include_router(locations.router)
 api_router.include_router(observations.router)
 api_router.include_router(system.router)
 api_router.include_router(simulation.router)
+api_router.include_router(basket.router)
 

@@ -58,6 +58,22 @@ export const getSyncTaskStatus = (taskId) => apiClient.get(`/system/sync/${taskI
 
 export const injectShock = (payload) => apiClient.post('/simulation/inject-shock', payload);
 
-export const getSpatialArbitrage = (commodityId) => 
+export const getSpatialArbitrage = (commodityId) =>
   apiClient.get('/locations/arbitrage', { params: { commodity_id: commodityId } });
+
+// ── Bazaar Basket endpoints ───────────────────────────────────────────────────
+
+/**
+ * POST /basket/calculate
+ * Calculate optimized channel cost breakdown for a custom market basket.
+ * @param {Object} payload - { items: [{commodity_id, quantity, raw_unit}], custom_name? }
+ */
+export const calculateBasket = (payload) => apiClient.post('/basket/calculate', payload);
+
+/**
+ * GET /basket/presets
+ * Returns 3 pre-defined Bangladeshi family basket presets.
+ */
+export const getBasketPresets = () => apiClient.get('/basket/presets');
+
 

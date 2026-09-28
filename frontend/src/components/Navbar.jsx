@@ -13,13 +13,15 @@ import {
   CheckCircle,
   Radio,
   Download,
-  Sliders
+  Sliders,
+  ShoppingBasket
 } from 'lucide-react';
 
 export default function Navbar({ 
   activeTab, 
   setActiveTab, 
-  anomalyCount = 0, 
+  anomalyCount = 0,
+  basketCount = 0,
   onRefresh, 
   isRefreshing = false,
   onOpenReportModal,
@@ -30,6 +32,7 @@ export default function Navbar({
 }) {
   const navItems = [
     { id: 'pulse', label: 'Market Pulse', icon: Activity },
+    { id: 'basket', label: 'Bazaar Basket', icon: ShoppingBasket, count: basketCount, isBasket: true },
     { id: 'compare', label: 'Compare Markets', icon: GitCompare },
     { id: 'explorer', label: 'Commodity Explorer', icon: TrendingUp },
     { id: 'anomalies', label: 'Anomaly Monitor', icon: AlertTriangle, count: anomalyCount },
@@ -66,16 +69,24 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  className={`relative flex items-center space-x-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
+                      ? item.isBasket
+                        ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30 shadow-sm'
+                        : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${
+                    isActive
+                      ? item.isBasket ? 'text-amber-400' : 'text-emerald-400'
+                      : 'text-slate-400'
+                  }`} />
                   <span>{item.label}</span>
                   {item.count > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-rose-500 text-white animate-pulse">
+                    <span className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full text-white ${
+                      item.isBasket ? 'bg-amber-500' : 'bg-rose-500 animate-pulse'
+                    }`}>
                       {item.count}
                     </span>
                   )}

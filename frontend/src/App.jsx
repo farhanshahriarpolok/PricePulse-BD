@@ -30,6 +30,7 @@ import CategoryFilter, { matchesCategory, CATEGORIES } from './components/Catego
 import ExportDataModal from './components/ExportDataModal';
 import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
+import BazaarBasketView from './components/BazaarBasketView';
 
 import {
   getDailyPulse,
@@ -62,6 +63,7 @@ export default function App() {
   const [activeProvenance, setActiveProvenance] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [basketItemCount, setBasketItemCount] = useState(0);
 
   // Fetch telemetry for upstream data providers
   const fetchSourceHealth = async () => {
@@ -211,6 +213,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         anomalyCount={activeAnomalyCount}
+        basketCount={basketItemCount}
         onRefresh={loadData}
         isRefreshing={isRefreshing}
         onOpenReportModal={() => setIsManualModalOpen(true)}
@@ -231,6 +234,13 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* TAB: BAZAAR BASKET */}
+        {activeTab === 'basket' && (
+          <BazaarBasketView
+            onBasketCountChange={setBasketItemCount}
+          />
+        )}
+
         {/* TAB 1: MARKET PULSE */}
         {activeTab === 'pulse' && (
           <div>

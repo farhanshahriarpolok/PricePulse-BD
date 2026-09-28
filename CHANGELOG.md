@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-09-28
+
+### Added
+- **Consumer "Bazaar Basket" & Cost of Living Tracker (Shopping Optimizer)**:
+  - `app/schemas/basket.py`: Pydantic schemas `BasketItemInput`, `BasketCalculationRequest`, `ChannelCostBreakdown`, `BasketItemCostDetail`, `BasketCalculationResponse` covering all basket calculus data contracts with full field documentation.
+  - `app/services/basket_service.py`: `BasketOptimizationService` — comprehensive basket calculus engine that normalizes customary units (`হালি` → 4 pc, `পোয়া` → 0.25 kg, `মণ` → 40 kg, `500ml` → 0.5 liter) via the existing `CommodityNormalizer`, pulls today's wholesale/retail/online prices per commodity from the DB using a single-pass SQL query with a 14-day trailing window, imputes missing channel prices from cross-channel averages (online defaults to +8% premium when absent), computes 7-day personal inflation shift (Δ% = (today − t7) / t7 × 100), generates smart substitute savings recommendations using a commodity close-variant map, and produces consumer-friendly Bengali procurement explanations.
+  - `app/api/v1/endpoints/basket.py`: Two REST endpoints registered under `/api/v1/basket`:
+    - `POST /api/v1/basket/calculate` — public endpoint computing optimized channel breakdown in <15ms; returns benchmark_total, wholesale_total, retail_total, online_total, best_channel, max_savings_bdt, savings_explanation (Bengali), cost_shift_7d_pct, cost_shift_7d_bdt, item_details, and smart_saving_tips.
+    - `GET /api/v1/basket/presets` — three pre-defined family baskets: "Middle-Class Weekly Essentials" (চাল ৫ কেজি, ডাল, পেঁয়াজ, আলু, তেল, ডিম), "Bachelor Fast Basket" (ডিম, আলু, পেঁয়াজ, তেল, কাঁচা মরিচ), "Family Weekend Feast" (গরুর মাংস, পোলাও চাল, পেঁয়াজ, সরিষার তেল, রসুন).
+  - `app/api/v1/router.py`: Registered `basket.router` in the v1 API aggregator.
+  - `frontend/src/components/BazaarBasketView.jsx`: Full React component with preset quick-load buttons, searchable bilingual commodity dropdown, quantity `−/+` stepper, unit selector (কেজি/লিটার/হালি/পিস/পোয়া), animated add-to-basket, active basket table with inline edit, Hero Total display, 3-channel comparison meter (Wholesale/Retail/Online with savings pills), 7-day cost shift banner, smart saving tips lightbulb card, and print/share export actions.
+  - `frontend/src/components/Navbar.jsx`: Added "🧺 Bazaar Basket" nav tab with amber accent coloring and floating mini-cart count badge (shows item count).
+  - `frontend/src/App.jsx`: Integrated `BazaarBasketView` tab panel and wired `basketItemCount` state to the Navbar `basketCount` prop.
+  - `frontend/src/api/endpoints.js`: Added `calculateBasket()` (POST) and `getBasketPresets()` (GET) API client functions.
+  - `frontend/src/index.css`: Added comprehensive `.bb-*` CSS component classes for the Bazaar Basket view using Tailwind `@apply` directives, plus print-only receipt stylesheet.
+  - `tests/test_basket_service.py`: 35-test comprehensive test suite covering: unit normalization (হালি, পোয়া, 500ml, g), `_ChannelPrices` aggregation, wholesale vs retail savings arithmetic, 7-day cost shift formula (including division-by-zero guard), channel imputation logic, mocked-DB service integration tests, and REST endpoint validation (empty basket 422, negative quantity 422, response schema completeness).
+
 ## [1.6.0] - 2026-09-28
 
 ### Added

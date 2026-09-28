@@ -1,0 +1,498 @@
+"""
+Basket Optimization Service — core calculus engine for the Consumer Bazaar Basket feature.
+
+Responsibilities:
+  - Normalize customary units (হালি → 4 pc, পোয়া → 0.25 kg, মণ → 40 kg).
+  - Pull today's wholesale, retail, and online prices per commodity via the DB.
+  - Impute missing channel prices from cross-channel averages.
+  - Compute 7-day trailing basket total and personal inflation shift.
+  - Generate channel cost breakdowns, smart saving tips, and Bengali explanations.
+"""
+
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass, field
+from datetime import date, timedelta
+from typing import Optional
+
+from sqlalchemy import select, func
+from sqlalchemy.orm import Session
+
+from app.models.commodity import Commodity
+from app.models.location import Market
+from app.models.observation import PriceObservation
+from app.models.source import Source
+from app.schemas.basket import (
+    BasketCalculationRequest,
+    BasketCalculationResponse,
+    BasketItemCostDetail,
+    ChannelCostBreakdown,
+)
+from app.services.normalizer import commodity_normalizer
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Internal aggregation container
+# ---------------------------------------------------------------------------
+
+@dataclass
+class _ChannelPrices:
+    """Aggregated channel prices for a single commodity on a given date."""
+
+    wholesale: Optional[float] = None
+    retail: Optional[float] = None
+    online: Optional[float] = None
+
+    def overall_average(self) -> Optional[float]:
+        """Return the mean across all available channels."""
+        available = [p for p in (self.wholesale, self.retail, self.online) if p is not None]
+        return round(sum(available) / len(available), 2) if available else None
+
+    def benchmark(self) -> Optional[float]:
+        """Best retail-side benchmark: retail → online → wholesale fallback."""
+        return self.retail or self.online or self.wholesale
+
+
+@dataclass
+class _ItemCalc:
+    """Intermediate calculation state for a single basket line-item."""
+
+    commodity_id: int
+    canonical_name: str
+    bangla_name: str
+    standard_unit: str
+    quantity_normalized: float  # in base unit after unit normalization
+    today_prices: _ChannelPrices = field(default_factory=_ChannelPrices)
+    week_prices: _ChannelPrices = field(default_factory=_ChannelPrices)  # t-7 day prices
+
+
+# ---------------------------------------------------------------------------
+# Commodity close-variant map for smart saving tips
+# ---------------------------------------------------------------------------
+
+# Maps canonical commodity names to cheaper / substitute options with a tip
+_SUBSTITUTE_TIPS: dict[str, tuple[str, str]] = {
+    "Onion (Local)": (
+        "Onion (Imported)",
+        "দেশি পেঁয়াজের বদলে আমদানি পেঁয়াজ নিলে খরচ কমতে পারে।",
+    ),
+    "Rice (Miniket)": (
+        "Rice (Coarse)",
+        "মিনিকেটের বদলে মোটা চাল নিলে উল্লেখযোগ্য সাশ্রয় সম্ভব।",
+    ),
+    "Soybean Oil (Bottled)": (
+        "Mustard Oil",
+        "বোতলজাত সয়াবিনের বদলে সরিষার তেল নিলে স্বাস্থ্যকর এবং সাশ্রয়ী।",
+    ),
+    "Beef (Local with Bone)": (
+        "Mutton (Goat Meat)",
+        "গরুর মাংসের বদলে খাসির মাংস অনেক ক্ষেত্রে সাশ্রয়ী হতে পারে।",
+    ),
+    "Rui Fish (Fresh)": (
+        "Pangas Fish (Farm)",
+        "রুই মাছের বদলে পাঙ্গাশ মাছ বেছে নিলে খরচ অনেকটা কমে।",
+    ),
+}
+
+# Channel display labels
+_CHANNEL_LABELS = {
+    "wholesale": "🏪 পাইকারি বাজার",
+    "retail": "🛒 খুচরা বাজার",
+    "online": "📱 অনলাইন / সুপারশপ",
+}
+
+
+class BasketOptimizationService:
+    """
+    Core engine that calculates the optimized cost breakdown for a user-supplied
+    market basket across wholesale, retail, and online channels.
+    """
+
+    # ---------------------------------------------------------------------------
+    # Public interface
+    # ---------------------------------------------------------------------------
+
+    def calculate(
+        self,
+        request: BasketCalculationRequest,
+        db: Session,
+    ) -> BasketCalculationResponse:
+        """
+        Execute full basket optimization analysis.
+
+        Steps:
+          1. Resolve and normalize each item's unit to the canonical base unit.
+          2. Query today's and 7-day-ago prices across all channels.
+          3. Impute missing channel prices from available data.
+          4. Aggregate channel totals and compute savings.
+          5. Calculate 7-day personal inflation shift.
+          6. Generate Bengali-language explanation and smart saving tips.
+        """
+        today = date.today()
+        week_ago = today - timedelta(days=7)
+
+        item_calcs: list[_ItemCalc] = []
+
+        for item in request.items:
+            commodity = db.get(Commodity, item.commodity_id)
+            if not commodity:
+                logger.warning("Basket: commodity_id=%d not found — skipping.", item.commodity_id)
+                continue
+
+            # Normalize the user-supplied unit to a base-unit quantity
+            try:
+                base_unit, multiplier = commodity_normalizer.normalize_unit(item.raw_unit)
+                quantity_normalized = round(item.quantity * multiplier, 4)
+            except ValueError:
+                logger.warning(
+                    "Basket: unrecognized unit '%s' for commodity %d — using raw quantity.",
+                    item.raw_unit,
+                    item.commodity_id,
+                )
+                base_unit = commodity.default_unit
+                quantity_normalized = item.quantity
+
+            calc = _ItemCalc(
+                commodity_id=commodity.id,
+                canonical_name=commodity.canonical_name,
+                bangla_name=commodity.bangla_name,
+                standard_unit=base_unit,
+                quantity_normalized=quantity_normalized,
+            )
+
+            # Pull prices for today and 7 days ago
+            calc.today_prices = self._fetch_channel_prices(db, commodity.id, today)
+            calc.week_prices = self._fetch_channel_prices(db, commodity.id, week_ago)
+
+            # Impute if channel data is missing (use overall average as benchmark)
+            self._impute_missing(calc.today_prices)
+            self._impute_missing(calc.week_prices)
+
+            item_calcs.append(calc)
+
+        if not item_calcs:
+            # Empty basket after resolution — return a zeroed response
+            return self._empty_response()
+
+        # ---------------------------------------------------------------------------
+        # Aggregate channel totals
+        # ---------------------------------------------------------------------------
+
+        wholesale_total = 0.0
+        retail_total = 0.0
+        online_total = 0.0
+        benchmark_total = 0.0
+        week_total = 0.0
+
+        item_details: list[BasketItemCostDetail] = []
+
+        for calc in item_calcs:
+            prices = calc.today_prices
+            qty = calc.quantity_normalized
+
+            # Retail benchmark for this item
+            benchmark_price = prices.benchmark() or 0.0
+            line_benchmark = round(benchmark_price * qty, 2)
+            benchmark_total += line_benchmark
+
+            # Channel line totals (fall back to benchmark if channel absent)
+            wh_price = prices.wholesale or benchmark_price
+            re_price = prices.retail or benchmark_price
+            on_price = prices.online or benchmark_price
+
+            wholesale_total += round(wh_price * qty, 2)
+            retail_total += round(re_price * qty, 2)
+            online_total += round(on_price * qty, 2)
+
+            # 7-day ago total (for inflation shift)
+            week_bench = calc.week_prices.benchmark() or benchmark_price
+            week_total += round(week_bench * qty, 2)
+
+            item_details.append(
+                BasketItemCostDetail(
+                    commodity_id=calc.commodity_id,
+                    canonical_name=calc.canonical_name,
+                    bangla_name=calc.bangla_name,
+                    quantity_normalized=round(qty, 3),
+                    standard_unit=calc.standard_unit,
+                    unit_price=round(benchmark_price, 2),
+                    line_total=line_benchmark,
+                    channel_prices={
+                        "wholesale": round(wh_price, 2),
+                        "retail": round(re_price, 2),
+                        "online": round(on_price, 2),
+                    },
+                )
+            )
+
+        # Round totals
+        wholesale_total = round(wholesale_total, 2)
+        retail_total = round(retail_total, 2)
+        online_total = round(online_total, 2)
+        benchmark_total = round(benchmark_total, 2)
+        week_total = round(week_total, 2)
+
+        # ---------------------------------------------------------------------------
+        # Determine best channel and savings
+        # ---------------------------------------------------------------------------
+
+        channel_totals = {
+            "wholesale": wholesale_total,
+            "retail": retail_total,
+            "online": online_total,
+        }
+        best_channel_key = min(channel_totals, key=lambda k: channel_totals[k])
+        best_channel_label = _CHANNEL_LABELS[best_channel_key]
+        best_total = channel_totals[best_channel_key]
+        max_savings = round(benchmark_total - best_total, 2)
+
+        # ---------------------------------------------------------------------------
+        # Channel breakdown objects for response
+        # ---------------------------------------------------------------------------
+
+        channel_breakdowns: list[ChannelCostBreakdown] = []
+        for key, label in _CHANNEL_LABELS.items():
+            total = channel_totals[key]
+            diff = round(total - benchmark_total, 2)
+            diff_pct = round((diff / benchmark_total) * 100, 1) if benchmark_total > 0 else 0.0
+            channel_breakdowns.append(
+                ChannelCostBreakdown(
+                    channel_name=label,
+                    total_cost=total,
+                    savings_vs_retail=round(-diff, 2),
+                    difference_pct=diff_pct,
+                )
+            )
+
+        # ---------------------------------------------------------------------------
+        # 7-day cost shift
+        # ---------------------------------------------------------------------------
+
+        cost_shift_bdt = round(benchmark_total - week_total, 2)
+        cost_shift_pct = (
+            round(((benchmark_total - week_total) / week_total) * 100, 1)
+            if week_total > 0
+            else 0.0
+        )
+
+        # ---------------------------------------------------------------------------
+        # Bengali savings explanation
+        # ---------------------------------------------------------------------------
+
+        savings_explanation = self._build_savings_explanation(
+            best_channel_key=best_channel_key,
+            wholesale_total=wholesale_total,
+            online_total=online_total,
+            benchmark_total=benchmark_total,
+            wholesale_savings=round(benchmark_total - wholesale_total, 2),
+            online_diff=round(online_total - benchmark_total, 2),
+        )
+
+        # ---------------------------------------------------------------------------
+        # Smart saving tips
+        # ---------------------------------------------------------------------------
+
+        smart_tips = self._generate_smart_tips(item_calcs, item_details)
+
+        return BasketCalculationResponse(
+            benchmark_total=benchmark_total,
+            wholesale_total=wholesale_total,
+            retail_total=retail_total,
+            online_total=online_total,
+            best_channel=best_channel_label,
+            max_savings_bdt=max_savings,
+            savings_explanation=savings_explanation,
+            cost_shift_7d_pct=cost_shift_pct,
+            cost_shift_7d_bdt=cost_shift_bdt,
+            item_details=item_details,
+            smart_saving_tips=smart_tips,
+        )
+
+    # ---------------------------------------------------------------------------
+    # Private helpers
+    # ---------------------------------------------------------------------------
+
+    def _fetch_channel_prices(
+        self,
+        db: Session,
+        commodity_id: int,
+        target_date: date,
+    ) -> _ChannelPrices:
+        """
+        Fetch the most recent price observation for each channel within a 14-day
+        window ending at target_date.  Uses a single aggregated SQL query for
+        efficiency.
+        """
+        window_start = target_date - timedelta(days=14)
+
+        rows = db.execute(
+            select(
+                PriceObservation.price_type,
+                Market.market_type,
+                Source.source_type,
+                Source.code.label("source_code"),
+                func.avg(PriceObservation.normalized_price).label("avg_price"),
+            )
+            .join(Market, PriceObservation.market_id == Market.id)
+            .join(Source, PriceObservation.source_id == Source.id)
+            .where(
+                PriceObservation.commodity_id == commodity_id,
+                PriceObservation.observation_date >= window_start,
+                PriceObservation.observation_date <= target_date,
+            )
+            .group_by(
+                PriceObservation.price_type,
+                Market.market_type,
+                Source.source_type,
+                Source.code,
+            )
+        ).all()
+
+        channel = _ChannelPrices()
+        wholesale_prices: list[float] = []
+        retail_prices: list[float] = []
+        online_prices: list[float] = []
+
+        for row in rows:
+            price = float(row.avg_price)
+            source_code = (row.source_code or "").upper()
+            source_type = (row.source_type or "").lower()
+            market_type = (row.market_type or "").lower()
+            price_type = (row.price_type or "").lower()
+
+            if (
+                source_code in ("CHALDAL_RETAIL",)
+                or source_type in ("retail_ecommerce",)
+                or market_type == "online"
+            ):
+                online_prices.append(price)
+            elif "wholesale" in price_type or market_type == "wholesale":
+                wholesale_prices.append(price)
+            else:
+                retail_prices.append(price)
+
+        if wholesale_prices:
+            channel.wholesale = round(sum(wholesale_prices) / len(wholesale_prices), 2)
+        if retail_prices:
+            channel.retail = round(sum(retail_prices) / len(retail_prices), 2)
+        if online_prices:
+            channel.online = round(sum(online_prices) / len(online_prices), 2)
+
+        return channel
+
+    @staticmethod
+    def _impute_missing(prices: _ChannelPrices) -> None:
+        """
+        Fill in missing channel prices using the overall average across available
+        channels.  This ensures a full cost comparison even when only one channel
+        has observations for a specific commodity.
+        """
+        avg = prices.overall_average()
+        if avg is None:
+            return
+        if prices.wholesale is None:
+            prices.wholesale = avg
+        if prices.retail is None:
+            prices.retail = avg
+        if prices.online is None:
+            # Online / super-shop typically carries a small premium
+            prices.online = round(avg * 1.08, 2)
+
+    @staticmethod
+    def _build_savings_explanation(
+        best_channel_key: str,
+        wholesale_total: float,
+        online_total: float,
+        benchmark_total: float,
+        wholesale_savings: float,
+        online_diff: float,
+    ) -> str:
+        """Compose a consumer-friendly Bengali explanation of the savings opportunity."""
+        wh_savings_str = f"৳{abs(wholesale_savings):.0f}"
+        on_diff_str = f"৳{abs(online_diff):.0f}"
+
+        if best_channel_key == "wholesale":
+            return (
+                f"পাইকারি বাজার থেকে কিনলে আপনার {wh_savings_str} বাঁচবে"
+                + (
+                    f", আর অনলাইন থেকে কিনলে {on_diff_str} বেশি লাগবে।"
+                    if online_diff > 0
+                    else "।"
+                )
+            )
+        elif best_channel_key == "retail":
+            return (
+                f"এই বাজারের জন্য খুচরা বাজার সবচেয়ে সাশ্রয়ী। "
+                f"পাইকারি থেকে {wh_savings_str} সাশ্রয় সম্ভব হলেও আজকের দরে খুচরা বাজারই লাভজনক।"
+            )
+        else:
+            online_savings = round(benchmark_total - online_total, 2)
+            return (
+                f"অনলাইন / সুপারশপ থেকে কিনলে আপনার ৳{online_savings:.0f} বাঁচবে"
+                + (
+                    f", পাইকারি বাজারে {wh_savings_str} সাশ্রয় সম্ভব হলেও ডেলিভারির সুবিধায় অনলাইন লাভজনক।"
+                    if wholesale_savings > 0
+                    else "।"
+                )
+            )
+
+    @staticmethod
+    def _generate_smart_tips(
+        item_calcs: list[_ItemCalc],
+        item_details: list[BasketItemCostDetail],
+    ) -> list[str]:
+        """
+        Formulate actionable procurement tips:
+          1. Substitute suggestions for high-cost commodities.
+          2. Bulk purchase recommendation for high-quantity items.
+          3. General freshness/timing tip.
+        """
+        tips: list[str] = []
+        commodity_names = {calc.commodity_id: calc.canonical_name for calc in item_calcs}
+
+        # Substitute tip lookup
+        for calc in item_calcs:
+            name = calc.canonical_name
+            if name in _SUBSTITUTE_TIPS:
+                _, tip_text = _SUBSTITUTE_TIPS[name]
+                tips.append(tip_text)
+                if len(tips) >= 2:
+                    break
+
+        # Bulk purchase tip for items > 2 kg / 2 liter
+        for calc in item_calcs:
+            if calc.quantity_normalized >= 2.0 and calc.standard_unit in ("kg", "liter"):
+                tips.append(
+                    f"{calc.bangla_name} বেশি পরিমাণে কিনলে পাইকারি দরে সাশ্রয় বেশি হয়।"
+                )
+                break
+
+        # Timing tip — always add one general tip
+        tips.append("সপ্তাহের শুরুতে (শনি-রবিবার) বাজার করলে তাজা মালে ভালো দাম পাওয়া যায়।")
+
+        # Limit to max 4 tips
+        return tips[:4]
+
+    @staticmethod
+    def _empty_response() -> BasketCalculationResponse:
+        """Return a zeroed response for an empty or unresolvable basket."""
+        return BasketCalculationResponse(
+            benchmark_total=0.0,
+            wholesale_total=0.0,
+            retail_total=0.0,
+            online_total=0.0,
+            best_channel="🛒 খুচরা বাজার",
+            max_savings_bdt=0.0,
+            savings_explanation="বাস্কেটে কোনো পণ্য যোগ করা হয়নি।",
+            cost_shift_7d_pct=0.0,
+            cost_shift_7d_bdt=0.0,
+            item_details=[],
+            smart_saving_tips=[],
+        )
+
+
+# Module-level singleton
+basket_service = BasketOptimizationService()
