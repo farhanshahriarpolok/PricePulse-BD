@@ -34,8 +34,8 @@
       "precision": 95.2,
       "recall": 69.0,
       "f1_score": 0.8,
-      "avg_latency_ms": 0.015,
-      "p95_latency_ms": 0.026
+      "avg_latency_ms": 0.016,
+      "p95_latency_ms": 0.028
     },
     "Out-of-Domain": {
       "sample_size": 15,
@@ -47,7 +47,7 @@
       "recall": 0.0,
       "f1_score": 0.0,
       "avg_latency_ms": 0.025,
-      "p95_latency_ms": 0.029
+      "p95_latency_ms": 0.026
     },
     "Overall": {
       "sample_size": 120,
@@ -58,7 +58,7 @@
       "precision": 81.2,
       "recall": 58.4,
       "f1_score": 0.68,
-      "avg_latency_ms": 0.016,
+      "avg_latency_ms": 0.017,
       "p95_latency_ms": 0.028
     }
   }

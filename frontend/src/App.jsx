@@ -28,6 +28,7 @@ import SourceHealthCard from './components/SourceHealthCard';
 import MarketTicker from './components/MarketTicker';
 import CategoryFilter, { matchesCategory, CATEGORIES } from './components/CategoryFilter';
 import ExportDataModal from './components/ExportDataModal';
+import SimulationSandbox from './components/SimulationSandbox';
 
 import {
   getDailyPulse,
@@ -403,7 +404,14 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 4: SPATIAL MAP */}
+        {/* TAB 4: VIVA DEFENSE SIMULATION SANDBOX */}
+        {activeTab === 'simulator' && (
+          <div>
+            <SimulationSandbox commodities={commodities} />
+          </div>
+        )}
+
+        {/* TAB 5: SPATIAL MAP */}
         {activeTab === 'map' && (
           <div>
             <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

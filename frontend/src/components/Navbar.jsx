@@ -12,7 +12,8 @@ import {
   Server,
   CheckCircle,
   Radio,
-  Download
+  Download,
+  Sliders
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -32,6 +33,7 @@ export default function Navbar({
     { id: 'compare', label: 'Compare Markets', icon: GitCompare },
     { id: 'explorer', label: 'Commodity Explorer', icon: TrendingUp },
     { id: 'anomalies', label: 'Anomaly Monitor', icon: AlertTriangle, count: anomalyCount },
+    { id: 'simulator', label: 'Viva Simulator', icon: Sliders },
     { id: 'map', label: 'Spatial Map', icon: MapPin },
     { id: 'sources', label: 'Source Health', icon: Server },
     { id: 'provenance', label: 'Data Provenance', icon: ShieldCheck },

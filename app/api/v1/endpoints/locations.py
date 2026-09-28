@@ -9,7 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services.spatial_service import spatial_service
-from app.schemas.spatial import GeoSpatialPulseResponse, LocationHierarchyResponse
+from app.schemas.spatial import (
+    GeoSpatialPulseResponse,
+    LocationHierarchyResponse,
+    SpatialArbitrageResponse,
+)
 
 router = APIRouter(prefix="/locations", tags=["Spatial Analytics"])
 
@@ -35,6 +39,31 @@ def get_spatial_price_spread(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Commodity '{commodity_id}' could not be resolved or has no spatial observations.",
+        )
+    return result
+
+
+@router.get(
+    "/arbitrage",
+    response_model=SpatialArbitrageResponse,
+    summary="Inter-District Freight & Spatial Arbitrage Estimator",
+    description=(
+        "Calculates freight-adjusted price spreads between regional production hubs and metropolitan consumption hubs, "
+        "estimating net arbitrage margins, ROI %, and economic viability."
+    ),
+)
+def get_spatial_arbitrage(
+    commodity_id: str = Query(..., description="Commodity ID or canonical alias (e.g., '1', 'onion_local', 'potato')"),
+    obs_date: Optional[date] = Query(None, alias="date", description="Target date (YYYY-MM-DD). Defaults to latest available."),
+    db: Session = Depends(get_db),
+):
+    result = spatial_service.get_spatial_arbitrage(
+        db=db, commodity_identifier=commodity_id, target_date=obs_date
+    )
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Commodity '{commodity_id}' could not be resolved or has no arbitrage data.",
         )
     return result
 

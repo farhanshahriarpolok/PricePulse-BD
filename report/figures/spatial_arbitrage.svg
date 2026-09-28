@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgArt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <filter id="boxShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="360" rx="16" fill="url(#bgArt)"/>
+
+  <text x="450" y="38" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    Inter-District Freight &amp; Spatial Price Arbitrage Model
+  </text>
+  <text x="450" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">
+    Spatial Dispersion Index D(t) • Haversine Road Circuity (1.25×) • Route Feasibility
+  </text>
+
+  <!-- Production Hubs (Left) -->
+  <g transform="translate(40, 80)" filter="url(#boxShadow)">
+    <rect width="250" height="240" rx="12" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+    <rect width="250" height="36" rx="12" fill="#065f46"/>
+    <text x="125" y="23" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+      SURPLUS PRODUCTION HUBS
+    </text>
+
+    <!-- Hub 1 -->
+    <g transform="translate(14, 50)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">Bogura (Raja Bazar)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_src: 85.00 BDT/kg • Lat: 24.84°</text>
+    </g>
+
+    <!-- Hub 2 -->
+    <g transform="translate(14, 100)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">Rangpur (City Bazar)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_src: 82.50 BDT/kg • Lat: 25.74°</text>
+    </g>
+
+    <!-- Hub 3 -->
+    <g transform="translate(14, 150)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="600">Jashore (Boro Bazar)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_src: 88.00 BDT/kg • Lat: 23.16°</text>
+    </g>
+  </g>
+
+  <!-- Corridors & Freight Math (Center) -->
+  <g transform="translate(325, 80)" filter="url(#boxShadow)">
+    <rect width="250" height="240" rx="12" fill="#0f172a" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="250" height="36" rx="12" fill="#1e40af"/>
+    <text x="125" y="23" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+      FREIGHT OVERHEAD MODEL
+    </text>
+
+    <g transform="translate(14, 50)">
+      <text x="0" y="14" fill="#93c5fd" font-family="sans-serif" font-size="10" font-weight="600">1. Haversine Road Distance:</text>
+      <rect x="0" y="22" width="222" height="26" rx="4" fill="#1e293b"/>
+      <text x="10" y="39" fill="#e2e8f0" font-family="monospace" font-size="9.5">d_km = 1.25 × 2R arcsin(√h)</text>
+    </g>
+
+    <g transform="translate(14, 110)">
+      <text x="0" y="14" fill="#93c5fd" font-family="sans-serif" font-size="10" font-weight="600">2. Freight Overhead Formula:</text>
+      <rect x="0" y="22" width="222" height="26" rx="4" fill="#1e293b"/>
+      <text x="10" y="39" fill="#e2e8f0" font-family="monospace" font-size="9.5">C_freight = 1.50 + 0.018 × d_km</text>
+    </g>
+
+    <g transform="translate(14, 170)">
+      <text x="0" y="14" fill="#93c5fd" font-family="sans-serif" font-size="10" font-weight="600">3. Net Arbitrage Margin:</text>
+      <rect x="0" y="22" width="222" height="26" rx="4" fill="#1e293b"/>
+      <text x="10" y="39" fill="#10b981" font-family="monospace" font-size="9.5">M_net = (P_dest - P_src) - C_freight</text>
+    </g>
+  </g>
+
+  <!-- Consumption Hubs (Right) -->
+  <g transform="translate(610, 80)" filter="url(#boxShadow)">
+    <rect width="250" height="240" rx="12" fill="#0f172a" stroke="#f43f5e" stroke-width="1.5"/>
+    <rect width="250" height="36" rx="12" fill="#9f1239"/>
+    <text x="125" y="23" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+      DEFICIT METROPOLITAN HUBS
+    </text>
+
+    <!-- Hub 1 -->
+    <g transform="translate(14, 50)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#fb7185" font-family="sans-serif" font-size="11" font-weight="600">Dhaka (Karwan Bazar)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_dest: 110.00 BDT/kg • Lat: 23.81°</text>
+    </g>
+
+    <!-- Hub 2 -->
+    <g transform="translate(14, 100)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#fb7185" font-family="sans-serif" font-size="11" font-weight="600">Chattogram (Khatunganj)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_dest: 115.00 BDT/kg • Lat: 22.35°</text>
+    </g>
+
+    <!-- Hub 3 -->
+    <g transform="translate(14, 150)">
+      <rect width="222" height="42" rx="6" fill="#1e293b"/>
+      <text x="12" y="18" fill="#fb7185" font-family="sans-serif" font-size="11" font-weight="600">Sylhet (Sobhanighat)</text>
+      <text x="12" y="34" fill="#94a3b8" font-family="monospace" font-size="10">P_dest: 118.00 BDT/kg • Lat: 24.89°</text>
+    </g>
+  </g>
+
+  <!-- Connective Arrows -->
+  <path d="M 290 150 L 325 150" stroke="#10b981" stroke-width="2"/>
+  <path d="M 575 150 L 610 150" stroke="#f43f5e" stroke-width="2"/>
+</svg>

@@ -60,6 +60,10 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
 
+    // Room Database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+
     // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.android)
 

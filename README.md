@@ -263,11 +263,32 @@ To operate robustly across real-world internet instability without crashing or p
 - [x] **Milestone 005**: Academic LaTeX research thesis, Viva Defense Master Guide, 6-step live demo script, and unified system launcher (`run_system.py`).
 - [x] **Milestone 006**: Protein and pulse taxonomy expansion (Broiler Chicken, Eggs, Masur Dal, Garlic), customary count units (`hali`, `dozen`), side-by-side comparison view, and field spot price ingestion form.
 - [x] **Milestone 007**: Resilient live web harvesting (DAM and Chaldal), zero-downtime offline fallback, in-process async scheduler, source health monitor, and UI live sync controls.
-- [ ] **Milestone 008**: Native Android client (Kotlin + Jetpack Compose) integration with offline Room caching.
+- [x] **Milestone 008**: Quantitative evaluation suite, P95/P99 latency benchmarks, LaTeX vector figures, and interactive Reveal.js presentation deck.
+- [x] **Milestone 009**: Full 21-commodity market basket expansion (Beef, Mutton, Fish, Milk, Green Chilli, Sugar, Salt), live marquee ticker, category filtering, and commercial Material 3 Android app.
+- [x] **Milestone 010**: National 64-District spatial expansion, Spatial Price Dispersion Index $D(t)$, freight/transport arbitrage model, autonomous TCB & newspaper regex harvesters, Android Room offline database caching, custom Canvas price charts, and Live Viva Defense Simulation Sandbox.
 
 ---
 
-## 8. License & Academic Attribution
+## 8. Viva Defense Live Simulation Mode
 
-This project is developed as part of an undergraduate CSE Final Year Research Project. Released under the [MIT License](LICENSE).
+Examiners and evaluators can interactively stress-test the statistical anomaly detection engine without altering ground-truth records:
+1. Navigate to the **"Viva Simulator"** tab in the web client.
+2. Select target commodity and economic scenario (e.g. *Sudden Supply Disruption*, *Import Tariff Spike*, *Transport Strike*, *Cartel Hoarding*).
+3. Adjust sliders:
+   - **Injected Price Shift (Δ%)**: -50% (Crash) to +100% (Crisis).
+   - **Shock Window Duration**: 1 to 14 days.
+   - **Baseline Price Drift**: -30% to +50%.
+   - **Volatility Noise (σ)**: 0% to 20%.
+4. Observe real-time Recharts trajectory updating the ground-truth line vs simulated curve and rolling 14-day SMA.
+5. Inspect the dynamic Z-score badge, Volatility CV%, and instant explainable natural language justification generated on-the-fly.
+
+---
+
+## 9. License & Academic Attribution
+
+This project is developed as part of an undergraduate CSE Final Year Research Project.
+- **Author**: Farhan Shahriar Polok
+- **Year**: 2026
+- Released under the [MIT License](LICENSE).
+
 

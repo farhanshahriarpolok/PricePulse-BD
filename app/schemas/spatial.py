@@ -38,6 +38,38 @@ class LocationSpreadMetrics(BaseModel):
     highest_price: Optional[float] = None
     absolute_spread_bdt: Optional[float] = None
     percentage_spread: Optional[float] = None
+    spatial_dispersion_index: Optional[float] = None
+    mean_market_price: Optional[float] = None
+    std_dev_price: Optional[float] = None
+
+
+class ArbitrageRoute(BaseModel):
+    source_district: str
+    destination_district: str
+    source_market: str
+    destination_market: str
+    source_price: float
+    destination_price: float
+    gross_spread_bdt: float
+    distance_km: float
+    estimated_freight_cost_bdt: float
+    net_arbitrage_margin_bdt: float
+    roi_percentage: float
+    economic_feasibility: str
+
+
+class SpatialArbitrageResponse(BaseModel):
+    commodity_id: int
+    canonical_name: str
+    bangla_name: str
+    unit: str
+    observation_date: dt.date
+    spatial_dispersion_index: float
+    inter_district_cv_pct: float
+    production_hubs: List[str]
+    consumption_hubs: List[str]
+    routes: List[ArbitrageRoute]
+    recommendation: str
 
 
 class GeoSpatialPulseResponse(BaseModel):

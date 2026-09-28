@@ -7,6 +7,8 @@
         {
           "name": "Dhaka",
           "bangla_name": "ঢাকা",
+          "latitude": 23.8103,
+          "longitude": 90.4125,
           "markets": [
             {
               "name": "Karwan Bazar",
@@ -30,6 +32,214 @@
               "longitude": 90.4192
             }
           ]
+        },
+        {
+          "name": "Gazipur",
+          "bangla_name": "গাজীপুর",
+          "latitude": 24.0023,
+          "longitude": 90.4264,
+          "markets": [
+            {
+              "name": "Joydebpur Central Bazar",
+              "bangla_name": "জয়দেবপুর বাজার",
+              "market_type": "retail",
+              "latitude": 23.998,
+              "longitude": 90.42
+            },
+            {
+              "name": "Tongi Wholesale Arat",
+              "bangla_name": "টঙ্গী আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 23.896,
+              "longitude": 90.402
+            }
+          ]
+        },
+        {
+          "name": "Narayanganj",
+          "bangla_name": "নারায়ণগঞ্জ",
+          "latitude": 23.6238,
+          "longitude": 90.5,
+          "markets": [
+            {
+              "name": "Nitayganj Wholesale Arat",
+              "bangla_name": "নিতাইগঞ্জ পাইকারি আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 23.615,
+              "longitude": 90.505
+            },
+            {
+              "name": "Digubabur Bazar",
+              "bangla_name": "দ্বিগুবাবুর বাজার",
+              "market_type": "retail",
+              "latitude": 23.622,
+              "longitude": 90.501
+            }
+          ]
+        },
+        {
+          "name": "Narsingdi",
+          "bangla_name": "নরসিংদী",
+          "latitude": 23.9193,
+          "longitude": 90.7176,
+          "markets": [
+            {
+              "name": "Velanagar Bazar",
+              "bangla_name": "ভেলারনগর বাজার",
+              "market_type": "wholesale",
+              "latitude": 23.921,
+              "longitude": 90.715
+            },
+            {
+              "name": "Bhelanagar Retail Market",
+              "bangla_name": "ভেলারনগর খুচরা বাজার",
+              "market_type": "retail",
+              "latitude": 23.918,
+              "longitude": 90.72
+            }
+          ]
+        },
+        {
+          "name": "Munshiganj",
+          "bangla_name": "মুন্সীগঞ্জ",
+          "latitude": 23.5422,
+          "longitude": 90.5305,
+          "markets": [
+            {
+              "name": "Munshiganj Sadar Bazar",
+              "bangla_name": "মুন্সীগঞ্জ সদর বাজার",
+              "market_type": "retail",
+              "latitude": 23.54,
+              "longitude": 90.528
+            },
+            {
+              "name": "Mirkadim Potato Hub",
+              "bangla_name": "মিরকাদিম আলুর আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 23.56,
+              "longitude": 90.51
+            }
+          ]
+        },
+        {
+          "name": "Manikganj",
+          "bangla_name": "মানিকগঞ্জ",
+          "latitude": 23.8617,
+          "longitude": 90.0003,
+          "markets": [
+            {
+              "name": "Manikganj Bus Stand Bazar",
+              "bangla_name": "মানিকগঞ্জ বাসস্ট্যান্ড বাজার",
+              "market_type": "retail",
+              "latitude": 23.86,
+              "longitude": 90.002
+            }
+          ]
+        },
+        {
+          "name": "Tangail",
+          "bangla_name": "টাঙ্গাইল",
+          "latitude": 24.2513,
+          "longitude": 89.9167,
+          "markets": [
+            {
+              "name": "Park Bazar Tangail",
+              "bangla_name": "পার্ক বাজার টাঙ্গাইল",
+              "market_type": "wholesale",
+              "latitude": 24.25,
+              "longitude": 89.918
+            }
+          ]
+        },
+        {
+          "name": "Kishoreganj",
+          "bangla_name": "কিশোরগঞ্জ",
+          "latitude": 24.4449,
+          "longitude": 90.7766,
+          "markets": [
+            {
+              "name": "Borothakur Bazar",
+              "bangla_name": "বড়বাজার কিশোরগঞ্জ",
+              "market_type": "wholesale",
+              "latitude": 24.441,
+              "longitude": 90.779
+            }
+          ]
+        },
+        {
+          "name": "Faridpur",
+          "bangla_name": "ফরিদপুর",
+          "latitude": 23.6071,
+          "longitude": 89.8429,
+          "markets": [
+            {
+              "name": "Chawkbazar Faridpur",
+              "bangla_name": "চকবাজার ফরিদপুর",
+              "market_type": "wholesale",
+              "latitude": 23.605,
+              "longitude": 89.845
+            }
+          ]
+        },
+        {
+          "name": "Gopalganj",
+          "bangla_name": "গোপালগঞ্জ",
+          "latitude": 23.0051,
+          "longitude": 89.8266,
+          "markets": [
+            {
+              "name": "Gopalganj Sadar Bazar",
+              "bangla_name": "গোপালগঞ্জ সদর বাজার",
+              "market_type": "retail",
+              "latitude": 23.004,
+              "longitude": 89.825
+            }
+          ]
+        },
+        {
+          "name": "Madaripur",
+          "bangla_name": "মাদারীপুর",
+          "latitude": 23.1641,
+          "longitude": 90.1897,
+          "markets": [
+            {
+              "name": "Puran Bazar Madaripur",
+              "bangla_name": "পুরান বাজার মাদারীপুর",
+              "market_type": "retail",
+              "latitude": 23.165,
+              "longitude": 90.19
+            }
+          ]
+        },
+        {
+          "name": "Rajbari",
+          "bangla_name": "রাজবাড়ী",
+          "latitude": 23.7574,
+          "longitude": 89.6445,
+          "markets": [
+            {
+              "name": "Rajbari Railgate Bazar",
+              "bangla_name": "রাজবাড়ী রেলগেট বাজার",
+              "market_type": "retail",
+              "latitude": 23.758,
+              "longitude": 89.645
+            }
+          ]
+        },
+        {
+          "name": "Shariatpur",
+          "bangla_name": "শরীয়তপুর",
+          "latitude": 23.2423,
+          "longitude": 90.4348,
+          "markets": [
+            {
+              "name": "Palong Bazar",
+              "bangla_name": "পালং বাজার",
+              "market_type": "retail",
+              "latitude": 23.241,
+              "longitude": 90.433
+            }
+          ]
         }
       ]
     },
@@ -40,6 +250,8 @@
         {
           "name": "Chattogram",
           "bangla_name": "চট্টগ্রাম",
+          "latitude": 22.3569,
+          "longitude": 91.7832,
           "markets": [
             {
               "name": "Khatunganj",
@@ -54,6 +266,841 @@
               "market_type": "retail",
               "latitude": 22.3384,
               "longitude": 91.8312
+            }
+          ]
+        },
+        {
+          "name": "Cox's Bazar",
+          "bangla_name": "কক্সবাজার",
+          "latitude": 21.4272,
+          "longitude": 92.0058,
+          "markets": [
+            {
+              "name": "Boro Bazar Cox's Bazar",
+              "bangla_name": "বড় বাজার কক্সবাজার",
+              "market_type": "wholesale",
+              "latitude": 21.43,
+              "longitude": 92.001
+            }
+          ]
+        },
+        {
+          "name": "Cumilla",
+          "bangla_name": "কুমিল্লা",
+          "latitude": 23.4682,
+          "longitude": 91.1788,
+          "markets": [
+            {
+              "name": "Chawkbazar Cumilla",
+              "bangla_name": "চকবাজার কুমিল্লা",
+              "market_type": "wholesale",
+              "latitude": 23.465,
+              "longitude": 91.18
+            }
+          ]
+        },
+        {
+          "name": "Feni",
+          "bangla_name": "ফেনী",
+          "latitude": 23.0159,
+          "longitude": 91.3976,
+          "markets": [
+            {
+              "name": "Feni Boro Bazar",
+              "bangla_name": "ফেনী বড় বাজার",
+              "market_type": "retail",
+              "latitude": 23.017,
+              "longitude": 91.398
+            }
+          ]
+        },
+        {
+          "name": "Brahmanbaria",
+          "bangla_name": "ব্রাহ্মণবাড়িয়া",
+          "latitude": 23.9571,
+          "longitude": 91.1119,
+          "markets": [
+            {
+              "name": "Anandabazar Brahmanbaria",
+              "bangla_name": "আনন্দবাজার ব্রাহ্মণবাড়িয়া",
+              "market_type": "retail",
+              "latitude": 23.958,
+              "longitude": 91.113
+            }
+          ]
+        },
+        {
+          "name": "Noakhali",
+          "bangla_name": "নোয়াখালী",
+          "latitude": 22.8696,
+          "longitude": 91.0994,
+          "markets": [
+            {
+              "name": "Maijdee Bazar",
+              "bangla_name": "মাইজদী বাজার",
+              "market_type": "retail",
+              "latitude": 22.871,
+              "longitude": 91.098
+            }
+          ]
+        },
+        {
+          "name": "Chandpur",
+          "bangla_name": "চাঁদপুর",
+          "latitude": 23.2333,
+          "longitude": 90.6667,
+          "markets": [
+            {
+              "name": "Hilsa Ghat Chandpur",
+              "bangla_name": "ইলিশ ঘাট চাঁদপুর",
+              "market_type": "wholesale",
+              "latitude": 23.231,
+              "longitude": 90.665
+            }
+          ]
+        },
+        {
+          "name": "Lakshmipur",
+          "bangla_name": "লক্ষ্মীপুর",
+          "latitude": 22.9425,
+          "longitude": 90.8412,
+          "markets": [
+            {
+              "name": "Lakshmipur Sadar Bazar",
+              "bangla_name": "লক্ষ্মীপুর সদর বাজার",
+              "market_type": "retail",
+              "latitude": 22.943,
+              "longitude": 90.842
+            }
+          ]
+        },
+        {
+          "name": "Rangamati",
+          "bangla_name": "রাঙ্গামাটি",
+          "latitude": 22.6574,
+          "longitude": 92.1733,
+          "markets": [
+            {
+              "name": "Banarupa Bazar",
+              "bangla_name": "বনরূপা বাজার",
+              "market_type": "retail",
+              "latitude": 22.658,
+              "longitude": 92.174
+            }
+          ]
+        },
+        {
+          "name": "Khagrachhari",
+          "bangla_name": "খাগড়াছড়ি",
+          "latitude": 23.1193,
+          "longitude": 91.9847,
+          "markets": [
+            {
+              "name": "Khagrachhari Sadar Bazar",
+              "bangla_name": "খাগড়াছড়ি সদর বাজার",
+              "market_type": "retail",
+              "latitude": 23.12,
+              "longitude": 91.985
+            }
+          ]
+        },
+        {
+          "name": "Bandarban",
+          "bangla_name": "বান্দরবান",
+          "latitude": 22.1953,
+          "longitude": 92.2184,
+          "markets": [
+            {
+              "name": "Madhyam Para Bazar",
+              "bangla_name": "মধ্যম পাড়া বাজার",
+              "market_type": "retail",
+              "latitude": 22.196,
+              "longitude": 92.219
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rajshahi",
+      "bangla_name": "রাজশাহী",
+      "districts": [
+        {
+          "name": "Rajshahi",
+          "bangla_name": "রাজশাহী",
+          "latitude": 24.3636,
+          "longitude": 88.6241,
+          "markets": [
+            {
+              "name": "Saheb Bazar Rajshahi",
+              "bangla_name": "সাহেব বাজার রাজশাহী",
+              "market_type": "wholesale",
+              "latitude": 24.364,
+              "longitude": 88.625
+            },
+            {
+              "name": "Masterpara Wholesale",
+              "bangla_name": "মাস্টারপাড়া আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 24.362,
+              "longitude": 88.623
+            }
+          ]
+        },
+        {
+          "name": "Bogura",
+          "bangla_name": "বগুড়া",
+          "latitude": 24.8465,
+          "longitude": 89.377,
+          "markets": [
+            {
+              "name": "Raja Bazar Bogura",
+              "bangla_name": "রাজাবাজার বগুড়া",
+              "market_type": "wholesale",
+              "latitude": 24.848,
+              "longitude": 89.375
+            },
+            {
+              "name": "Phulbari Vegetable Arat",
+              "bangla_name": "ফুলবাড়ি সবজি আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 24.852,
+              "longitude": 89.379
+            }
+          ]
+        },
+        {
+          "name": "Pabna",
+          "bangla_name": "পাবনা",
+          "latitude": 24.0064,
+          "longitude": 89.2372,
+          "markets": [
+            {
+              "name": "Chhoto Bazar Pabna",
+              "bangla_name": "ছোট বাজার পাবনা",
+              "market_type": "retail",
+              "latitude": 24.007,
+              "longitude": 89.238
+            }
+          ]
+        },
+        {
+          "name": "Sirajganj",
+          "bangla_name": "সিরাজগঞ্জ",
+          "latitude": 24.4534,
+          "longitude": 89.7008,
+          "markets": [
+            {
+              "name": "Boro Bazar Sirajganj",
+              "bangla_name": "বড় বাজার সিরাজগঞ্জ",
+              "market_type": "wholesale",
+              "latitude": 24.454,
+              "longitude": 89.701
+            }
+          ]
+        },
+        {
+          "name": "Naogaon",
+          "bangla_name": "নওগাঁ",
+          "latitude": 24.7936,
+          "longitude": 88.9318,
+          "markets": [
+            {
+              "name": "Dakkhinchak Rice Arat",
+              "bangla_name": "দক্ষিণচক চালের আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 24.795,
+              "longitude": 88.933
+            }
+          ]
+        },
+        {
+          "name": "Natore",
+          "bangla_name": "নাটোর",
+          "latitude": 24.4206,
+          "longitude": 89.0003,
+          "markets": [
+            {
+              "name": "Nicho Bazar Natore",
+              "bangla_name": "নিচো বাজার নাটোর",
+              "market_type": "retail",
+              "latitude": 24.421,
+              "longitude": 89.001
+            }
+          ]
+        },
+        {
+          "name": "Chapainawabganj",
+          "bangla_name": "চাঁপাইনবাবগঞ্জ",
+          "latitude": 24.5965,
+          "longitude": 88.2775,
+          "markets": [
+            {
+              "name": "Puratan Bazar Chapai",
+              "bangla_name": "পুরাতন বাজার চাঁপাই",
+              "market_type": "wholesale",
+              "latitude": 24.597,
+              "longitude": 88.278
+            }
+          ]
+        },
+        {
+          "name": "Joypurhat",
+          "bangla_name": "জয়পুরহাট",
+          "latitude": 25.1015,
+          "longitude": 89.0277,
+          "markets": [
+            {
+              "name": "Joypurhat Central Bazar",
+              "bangla_name": "জয়পুরহাট কেন্দ্রীয় বাজার",
+              "market_type": "retail",
+              "latitude": 25.102,
+              "longitude": 89.028
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Khulna",
+      "bangla_name": "খুলনা",
+      "districts": [
+        {
+          "name": "Khulna",
+          "bangla_name": "খুলনা",
+          "latitude": 22.8456,
+          "longitude": 89.5403,
+          "markets": [
+            {
+              "name": "Boro Bazar Khulna",
+              "bangla_name": "বড় বাজার খুলনা",
+              "market_type": "wholesale",
+              "latitude": 22.846,
+              "longitude": 89.541
+            },
+            {
+              "name": "Sandha Bazar",
+              "bangla_name": "সন্ধ্যা বাজার খুলনা",
+              "market_type": "retail",
+              "latitude": 22.844,
+              "longitude": 89.539
+            }
+          ]
+        },
+        {
+          "name": "Jashore",
+          "bangla_name": "যশোর",
+          "latitude": 23.1664,
+          "longitude": 89.2081,
+          "markets": [
+            {
+              "name": "Boro Bazar Jashore",
+              "bangla_name": "বড় বাজার যশোর",
+              "market_type": "wholesale",
+              "latitude": 23.167,
+              "longitude": 89.209
+            }
+          ]
+        },
+        {
+          "name": "Satkhira",
+          "bangla_name": "সাতক্ষীরা",
+          "latitude": 22.7185,
+          "longitude": 89.0705,
+          "markets": [
+            {
+              "name": "Sultanpur Fish & Fish Arat",
+              "bangla_name": "সুলতানপুর মাছের আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 22.719,
+              "longitude": 89.071
+            }
+          ]
+        },
+        {
+          "name": "Bagerhat",
+          "bangla_name": "বাগেরহাট",
+          "latitude": 22.6516,
+          "longitude": 89.7859,
+          "markets": [
+            {
+              "name": "Bagerhat Pradhan Bazar",
+              "bangla_name": "বাগেরহাট প্রধান বাজার",
+              "market_type": "retail",
+              "latitude": 22.652,
+              "longitude": 89.786
+            }
+          ]
+        },
+        {
+          "name": "Jhenaidah",
+          "bangla_name": "ঝিনাইদহ",
+          "latitude": 23.5448,
+          "longitude": 89.1539,
+          "markets": [
+            {
+              "name": "Jhenaidah Sadar Bazar",
+              "bangla_name": "ঝিনাইদহ সদর বাজার",
+              "market_type": "retail",
+              "latitude": 23.545,
+              "longitude": 89.154
+            }
+          ]
+        },
+        {
+          "name": "Kushtia",
+          "bangla_name": "কুষ্টিয়া",
+          "latitude": 23.9013,
+          "longitude": 89.1205,
+          "markets": [
+            {
+              "name": "Khajanagar Rice Mill Hub",
+              "bangla_name": "খাজনগরের চালের আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 23.905,
+              "longitude": 89.125
+            }
+          ]
+        },
+        {
+          "name": "Chuadanga",
+          "bangla_name": "চুয়াডাঙ্গা",
+          "latitude": 23.6402,
+          "longitude": 88.8418,
+          "markets": [
+            {
+              "name": "Chuadanga Boro Bazar",
+              "bangla_name": "চুয়াডাঙ্গা বড় বাজার",
+              "market_type": "retail",
+              "latitude": 23.641,
+              "longitude": 88.842
+            }
+          ]
+        },
+        {
+          "name": "Meherpur",
+          "bangla_name": "মেহেরপুর",
+          "latitude": 23.7622,
+          "longitude": 88.6318,
+          "markets": [
+            {
+              "name": "Meherpur Boro Bazar",
+              "bangla_name": "মেহেরপুর বড় বাজার",
+              "market_type": "retail",
+              "latitude": 23.763,
+              "longitude": 88.632
+            }
+          ]
+        },
+        {
+          "name": "Magura",
+          "bangla_name": "মাগুরা",
+          "latitude": 23.4873,
+          "longitude": 89.4199,
+          "markets": [
+            {
+              "name": "Chourangi Bazar Magura",
+              "bangla_name": "চৌরঙ্গী বাজার মাগুরা",
+              "market_type": "retail",
+              "latitude": 23.488,
+              "longitude": 89.42
+            }
+          ]
+        },
+        {
+          "name": "Narail",
+          "bangla_name": "নড়াইল",
+          "latitude": 23.1725,
+          "longitude": 89.5127,
+          "markets": [
+            {
+              "name": "Rupganj Bazar Narail",
+              "bangla_name": "রূপগঞ্জ বাজার নড়াইল",
+              "market_type": "retail",
+              "latitude": 23.173,
+              "longitude": 89.513
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Barisal",
+      "bangla_name": "বরিশাল",
+      "districts": [
+        {
+          "name": "Barishal",
+          "bangla_name": "বরিশাল",
+          "latitude": 22.701,
+          "longitude": 90.3535,
+          "markets": [
+            {
+              "name": "Port Road Wholesale Arat",
+              "bangla_name": "পোর্ট রোড পাইকারি আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 22.702,
+              "longitude": 90.354
+            },
+            {
+              "name": "Natun Bazar Barishal",
+              "bangla_name": "নতুন বাজার বরিশাল",
+              "market_type": "retail",
+              "latitude": 22.7,
+              "longitude": 90.352
+            }
+          ]
+        },
+        {
+          "name": "Patuakhali",
+          "bangla_name": "পটুয়াখালী",
+          "latitude": 22.3596,
+          "longitude": 90.3299,
+          "markets": [
+            {
+              "name": "Patuakhali Pouro Bazar",
+              "bangla_name": "পটুয়াখালী পৌর বাজার",
+              "market_type": "retail",
+              "latitude": 22.36,
+              "longitude": 90.33
+            }
+          ]
+        },
+        {
+          "name": "Bhola",
+          "bangla_name": "ভোলা",
+          "latitude": 22.6859,
+          "longitude": 90.6482,
+          "markets": [
+            {
+              "name": "Bhola Sadar Bazar",
+              "bangla_name": "ভোলা সদর বাজার",
+              "market_type": "retail",
+              "latitude": 22.686,
+              "longitude": 90.649
+            }
+          ]
+        },
+        {
+          "name": "Pirojpur",
+          "bangla_name": "পিরোজপুর",
+          "latitude": 22.5841,
+          "longitude": 89.972,
+          "markets": [
+            {
+              "name": "Rajarhat Pirojpur",
+              "bangla_name": "রাজারহাট পিরোজপুর",
+              "market_type": "retail",
+              "latitude": 22.585,
+              "longitude": 89.973
+            }
+          ]
+        },
+        {
+          "name": "Barguna",
+          "bangla_name": "বরগুনা",
+          "latitude": 22.1587,
+          "longitude": 90.1256,
+          "markets": [
+            {
+              "name": "Barguna Launch Ghat Bazar",
+              "bangla_name": "বরগুনা লঞ্চঘাট বাজার",
+              "market_type": "retail",
+              "latitude": 22.159,
+              "longitude": 90.126
+            }
+          ]
+        },
+        {
+          "name": "Jhalokati",
+          "bangla_name": "ঝালকাঠি",
+          "latitude": 22.6406,
+          "longitude": 90.1987,
+          "markets": [
+            {
+              "name": "Bimruli Floating Market",
+              "bangla_name": "ভিমরুলী ভাসমান বাজার",
+              "market_type": "wholesale",
+              "latitude": 22.642,
+              "longitude": 90.2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sylhet",
+      "bangla_name": "সিলেট",
+      "districts": [
+        {
+          "name": "Sylhet",
+          "bangla_name": "সিলেট",
+          "latitude": 24.8949,
+          "longitude": 91.8687,
+          "markets": [
+            {
+              "name": "Sobhanighat Wholesale Arat",
+              "bangla_name": "সোবহানীঘাট আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 24.896,
+              "longitude": 91.87
+            },
+            {
+              "name": "Bondor Bazar Sylhet",
+              "bangla_name": "বন্দর বাজার সিলেট",
+              "market_type": "retail",
+              "latitude": 24.893,
+              "longitude": 91.867
+            }
+          ]
+        },
+        {
+          "name": "Moulvibazar",
+          "bangla_name": "মৌলভীবাজার",
+          "latitude": 24.4829,
+          "longitude": 91.7774,
+          "markets": [
+            {
+              "name": "Paschim Bazar Moulvibazar",
+              "bangla_name": "পশ্চিম বাজার মৌলভীবাজার",
+              "market_type": "retail",
+              "latitude": 24.484,
+              "longitude": 91.778
+            }
+          ]
+        },
+        {
+          "name": "Habiganj",
+          "bangla_name": "হবিগঞ্জ",
+          "latitude": 24.3749,
+          "longitude": 91.4155,
+          "markets": [
+            {
+              "name": "Chowdhury Bazar Habiganj",
+              "bangla_name": "চৌধুরী বাজার হবিগঞ্জ",
+              "market_type": "retail",
+              "latitude": 24.376,
+              "longitude": 91.416
+            }
+          ]
+        },
+        {
+          "name": "Sunamganj",
+          "bangla_name": "সুনামগঞ্জ",
+          "latitude": 25.0658,
+          "longitude": 91.395,
+          "markets": [
+            {
+              "name": "Madhyanagar Fish Arat",
+              "bangla_name": "মধ্যনগর মাছের আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 25.067,
+              "longitude": 91.396
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rangpur",
+      "bangla_name": "রংপুর",
+      "districts": [
+        {
+          "name": "Rangpur",
+          "bangla_name": "রংপুর",
+          "latitude": 25.7439,
+          "longitude": 89.2752,
+          "markets": [
+            {
+              "name": "City Bazar Rangpur",
+              "bangla_name": "সিটি বাজার রংপুর",
+              "market_type": "wholesale",
+              "latitude": 25.745,
+              "longitude": 89.276
+            },
+            {
+              "name": "Nababganj Bazar",
+              "bangla_name": "নবাবগঞ্জ বাজার রংপুর",
+              "market_type": "retail",
+              "latitude": 25.742,
+              "longitude": 89.274
+            }
+          ]
+        },
+        {
+          "name": "Dinajpur",
+          "bangla_name": "দিনাজপুর",
+          "latitude": 25.6217,
+          "longitude": 88.6355,
+          "markets": [
+            {
+              "name": "Bahadur Bazar Dinajpur",
+              "bangla_name": "বাহাদুর বাজার দিনাজপুর",
+              "market_type": "wholesale",
+              "latitude": 25.623,
+              "longitude": 88.636
+            }
+          ]
+        },
+        {
+          "name": "Kurigram",
+          "bangla_name": "কুড়িগ্রাম",
+          "latitude": 25.8054,
+          "longitude": 89.6362,
+          "markets": [
+            {
+              "name": "Pouro Bazar Kurigram",
+              "bangla_name": "পৌর বাজার কুড়িগ্রাম",
+              "market_type": "retail",
+              "latitude": 25.806,
+              "longitude": 89.637
+            }
+          ]
+        },
+        {
+          "name": "Gaibandha",
+          "bangla_name": "গাইবান্ধা",
+          "latitude": 25.3288,
+          "longitude": 89.5403,
+          "markets": [
+            {
+              "name": "Puratan Bazar Gaibandha",
+              "bangla_name": "পুরাতন বাজার গাইবান্ধা",
+              "market_type": "retail",
+              "latitude": 25.329,
+              "longitude": 89.541
+            }
+          ]
+        },
+        {
+          "name": "Nilphamari",
+          "bangla_name": "নীলফামারী",
+          "latitude": 25.9318,
+          "longitude": 88.856,
+          "markets": [
+            {
+              "name": "Saidpur Rail Market",
+              "bangla_name": "সৈয়দপুর রেল বাজার",
+              "market_type": "wholesale",
+              "latitude": 25.778,
+              "longitude": 88.892
+            }
+          ]
+        },
+        {
+          "name": "Lalmonirhat",
+          "bangla_name": "লালমনিরহাট",
+          "latitude": 25.9923,
+          "longitude": 89.2847,
+          "markets": [
+            {
+              "name": "Goshala Bazar Lalmonirhat",
+              "bangla_name": "গোশালা বাজার লালমনিরহাট",
+              "market_type": "retail",
+              "latitude": 25.993,
+              "longitude": 89.285
+            }
+          ]
+        },
+        {
+          "name": "Thakurgaon",
+          "bangla_name": "ঠাকুরগাঁও",
+          "latitude": 26.0337,
+          "longitude": 88.4617,
+          "markets": [
+            {
+              "name": "Kalibari Bazar Thakurgaon",
+              "bangla_name": "কালিবাড়ি বাজার ঠাকুরগাঁও",
+              "market_type": "retail",
+              "latitude": 26.035,
+              "longitude": 88.462
+            }
+          ]
+        },
+        {
+          "name": "Panchagarh",
+          "bangla_name": "পঞ্চগড়",
+          "latitude": 26.3411,
+          "longitude": 88.5542,
+          "markets": [
+            {
+              "name": "Panchagarh Bazar",
+              "bangla_name": "পঞ্চগড় বাজার",
+              "market_type": "retail",
+              "latitude": 26.342,
+              "longitude": 88.555
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mymensingh",
+      "bangla_name": "ময়মনসিংহ",
+      "districts": [
+        {
+          "name": "Mymensingh",
+          "bangla_name": "ময়মনসিংহ",
+          "latitude": 24.7471,
+          "longitude": 90.4203,
+          "markets": [
+            {
+              "name": "Mechuabazar Wholesale Arat",
+              "bangla_name": "মেছুয়াবাজার আড়ৎ",
+              "market_type": "wholesale",
+              "latitude": 24.748,
+              "longitude": 90.421
+            },
+            {
+              "name": "Natun Bazar Mymensingh",
+              "bangla_name": "নতুন বাজার ময়মনসিংহ",
+              "market_type": "retail",
+              "latitude": 24.746,
+              "longitude": 90.419
+            }
+          ]
+        },
+        {
+          "name": "Jamalpur",
+          "bangla_name": "জামালপুর",
+          "latitude": 24.9375,
+          "longitude": 89.9378,
+          "markets": [
+            {
+              "name": "Station Bazar Jamalpur",
+              "bangla_name": "স্টেশন বাজার জামালপুর",
+              "market_type": "retail",
+              "latitude": 24.938,
+              "longitude": 89.938
+            }
+          ]
+        },
+        {
+          "name": "Netrokona",
+          "bangla_name": "নেত্রকোণা",
+          "latitude": 24.8709,
+          "longitude": 90.7279,
+          "markets": [
+            {
+              "name": "Chhoto Bazar Netrokona",
+              "bangla_name": "ছোট বাজার নেত্রকোণা",
+              "market_type": "retail",
+              "latitude": 24.872,
+              "longitude": 90.729
+            }
+          ]
+        },
+        {
+          "name": "Sherpur",
+          "bangla_name": "শেরপুর",
+          "latitude": 25.0205,
+          "longitude": 90.0153,
+          "markets": [
+            {
+              "name": "Nayanbazar Sherpur",
+              "bangla_name": "নয়নবাজার শেরপুর",
+              "market_type": "retail",
+              "latitude": 25.021,
+              "longitude": 90.016
             }
           ]
         }

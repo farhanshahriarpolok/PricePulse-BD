@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="920" height="320" rx="16" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="460" y="38" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    Explainable Anomaly Detection Pipeline &amp; Decision Compound Rule
+  </text>
+
+  <!-- Step 1: Input Series -->
+  <g transform="translate(30, 75)" filter="url(#glow)">
+    <rect width="180" height="200" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect width="180" height="32" rx="12" fill="#0284c7"/>
+    <text x="90" y="21" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="700" text-anchor="middle">1. INPUT TIME-SERIES</text>
+    <text x="16" y="58" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Daily Price Obs P(t)</text>
+    <text x="16" y="80" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Unit Normalization (kg)</text>
+    <text x="16" y="102" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Source Reliability S_src</text>
+    <text x="16" y="124" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Sliding Window W_14</text>
+    <rect x="14" y="145" width="152" height="42" rx="6" fill="#1e293b"/>
+    <text x="90" y="170" fill="#38bdf8" font-family="monospace" font-size="10" text-anchor="middle">W_14 = {P_(t-14), ..., P_t}</text>
+  </g>
+
+  <!-- Arrow 1 to 2 -->
+  <path d="M 215 175 L 245 175" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="4 2"/>
+  <polygon points="245,171 253,175 245,179" fill="#38bdf8"/>
+
+  <!-- Step 2: Statistical Moments -->
+  <g transform="translate(255, 75)" filter="url(#glow)">
+    <rect width="190" height="200" rx="12" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
+    <rect width="190" height="32" rx="12" fill="#059669"/>
+    <text x="95" y="21" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="700" text-anchor="middle">2. STATISTICAL MOMENTS</text>
+    <text x="16" y="58" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Rolling Baseline SMA:</text>
+    <text x="24" y="78" fill="#10b981" font-family="monospace" font-size="10">μ_14 = (1/14) Σ P_i</text>
+    <text x="16" y="102" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Sample Standard Dev:</text>
+    <text x="24" y="122" fill="#10b981" font-family="monospace" font-size="10">σ_14 = √(1/(N-1) Σ(P-μ)²)</text>
+    <text x="16" y="146" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Standard Z-Score:</text>
+    <text x="24" y="166" fill="#10b981" font-family="monospace" font-size="10">Z = (P_t - μ_14) / σ_14</text>
+    <text x="16" y="186" fill="#38bdf8" font-family="sans-serif" font-size="9">Volatility CV = (σ/μ) × 100%</text>
+  </g>
+
+  <!-- Arrow 2 to 3 -->
+  <path d="M 450 175 L 480 175" stroke="#10b981" stroke-width="2.5" stroke-dasharray="4 2"/>
+  <polygon points="480,171 488,175 480,179" fill="#10b981"/>
+
+  <!-- Step 3: Compound Threshold Rule -->
+  <g transform="translate(490, 75)" filter="url(#glow)">
+    <rect width="200" height="200" rx="12" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect width="200" height="32" rx="12" fill="#d97706"/>
+    <text x="100" y="21" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="700" text-anchor="middle">3. COMPOUND DECISION</text>
+    <text x="14" y="58" fill="#cbd5e1" font-family="sans-serif" font-size="10">Rule: (|Z| ≥ 1.5) ∧ (|Δ%| ≥ 10%)</text>
+    <rect x="14" y="70" width="172" height="32" rx="6" fill="#1e293b"/>
+    <text x="20" y="86" fill="#34d399" font-family="sans-serif" font-size="9">• |Z| &lt; 1.5: Normal Band</text>
+    <text x="20" y="98" fill="#fde047" font-family="sans-serif" font-size="9">• |Z| ≥ 1.5, |Δ| ≥ 10%: Moderate</text>
+    <rect x="14" y="108" width="172" height="32" rx="6" fill="#1e293b"/>
+    <text x="20" y="124" fill="#fb923c" font-family="sans-serif" font-size="9">• |Z| ≥ 2.0, |Δ| ≥ 20%: Severe</text>
+    <text x="20" y="136" fill="#f87171" font-family="sans-serif" font-size="9">• |Z| ≥ 2.5, |Δ| ≥ 30%: Critical</text>
+    <text x="14" y="165" fill="#94a3b8" font-family="sans-serif" font-size="9">Direction: Spike (Δ &gt; 0) / Drop (Δ &lt; 0)</text>
+    <text x="14" y="182" fill="#38bdf8" font-family="sans-serif" font-size="9">Prevents low-variance false alerts</text>
+  </g>
+
+  <!-- Arrow 3 to 4 -->
+  <path d="M 695 175 L 725 175" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="4 2"/>
+  <polygon points="725,171 733,175 725,179" fill="#f59e0b"/>
+
+  <!-- Step 4: Explainable Text Output -->
+  <g transform="translate(735, 75)" filter="url(#glow)">
+    <rect width="155" height="200" rx="12" fill="#0f172a" stroke="#ec4899" stroke-width="1.5"/>
+    <rect width="155" height="32" rx="12" fill="#db2777"/>
+    <text x="77" y="21" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="700" text-anchor="middle">4. EXPLANATION</text>
+    <text x="12" y="58" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Human Justification</text>
+    <text x="12" y="78" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Quantitative Delta</text>
+    <text x="12" y="98" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Baseline Reference</text>
+    <text x="12" y="118" fill="#cbd5e1" font-family="sans-serif" font-size="10">• Policy Assessment</text>
+    <rect x="10" y="135" width="135" height="50" rx="6" fill="#1e293b"/>
+    <text x="14" y="152" fill="#f472b6" font-family="sans-serif" font-size="8">"Onion surged 25%</text>
+    <text x="14" y="165" fill="#f472b6" font-family="sans-serif" font-size="8">above 14d SMA with</text>
+    <text x="14" y="178" fill="#f472b6" font-family="sans-serif" font-size="8">Z-score +2.18σ..."</text>
+  </g>
+</svg>

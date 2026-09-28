@@ -56,3 +56,8 @@ export const triggerManualSync = () => apiClient.post('/system/sync');
 
 export const getSyncTaskStatus = (taskId) => apiClient.get(`/system/sync/${taskId}`);
 
+export const injectShock = (payload) => apiClient.post('/simulation/inject-shock', payload);
+
+export const getSpatialArbitrage = (commodityId) => 
+  apiClient.get('/locations/arbitrage', { params: { commodity_id: commodityId } });
+

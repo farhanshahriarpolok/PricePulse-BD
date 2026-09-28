@@ -145,9 +145,13 @@ def seed_sources(session):
     """Seed default publisher sources and field reporter source."""
     default_sources = [
         {"code": "dam_bulletin", "name": "Department of Agricultural Marketing (DAM)", "source_type": "government", "reliability_score": 0.90},
+        {"code": "DAM_DAILY", "name": "Department of Agricultural Marketing Live", "source_type": "government", "reliability_score": 0.95},
         {"code": "tcb_bulletin", "name": "Trading Corporation of Bangladesh (TCB)", "source_type": "government", "reliability_score": 0.88},
+        {"code": "TCB_DAILY", "name": "Trading Corporation of Bangladesh Live", "source_type": "statutory_body", "reliability_score": 0.90},
         {"code": "chaldal_retail", "name": "Chaldal Online Grocery", "source_type": "digital_retail", "reliability_score": 0.85},
+        {"code": "CHALDAL_RETAIL", "name": "Chaldal Live Catalog", "source_type": "digital_retail", "reliability_score": 0.85},
         {"code": "field_report", "name": "Field Spot Report (Manual)", "source_type": "field_report", "reliability_score": 0.60},
+        {"code": "PRESS_REPORT", "name": "National Daily Press Spot Roundups", "source_type": "press", "reliability_score": 0.70},
     ]
     src_count = 0
     for s_data in default_sources:

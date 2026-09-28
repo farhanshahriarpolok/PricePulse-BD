@@ -16,116 +16,1212 @@
         "bn_name": "ঢাকা",
         "division": "Dhaka",
         "latitude": 23.8103,
-        "longitude": 90.4125
+        "longitude": 90.4125,
+        "primary_market": "Karwan Bazar"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [90.4125, 23.8103]
+        "coordinates": [
+          90.4125,
+          23.8103
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 2,
-        "name": "Chattogram",
-        "bn_name": "চট্টগ্রাম",
-        "division": "Chittagong",
-        "latitude": 22.3569,
-        "longitude": 91.7832
+        "name": "Gazipur",
+        "bn_name": "গাজীপুর",
+        "division": "Dhaka",
+        "latitude": 24.0023,
+        "longitude": 90.4264,
+        "primary_market": "Joydebpur Central Bazar"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [91.7832, 22.3569]
+        "coordinates": [
+          90.4264,
+          24.0023
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 3,
-        "name": "Rajshahi",
-        "bn_name": "রাজশাহী",
-        "division": "Rajshahi",
-        "latitude": 24.3636,
-        "longitude": 88.6241
+        "name": "Narayanganj",
+        "bn_name": "নারায়ণগঞ্জ",
+        "division": "Dhaka",
+        "latitude": 23.6238,
+        "longitude": 90.5,
+        "primary_market": "Nitayganj Wholesale Arat"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [88.6241, 24.3636]
+        "coordinates": [
+          90.5,
+          23.6238
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 4,
-        "name": "Khulna",
-        "bn_name": "খুলনা",
-        "division": "Khulna",
-        "latitude": 22.8456,
-        "longitude": 89.5403
+        "name": "Narsingdi",
+        "bn_name": "নরসিংদী",
+        "division": "Dhaka",
+        "latitude": 23.9193,
+        "longitude": 90.7176,
+        "primary_market": "Velanagar Bazar"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [89.5403, 22.8456]
+        "coordinates": [
+          90.7176,
+          23.9193
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 5,
-        "name": "Sylhet",
-        "bn_name": "সিলেট",
-        "division": "Sylhet",
-        "latitude": 24.8949,
-        "longitude": 91.8687
+        "name": "Munshiganj",
+        "bn_name": "মুন্সীগঞ্জ",
+        "division": "Dhaka",
+        "latitude": 23.5422,
+        "longitude": 90.5305,
+        "primary_market": "Munshiganj Sadar Bazar"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [91.8687, 24.8949]
+        "coordinates": [
+          90.5305,
+          23.5422
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 6,
-        "name": "Rangpur",
-        "bn_name": "রংপুর",
-        "division": "Rangpur",
-        "latitude": 25.7439,
-        "longitude": 89.2752
+        "name": "Manikganj",
+        "bn_name": "মানিকগঞ্জ",
+        "division": "Dhaka",
+        "latitude": 23.8617,
+        "longitude": 90.0003,
+        "primary_market": "Manikganj Bus Stand Bazar"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [89.2752, 25.7439]
+        "coordinates": [
+          90.0003,
+          23.8617
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 7,
-        "name": "Barisal",
-        "bn_name": "বরিশাল",
-        "division": "Barisal",
-        "latitude": 22.7010,
-        "longitude": 90.3535
+        "name": "Tangail",
+        "bn_name": "টাঙ্গাইল",
+        "division": "Dhaka",
+        "latitude": 24.2513,
+        "longitude": 89.9167,
+        "primary_market": "Park Bazar Tangail"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [90.3535, 22.7010]
+        "coordinates": [
+          89.9167,
+          24.2513
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
         "id": 8,
+        "name": "Kishoreganj",
+        "bn_name": "কিশোরগঞ্জ",
+        "division": "Dhaka",
+        "latitude": 24.4449,
+        "longitude": 90.7766,
+        "primary_market": "Borothakur Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.7766,
+          24.4449
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 9,
+        "name": "Faridpur",
+        "bn_name": "ফরিদপুর",
+        "division": "Dhaka",
+        "latitude": 23.6071,
+        "longitude": 89.8429,
+        "primary_market": "Chawkbazar Faridpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.8429,
+          23.6071
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 10,
+        "name": "Gopalganj",
+        "bn_name": "গোপালগঞ্জ",
+        "division": "Dhaka",
+        "latitude": 23.0051,
+        "longitude": 89.8266,
+        "primary_market": "Gopalganj Sadar Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.8266,
+          23.0051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 11,
+        "name": "Madaripur",
+        "bn_name": "মাদারীপুর",
+        "division": "Dhaka",
+        "latitude": 23.1641,
+        "longitude": 90.1897,
+        "primary_market": "Puran Bazar Madaripur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.1897,
+          23.1641
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 12,
+        "name": "Rajbari",
+        "bn_name": "রাজবাড়ী",
+        "division": "Dhaka",
+        "latitude": 23.7574,
+        "longitude": 89.6445,
+        "primary_market": "Rajbari Railgate Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6445,
+          23.7574
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 13,
+        "name": "Shariatpur",
+        "bn_name": "শরীয়তপুর",
+        "division": "Dhaka",
+        "latitude": 23.2423,
+        "longitude": 90.4348,
+        "primary_market": "Palong Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.4348,
+          23.2423
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 14,
+        "name": "Chattogram",
+        "bn_name": "চট্টগ্রাম",
+        "division": "Chittagong",
+        "latitude": 22.3569,
+        "longitude": 91.7832,
+        "primary_market": "Khatunganj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.7832,
+          22.3569
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 15,
+        "name": "Cox's Bazar",
+        "bn_name": "কক্সবাজার",
+        "division": "Chittagong",
+        "latitude": 21.4272,
+        "longitude": 92.0058,
+        "primary_market": "Boro Bazar Cox's Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.0058,
+          21.4272
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 16,
+        "name": "Cumilla",
+        "bn_name": "কুমিল্লা",
+        "division": "Chittagong",
+        "latitude": 23.4682,
+        "longitude": 91.1788,
+        "primary_market": "Chawkbazar Cumilla"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.1788,
+          23.4682
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 17,
+        "name": "Feni",
+        "bn_name": "ফেনী",
+        "division": "Chittagong",
+        "latitude": 23.0159,
+        "longitude": 91.3976,
+        "primary_market": "Feni Boro Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.3976,
+          23.0159
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 18,
+        "name": "Brahmanbaria",
+        "bn_name": "ব্রাহ্মণবাড়িয়া",
+        "division": "Chittagong",
+        "latitude": 23.9571,
+        "longitude": 91.1119,
+        "primary_market": "Anandabazar Brahmanbaria"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.1119,
+          23.9571
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 19,
+        "name": "Noakhali",
+        "bn_name": "নোয়াখালী",
+        "division": "Chittagong",
+        "latitude": 22.8696,
+        "longitude": 91.0994,
+        "primary_market": "Maijdee Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.0994,
+          22.8696
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 20,
+        "name": "Chandpur",
+        "bn_name": "চাঁদপুর",
+        "division": "Chittagong",
+        "latitude": 23.2333,
+        "longitude": 90.6667,
+        "primary_market": "Hilsa Ghat Chandpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.6667,
+          23.2333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 21,
+        "name": "Lakshmipur",
+        "bn_name": "লক্ষ্মীপুর",
+        "division": "Chittagong",
+        "latitude": 22.9425,
+        "longitude": 90.8412,
+        "primary_market": "Lakshmipur Sadar Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.8412,
+          22.9425
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 22,
+        "name": "Rangamati",
+        "bn_name": "রাঙ্গামাটি",
+        "division": "Chittagong",
+        "latitude": 22.6574,
+        "longitude": 92.1733,
+        "primary_market": "Banarupa Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.1733,
+          22.6574
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 23,
+        "name": "Khagrachhari",
+        "bn_name": "খাগড়াছড়ি",
+        "division": "Chittagong",
+        "latitude": 23.1193,
+        "longitude": 91.9847,
+        "primary_market": "Khagrachhari Sadar Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.9847,
+          23.1193
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 24,
+        "name": "Bandarban",
+        "bn_name": "বান্দরবান",
+        "division": "Chittagong",
+        "latitude": 22.1953,
+        "longitude": 92.2184,
+        "primary_market": "Madhyam Para Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          92.2184,
+          22.1953
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 25,
+        "name": "Rajshahi",
+        "bn_name": "রাজশাহী",
+        "division": "Rajshahi",
+        "latitude": 24.3636,
+        "longitude": 88.6241,
+        "primary_market": "Saheb Bazar Rajshahi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.6241,
+          24.3636
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 26,
+        "name": "Bogura",
+        "bn_name": "বগুড়া",
+        "division": "Rajshahi",
+        "latitude": 24.8465,
+        "longitude": 89.377,
+        "primary_market": "Raja Bazar Bogura"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.377,
+          24.8465
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 27,
+        "name": "Pabna",
+        "bn_name": "পাবনা",
+        "division": "Rajshahi",
+        "latitude": 24.0064,
+        "longitude": 89.2372,
+        "primary_market": "Chhoto Bazar Pabna"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.2372,
+          24.0064
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 28,
+        "name": "Sirajganj",
+        "bn_name": "সিরাজগঞ্জ",
+        "division": "Rajshahi",
+        "latitude": 24.4534,
+        "longitude": 89.7008,
+        "primary_market": "Boro Bazar Sirajganj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.7008,
+          24.4534
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 29,
+        "name": "Naogaon",
+        "bn_name": "নওগাঁ",
+        "division": "Rajshahi",
+        "latitude": 24.7936,
+        "longitude": 88.9318,
+        "primary_market": "Dakkhinchak Rice Arat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.9318,
+          24.7936
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 30,
+        "name": "Natore",
+        "bn_name": "নাটোর",
+        "division": "Rajshahi",
+        "latitude": 24.4206,
+        "longitude": 89.0003,
+        "primary_market": "Nicho Bazar Natore"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.0003,
+          24.4206
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 31,
+        "name": "Chapainawabganj",
+        "bn_name": "চাঁপাইনবাবগঞ্জ",
+        "division": "Rajshahi",
+        "latitude": 24.5965,
+        "longitude": 88.2775,
+        "primary_market": "Puratan Bazar Chapai"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.2775,
+          24.5965
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 32,
+        "name": "Joypurhat",
+        "bn_name": "জয়পুরহাট",
+        "division": "Rajshahi",
+        "latitude": 25.1015,
+        "longitude": 89.0277,
+        "primary_market": "Joypurhat Central Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.0277,
+          25.1015
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 33,
+        "name": "Khulna",
+        "bn_name": "খুলনা",
+        "division": "Khulna",
+        "latitude": 22.8456,
+        "longitude": 89.5403,
+        "primary_market": "Boro Bazar Khulna"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.5403,
+          22.8456
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 34,
+        "name": "Jashore",
+        "bn_name": "যশোর",
+        "division": "Khulna",
+        "latitude": 23.1664,
+        "longitude": 89.2081,
+        "primary_market": "Boro Bazar Jashore"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.2081,
+          23.1664
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 35,
+        "name": "Satkhira",
+        "bn_name": "সাতক্ষীরা",
+        "division": "Khulna",
+        "latitude": 22.7185,
+        "longitude": 89.0705,
+        "primary_market": "Sultanpur Fish & Fish Arat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.0705,
+          22.7185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 36,
+        "name": "Bagerhat",
+        "bn_name": "বাগেরহাট",
+        "division": "Khulna",
+        "latitude": 22.6516,
+        "longitude": 89.7859,
+        "primary_market": "Bagerhat Pradhan Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.7859,
+          22.6516
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 37,
+        "name": "Jhenaidah",
+        "bn_name": "ঝিনাইদহ",
+        "division": "Khulna",
+        "latitude": 23.5448,
+        "longitude": 89.1539,
+        "primary_market": "Jhenaidah Sadar Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.1539,
+          23.5448
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 38,
+        "name": "Kushtia",
+        "bn_name": "কুষ্টিয়া",
+        "division": "Khulna",
+        "latitude": 23.9013,
+        "longitude": 89.1205,
+        "primary_market": "Khajanagar Rice Mill Hub"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.1205,
+          23.9013
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 39,
+        "name": "Chuadanga",
+        "bn_name": "চুয়াডাঙ্গা",
+        "division": "Khulna",
+        "latitude": 23.6402,
+        "longitude": 88.8418,
+        "primary_market": "Chuadanga Boro Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.8418,
+          23.6402
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 40,
+        "name": "Meherpur",
+        "bn_name": "মেহেরপুর",
+        "division": "Khulna",
+        "latitude": 23.7622,
+        "longitude": 88.6318,
+        "primary_market": "Meherpur Boro Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.6318,
+          23.7622
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 41,
+        "name": "Magura",
+        "bn_name": "মাগুরা",
+        "division": "Khulna",
+        "latitude": 23.4873,
+        "longitude": 89.4199,
+        "primary_market": "Chourangi Bazar Magura"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.4199,
+          23.4873
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 42,
+        "name": "Narail",
+        "bn_name": "নড়াইল",
+        "division": "Khulna",
+        "latitude": 23.1725,
+        "longitude": 89.5127,
+        "primary_market": "Rupganj Bazar Narail"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.5127,
+          23.1725
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 43,
+        "name": "Barishal",
+        "bn_name": "বরিশাল",
+        "division": "Barisal",
+        "latitude": 22.701,
+        "longitude": 90.3535,
+        "primary_market": "Port Road Wholesale Arat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.3535,
+          22.701
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 44,
+        "name": "Patuakhali",
+        "bn_name": "পটুয়াখালী",
+        "division": "Barisal",
+        "latitude": 22.3596,
+        "longitude": 90.3299,
+        "primary_market": "Patuakhali Pouro Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.3299,
+          22.3596
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 45,
+        "name": "Bhola",
+        "bn_name": "ভোলা",
+        "division": "Barisal",
+        "latitude": 22.6859,
+        "longitude": 90.6482,
+        "primary_market": "Bhola Sadar Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.6482,
+          22.6859
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 46,
+        "name": "Pirojpur",
+        "bn_name": "পিরোজপুর",
+        "division": "Barisal",
+        "latitude": 22.5841,
+        "longitude": 89.972,
+        "primary_market": "Rajarhat Pirojpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.972,
+          22.5841
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 47,
+        "name": "Barguna",
+        "bn_name": "বরগুনা",
+        "division": "Barisal",
+        "latitude": 22.1587,
+        "longitude": 90.1256,
+        "primary_market": "Barguna Launch Ghat Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.1256,
+          22.1587
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 48,
+        "name": "Jhalokati",
+        "bn_name": "ঝালকাঠি",
+        "division": "Barisal",
+        "latitude": 22.6406,
+        "longitude": 90.1987,
+        "primary_market": "Bimruli Floating Market"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.1987,
+          22.6406
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 49,
+        "name": "Sylhet",
+        "bn_name": "সিলেট",
+        "division": "Sylhet",
+        "latitude": 24.8949,
+        "longitude": 91.8687,
+        "primary_market": "Sobhanighat Wholesale Arat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.8687,
+          24.8949
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 50,
+        "name": "Moulvibazar",
+        "bn_name": "মৌলভীবাজার",
+        "division": "Sylhet",
+        "latitude": 24.4829,
+        "longitude": 91.7774,
+        "primary_market": "Paschim Bazar Moulvibazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.7774,
+          24.4829
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 51,
+        "name": "Habiganj",
+        "bn_name": "হবিগঞ্জ",
+        "division": "Sylhet",
+        "latitude": 24.3749,
+        "longitude": 91.4155,
+        "primary_market": "Chowdhury Bazar Habiganj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.4155,
+          24.3749
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 52,
+        "name": "Sunamganj",
+        "bn_name": "সুনামগঞ্জ",
+        "division": "Sylhet",
+        "latitude": 25.0658,
+        "longitude": 91.395,
+        "primary_market": "Madhyanagar Fish Arat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          91.395,
+          25.0658
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 53,
+        "name": "Rangpur",
+        "bn_name": "রংপুর",
+        "division": "Rangpur",
+        "latitude": 25.7439,
+        "longitude": 89.2752,
+        "primary_market": "City Bazar Rangpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.2752,
+          25.7439
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 54,
+        "name": "Dinajpur",
+        "bn_name": "দিনাজপুর",
+        "division": "Rangpur",
+        "latitude": 25.6217,
+        "longitude": 88.6355,
+        "primary_market": "Bahadur Bazar Dinajpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.6355,
+          25.6217
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 55,
+        "name": "Kurigram",
+        "bn_name": "কুড়িগ্রাম",
+        "division": "Rangpur",
+        "latitude": 25.8054,
+        "longitude": 89.6362,
+        "primary_market": "Pouro Bazar Kurigram"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6362,
+          25.8054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 56,
+        "name": "Gaibandha",
+        "bn_name": "গাইবান্ধা",
+        "division": "Rangpur",
+        "latitude": 25.3288,
+        "longitude": 89.5403,
+        "primary_market": "Puratan Bazar Gaibandha"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.5403,
+          25.3288
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 57,
+        "name": "Nilphamari",
+        "bn_name": "নীলফামারী",
+        "division": "Rangpur",
+        "latitude": 25.9318,
+        "longitude": 88.856,
+        "primary_market": "Saidpur Rail Market"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.856,
+          25.9318
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 58,
+        "name": "Lalmonirhat",
+        "bn_name": "লালমনিরহাট",
+        "division": "Rangpur",
+        "latitude": 25.9923,
+        "longitude": 89.2847,
+        "primary_market": "Goshala Bazar Lalmonirhat"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.2847,
+          25.9923
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 59,
+        "name": "Thakurgaon",
+        "bn_name": "ঠাকুরগাঁও",
+        "division": "Rangpur",
+        "latitude": 26.0337,
+        "longitude": 88.4617,
+        "primary_market": "Kalibari Bazar Thakurgaon"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.4617,
+          26.0337
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 60,
+        "name": "Panchagarh",
+        "bn_name": "পঞ্চগড়",
+        "division": "Rangpur",
+        "latitude": 26.3411,
+        "longitude": 88.5542,
+        "primary_market": "Panchagarh Bazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          88.5542,
+          26.3411
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 61,
         "name": "Mymensingh",
         "bn_name": "ময়মনসিংহ",
         "division": "Mymensingh",
         "latitude": 24.7471,
-        "longitude": 90.4203
+        "longitude": 90.4203,
+        "primary_market": "Mechuabazar Wholesale Arat"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [90.4203, 24.7471]
+        "coordinates": [
+          90.4203,
+          24.7471
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 62,
+        "name": "Jamalpur",
+        "bn_name": "জামালপুর",
+        "division": "Mymensingh",
+        "latitude": 24.9375,
+        "longitude": 89.9378,
+        "primary_market": "Station Bazar Jamalpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.9378,
+          24.9375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 63,
+        "name": "Netrokona",
+        "bn_name": "নেত্রকোণা",
+        "division": "Mymensingh",
+        "latitude": 24.8709,
+        "longitude": 90.7279,
+        "primary_market": "Chhoto Bazar Netrokona"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.7279,
+          24.8709
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 64,
+        "name": "Sherpur",
+        "bn_name": "শেরপুর",
+        "division": "Mymensingh",
+        "latitude": 25.0205,
+        "longitude": 90.0153,
+        "primary_market": "Nayanbazar Sherpur"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          90.0153,
+          25.0205
+        ]
       }
     }
   ]

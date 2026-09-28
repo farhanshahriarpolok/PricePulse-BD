@@ -1,0 +1,40 @@
+[
+  {
+    "source": "Prothom Alo",
+    "section": "বাণিজ্য / বাজারদর",
+    "published_at": "2026-09-28T08:30:00+06:00",
+    "market_mention": "Karwan Bazar",
+    "headline": "কারওয়ান বাজারে পেঁয়াজের ঝাঁজ, ব্রয়লার মুরগির দাম চড়া",
+    "text_snippets": [
+      "রাজধানীর কারওয়ান বাজারে আজ দেশি পেঁয়াজ বিক্রি হচ্ছে প্রতি কেজি ১২০ থেকে ১৩০ টাকায়।",
+      "ডায়মন্ড জাতের নতুন আলু প্রতি কেজি ৫৫-৬০ টাকা দরে বিক্রি হতে দেখা গেছে।",
+      "বাজারে ব্রয়লার মুরগির দাম বেড়ে ১৯০ থেকে ২০০ টাকা হয়েছে।",
+      "ফার্মের মুরগির লাল ডিম প্রতি হালি ৫০ থেকে ৫২ টাকায় মিলছে।"
+    ]
+  },
+  {
+    "source": "The Daily Star",
+    "section": "Business Market Pulse",
+    "published_at": "2026-09-28T09:15:00+06:00",
+    "market_mention": "Mirpur-1 Kacha Bazar",
+    "headline": "Essential Kitchen Staples Report: Vegetables and Fish Steady",
+    "text_snippets": [
+      "At Mirpur-1 kitchen market, local onion quoted at Tk 120-130 per kg while imported Indian varieties sold at Tk 110.",
+      "Beef with bone was retailing between Tk 750 and 780 per kg across major city counters.",
+      "Rui fish of medium size was selling at Tk 350 to 380 per kg depending on weight.",
+      "Green chilli prices surged sharply to Tk 200-240 per kg due to rain disruptions."
+    ]
+  },
+  {
+    "source": "The Financial Express",
+    "section": "Commodities & Trade",
+    "published_at": "2026-09-28T10:00:00+06:00",
+    "market_mention": "Khatunganj",
+    "headline": "Chittagong Khatunganj Wholesale Bulletin",
+    "text_snippets": [
+      "In Khatunganj wholesale hub, refined sugar sold at Tk 128-132 per kg.",
+      "Mustard oil in bulk drums changed hands at Tk 210 to 220 per liter.",
+      "Coarse rice wholesale rate hovered around Tk 52-55 per kg."
+    ]
+  }
+]

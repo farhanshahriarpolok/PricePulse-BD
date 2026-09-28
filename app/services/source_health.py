@@ -56,6 +56,26 @@ class SourceHealthService:
                 is_fallback=False,
                 success_count=1,
             ),
+            "TCB_DAILY": SourceTelemetry(
+                source_code="TCB_DAILY",
+                source_name="Trading Corporation of Bangladesh (TCB)",
+                source_type="statutory_body",
+                status="HEALTHY",
+                latency_ms=18.5,
+                last_sync=datetime.now(timezone.utc),
+                is_fallback=False,
+                success_count=1,
+            ),
+            "PRESS_REPORT": SourceTelemetry(
+                source_code="PRESS_REPORT",
+                source_name="National Daily Press Spot Roundups",
+                source_type="press",
+                status="HEALTHY",
+                latency_ms=8.2,
+                last_sync=datetime.now(timezone.utc),
+                is_fallback=False,
+                success_count=1,
+            ),
         }
 
     def record_attempt(
@@ -100,6 +120,10 @@ class SourceHealthService:
         if not telemetry:
             return None
         return asdict(telemetry)
+
+    def get_source_telemetry(self, source_code: str) -> Optional[dict]:
+        """Alias for get_source_status."""
+        return self.get_source_status(source_code)
 
     def get_all_statuses(self) -> List[dict]:
         """Retrieve telemetry dictionary for all registered sources."""

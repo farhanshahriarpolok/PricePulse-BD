@@ -136,3 +136,36 @@ When $\mu_{\text{geo}}$ exceeds 35\%, the system flags a spatial transmission in
 
 \subsection{GeoJSON Dynamic Feature Collection}
 The spatial engine binds dynamic pricing metrics directly into a simplified Bangladesh District GeoJSON polygon layer. Each district feature is enriched with live attributes (\texttt{district\_name}, \texttt{price}, \texttt{is\_cheapest}, \texttt{is\_highest}, \texttt{observation\_count}). This feature collection is consumed directly by the React Leaflet web interface, rendering dynamic choropleth maps and interactive popup cards on OpenStreetMap tile layers without external proprietary mapping API fees.
+
+\subsection{National 64-District Spatial Price Dispersion Index}
+To measure nationwide market integration beyond pairwise extremes, PricePulse BD formulates the Spatial Price Dispersion Index $D(t)$:
+
+\begin{equation}
+D(t) = \frac{1}{\bar{P}(t)} \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left( P_i(t) - \bar{P}(t) \right)^2}
+\end{equation}
+
+where $N = 64$ represents the total administrative districts of Bangladesh, $P_i(t)$ is the volume-weighted price in district $i$ on date $t$, and $\bar{P}(t) = \frac{1}{N} \sum_{i=1}^{N} P_i(t)$ is the unweighted national mean price. Under the Law of One Price (LOOP) in an integrated market, $D(t) \to 0$ in the absence of transport frictions. Empirical monitoring of essential commodities demonstrates that perishable vegetables (e.g., Green Chilli, Potato) exhibit baseline $D(t) \in [0.18, 0.28]$, whereas non-perishable administered commodities (Sugar, Bottled Soybean Oil) maintain $D(t) \le 0.06$.
+
+\subsection{Freight Overhead \& Inter-District Arbitrage Modeling}
+PricePulse BD introduces an automated spatial arbitrage engine that maps commodity flow between primary agricultural surplus hubs (e.g., Bogura, Rangpur, Dinajpur, Jashore) and deficit consumption centers (Dhaka, Chattogram, Sylhet).
+
+The effective highway transit distance between production hub $s$ and consumption hub $d$ is derived via great-circle Haversine distance scaled by the empirical highway circuity factor $\kappa = 1.25$ for Bangladeshi road topography:
+
+\begin{equation}
+d_{\text{road}}(s, d) = \kappa \cdot 2 R \arcsin \left( \sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_s) \cos(\phi_d) \sin^2\left(\frac{\Delta \lambda}{2}\right)} \right)
+\end{equation}
+
+where $R = 6371\text{ km}$, $\phi$ denotes latitude, and $\lambda$ denotes longitude. Freight overhead per kilogram is calibrated according to national carrier surveys:
+
+\begin{equation}
+C_{\text{freight}}(s, d) = C_{\text{fixed}} + \beta \cdot d_{\text{road}}(s, d) = 1.50 + 0.018 \cdot d_{\text{road}}(s, d) \quad (\text{BDT/kg})
+\end{equation}
+
+The net arbitrage margin $M_{\text{net}}$ and economic feasibility classification are given by:
+
+\begin{equation}
+M_{\text{net}}(s, d) = \left( P_d - P_s \right) - C_{\text{freight}}(s, d)
+\end{equation}
+
+When $M_{\text{net}} \ge 6.00\text{ BDT/kg}$, commercial transfer is flagged as \textit{Highly Feasible}. When $2.00 \le M_{\text{net}} < 6.00$, the corridor is designated as \textit{Marginal}. When $M_{\text{net}} < 2.00$, inter-district transport is economically infeasible due to transport cost barriers.
+
