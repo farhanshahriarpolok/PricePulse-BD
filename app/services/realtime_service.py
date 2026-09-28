@@ -2,7 +2,9 @@
 Realtime price service managing on-demand ingestion fallback, caching, and freshness markers.
 """
 
-from datetime import date, datetime, timezone
+import math
+from collections import defaultdict
+from datetime import date, datetime, timezone, timedelta
 from typing import List, Optional
 from sqlalchemy import select, func, desc
 from sqlalchemy.orm import Session
@@ -191,7 +193,7 @@ class RealtimePriceService:
         )
 
     def get_today_pulse(self) -> DailyPulseResponse:
-        """Generate overall market intelligence pulse for essential commodities."""
+        """Generate overall market intelligence pulse for essential commodities with 7d sparklines and channel metrics."""
         today = date.today()
         # Ensure latest data is loaded
         commodities = list(self.db.scalars(select(Commodity).order_by(Commodity.id)).all())
@@ -203,6 +205,26 @@ class RealtimePriceService:
         if obs_count == 0:
             self._trigger_on_demand_harvest(today)
 
+        # Efficiently fetch up to 14 days of historical daily average prices in a single query
+        start_14d = today - timedelta(days=14)
+        hist_stmt = (
+            select(
+                PriceObservation.commodity_id,
+                PriceObservation.observation_date,
+                func.avg(PriceObservation.normalized_price).label("daily_avg"),
+            )
+            .where(
+                PriceObservation.observation_date >= start_14d,
+                PriceObservation.observation_date <= today,
+            )
+            .group_by(PriceObservation.commodity_id, PriceObservation.observation_date)
+            .order_by(PriceObservation.commodity_id, PriceObservation.observation_date.asc())
+        )
+        hist_rows = self.db.execute(hist_stmt).all()
+        daily_history_by_comm = defaultdict(list)
+        for r in hist_rows:
+            daily_history_by_comm[r.commodity_id].append(round(float(r.daily_avg), 2))
+
         items: List[DailyPulseItem] = []
         for comm in commodities:
             observations = self._query_observations(comm.id, today)
@@ -211,6 +233,42 @@ class RealtimePriceService:
 
             analytics_result = self.analytics.compute_analytics(observations)
             latest_scraped = max((o.scraped_at for o in observations if o.scraped_at), default=None)
+
+            # Sparkline and delta calculation
+            hist_series = daily_history_by_comm[comm.id]
+            sparkline_7d = hist_series[-7:] if len(hist_series) >= 7 else hist_series
+            if not sparkline_7d:
+                sparkline_7d = [analytics_result.summary.avg_price]
+
+            if len(sparkline_7d) >= 2 and sparkline_7d[0] > 0:
+                pct_change_7d = round(((sparkline_7d[-1] - sparkline_7d[0]) / sparkline_7d[0]) * 100.0, 2)
+            else:
+                pct_change_7d = 0.0
+
+            # Source count and confidence
+            unique_sources = {o.source_id for o in observations if o.source_id}
+            source_count = len(unique_sources) if unique_sources else 1
+            conf_list = [o.confidence_score for o in observations if o.confidence_score is not None]
+            avg_confidence = round(sum(conf_list) / len(conf_list), 2) if conf_list else 0.90
+
+            # Volatility CV% and Z-score
+            if len(hist_series) >= 3:
+                m_14 = sum(hist_series) / len(hist_series)
+                var_14 = sum((x - m_14) ** 2 for x in hist_series) / (len(hist_series) - 1)
+                std_14 = math.sqrt(var_14)
+                vol_cv = round((std_14 / m_14) * 100.0, 2) if m_14 > 0 else 0.0
+
+                if len(hist_series[:-1]) >= 2:
+                    base_pts = hist_series[:-1]
+                    b_mean = sum(base_pts) / len(base_pts)
+                    b_var = sum((x - b_mean) ** 2 for x in base_pts) / (len(base_pts) - 1)
+                    b_std = math.sqrt(b_var)
+                    z_val = round((hist_series[-1] - b_mean) / b_std, 2) if b_std > 1e-5 else 0.0
+                else:
+                    z_val = 0.0
+            else:
+                vol_cv = 0.0
+                z_val = 0.0
 
             items.append(
                 DailyPulseItem(
@@ -240,6 +298,17 @@ class RealtimePriceService:
                         is_stale=False,
                         cache_age_seconds=0,
                     ),
+                    sparkline_7d=sparkline_7d,
+                    percentage_change_7d=pct_change_7d,
+                    min_price=analytics_result.summary.min_price,
+                    max_price=analytics_result.summary.max_price,
+                    wholesale_avg=analytics_result.channels.wholesale_avg,
+                    retail_avg=analytics_result.channels.retail_avg,
+                    online_avg=analytics_result.channels.online_avg,
+                    source_count=source_count,
+                    confidence_score=avg_confidence,
+                    volatility_cv=vol_cv,
+                    z_score=z_val,
                 )
             )
 

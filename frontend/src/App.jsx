@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Activity, 
   TrendingUp, 
@@ -29,6 +29,7 @@ import MarketTicker from './components/MarketTicker';
 import CategoryFilter, { matchesCategory, CATEGORIES } from './components/CategoryFilter';
 import ExportDataModal from './components/ExportDataModal';
 import SimulationSandbox from './components/SimulationSandbox';
+import CommodityCard from './components/CommodityCard';
 
 import {
   getDailyPulse,
@@ -187,6 +188,23 @@ export default function App() {
     matchesCategory(item, selectedCategory)
   );
 
+  const topMover = useMemo(() => {
+    if (!allPulseItems || allPulseItems.length === 0) return null;
+    const sorted = [...allPulseItems].sort((a, b) => {
+      const aVal = a.percentage_change_7d !== undefined && a.percentage_change_7d !== null ? a.percentage_change_7d : 0;
+      const bVal = b.percentage_change_7d !== undefined && b.percentage_change_7d !== null ? b.percentage_change_7d : 0;
+      return bVal - aVal;
+    });
+    return sorted[0] || null;
+  }, [allPulseItems]);
+
+  const remainingPulseItems = useMemo(() => {
+    if (topMover && selectedCategory === 'all') {
+      return displayedPulseItems.filter((item) => item.commodity_id !== topMover.commodity_id);
+    }
+    return displayedPulseItems;
+  }, [displayedPulseItems, topMover, selectedCategory]);
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
       <Navbar
@@ -256,50 +274,31 @@ export default function App() {
               </div>
 
               {displayedPulseItems.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {displayedPulseItems.map((item) => (
-                    <div
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {/* Top Market Mover Hero Card */}
+                  {topMover && selectedCategory === 'all' && (
+                    <CommodityCard
+                      item={topMover}
+                      isHero={true}
+                      onClick={() => {
+                        const c = commodities.find((x) => x.id === topMover.commodity_id);
+                        if (c) setSelectedCommodity(c);
+                        setActiveTab('explorer');
+                      }}
+                    />
+                  )}
+
+                  {/* High-Density Commodity Cards */}
+                  {remainingPulseItems.map((item) => (
+                    <CommodityCard
                       key={item.commodity_id}
+                      item={item}
                       onClick={() => {
                         const c = commodities.find((x) => x.id === item.commodity_id);
                         if (c) setSelectedCommodity(c);
                         setActiveTab('explorer');
                       }}
-                      className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 hover:border-emerald-500/50 cursor-pointer transition shadow-sm hover:shadow-emerald-950/20 group"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-                          {item.category}
-                        </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          item.price_status === 'High'
-                            ? 'bg-rose-500/20 text-rose-300'
-                            : item.price_status === 'Elevated'
-                            ? 'bg-amber-500/20 text-amber-300'
-                            : 'bg-emerald-500/20 text-emerald-300'
-                        }`}>
-                          {item.price_status}
-                        </span>
-                      </div>
-
-                      <div className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
-                        {item.canonical_name}
-                      </div>
-                      <div className="text-xs text-slate-400 mb-3 font-bengali">
-                        {item.bangla_name}
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-700/60 flex items-baseline justify-between">
-                        <div>
-                          <span className="text-xs text-slate-400">Avg Benchmark:</span>
-                          <div className="text-xl font-bold font-outfit text-white">
-                            BDT {item.price_summary?.avg_price ? item.price_summary.avg_price.toFixed(2) : '0.00'}
-                            <span className="text-xs font-normal text-slate-400"> /{item.unit}</span>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </div>
+                    />
                   ))}
                 </div>
               ) : (

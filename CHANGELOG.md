@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-09-28
+
+### Added
+- **Dynamic, Engaging & High-Density Commodity Card Architecture**:
+  - `CommodityCard.jsx`: Replaced legacy flat cards with high-density market intelligence cards featuring category identity pills with Lucide icons, 3.5px left border accents, 7-day visual mini-sparklines, percentage change delta tags (`↑ +13.4%` / `↓ -4.2%` / `→ 0.0%`), observed range metrics (`৳min – ৳max`), channel split bar (`Wholesale • Retail • Online`), and provenance indicators (`● X Sources | Y% Conf`).
+  - `MiniSparkline.jsx`: Zero-layout-shift SVG cubic-bezier sparkline with dynamic stroke color coding (Rose for surges $> +2\%$, Emerald for decreases $< -2\%$, Slate for neutral), vertical gradient underlay, and terminal glow node.
+  - Category Visual Identity (`frontend/src/utils/categoryTheme.js`): Systematic color-coded border accents, background badges, and category iconography (`Vegetables`, `Grains & Pulses`, `Meat & Fish`, `Dairy & Eggs`, `Spices & Oils`).
+  - Refined Multi-Factor Severity Classification: Five-state status indicators (`Critical Spike`, `Elevated`, `Price Drop`, `Volatile`, `Stable`) driven by Z-score, 7-day delta percentage, and 14-day coefficient of variation.
+  - "Top Market Mover" Dynamic Hero Layout: Prominent double-span Hero Card dynamically highlighting the market basket's primary price mover at the top of the grid with anomaly explanations, expanded sparkline, and direct inspection workflows.
+- **Backend Realtime Pulse API & Serialization Enrichment**:
+  - Enriched `DailyPulseItem` schema in `app/schemas/search.py` with `sparkline_7d`, `percentage_change_7d`, `min_price`, `max_price`, `wholesale_avg`, `retail_avg`, `online_avg`, `source_count`, `confidence_score`, `volatility_cv`, and `z_score`.
+  - Optimized batched SQL history trail aggregation in `RealtimeService.get_today_pulse()` executing single-pass multi-commodity window calculations with sub-30ms API latency.
+
 ## [1.5.0] - 2026-09-28
 
 ### Added

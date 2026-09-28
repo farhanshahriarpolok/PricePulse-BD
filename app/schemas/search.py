@@ -43,6 +43,17 @@ class DailyPulseItem(BaseModel):
     channels: ChannelComparisonOut
     price_status: str
     freshness: FreshnessMetadata
+    sparkline_7d: List[float] = Field(default_factory=list, description="Last 7 daily representative prices in chronological order")
+    percentage_change_7d: float = Field(0.0, description="7-day percentage change relative to 7d SMA or start of window")
+    min_price: float = Field(0.0, description="Observed daily minimum price in BDT")
+    max_price: float = Field(0.0, description="Observed daily maximum price in BDT")
+    wholesale_avg: Optional[float] = Field(None, description="Observed wholesale price in BDT")
+    retail_avg: Optional[float] = Field(None, description="Observed physical retail price in BDT")
+    online_avg: Optional[float] = Field(None, description="Observed e-commerce retail price in BDT")
+    source_count: int = Field(1, description="Number of independent publisher sources")
+    confidence_score: float = Field(0.9, description="Average confidence score (0.0 to 1.0)")
+    volatility_cv: float = Field(0.0, description="14-day Coefficient of Variation percentage")
+    z_score: float = Field(0.0, description="14-day Standard Score Z")
 
 
 class DailyPulseResponse(BaseModel):
