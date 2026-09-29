@@ -1,0 +1,22 @@
+{
+  "name": "PricePulse BD — বাংলাদেশ নিত্যপণ্য বাজারদর ও সাশ্রয় ট্র্যাকার",
+  "short_name": "PricePulse BD",
+  "description": "৬৪ জেলার পাইকারি ও খুচরা নিত্যপণ্যের সঠিক বাজারদর, বাজার বাস্কেট ও সাশ্রয় ট্র্যাকার",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "48x48 72x72 96x96",
+      "type": "image/svg+xml"
+    }
+  ]
+}

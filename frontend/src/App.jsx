@@ -11,7 +11,9 @@ import {
   Calendar, 
   ChevronRight,
   Sparkles,
-  Info
+  Info,
+  ShoppingBasket,
+  GitCompare
 } from 'lucide-react';
 
 import Navbar from './components/Navbar';
@@ -31,6 +33,7 @@ import ExportDataModal from './components/ExportDataModal';
 import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
 import BazaarBasketView from './components/BazaarBasketView';
+import BudgetOptimizerModal from './components/BudgetOptimizerModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import { getTranslation } from './i18n/translations';
 
@@ -67,6 +70,44 @@ export default function App() {
 
   const t = (key) => getTranslation(key, lang);
 
+  // Dynamic Theme State: Clean Light Mode as Default
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pricepulse_theme') || 'light';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      localStorage.setItem('pricepulse_theme', theme);
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // Sticky District Selector State
+  const [selectedDistrict, setSelectedDistrict] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pricepulse_district') || 'dhaka_karwan';
+    }
+    return 'dhaka_karwan';
+  });
+
+  const handleSelectDistrict = (dist) => {
+    setSelectedDistrict(dist);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pricepulse_district', dist);
+    }
+  };
+
   // Active Tab State with URL query & hash synchronization
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -101,6 +142,7 @@ export default function App() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncToast, setSyncToast] = useState(null);
   const [sourcesData, setSourcesData] = useState([]);
@@ -116,7 +158,68 @@ export default function App() {
   const [activeProvenance, setActiveProvenance] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [basketItemCount, setBasketItemCount] = useState(0);
+  const [basketItemCount, setBasketItemCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('pricepulse_active_basket');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed.length;
+        }
+      } catch (e) {}
+    }
+    return 0;
+  });
+
+  // 1-Click Add to Basket from CommodityCard
+  const handleAddToBasket = (item) => {
+    try {
+      const stored = localStorage.getItem('pricepulse_active_basket');
+      const list = stored ? JSON.parse(stored) : [];
+      const existingIdx = list.findIndex(
+        (x) => (x.commodity_id && x.commodity_id === item.commodity_id) || x.commodity_name === item.canonical_name
+      );
+      if (existingIdx >= 0) {
+        list[existingIdx].quantity = parseFloat(((list[existingIdx].quantity || 1) + 1).toFixed(2));
+      } else {
+        list.push({
+          id: `card-${item.commodity_id || Date.now()}-${Date.now()}`,
+          commodity_id: item.commodity_id || item.id,
+          commodity_name: item.canonical_name,
+          bangla_name: item.bangla_name || item.canonical_name,
+          quantity: 1,
+          unit: item.unit || 'kg',
+          matched: true,
+        });
+      }
+      localStorage.setItem('pricepulse_active_basket', JSON.stringify(list));
+      setBasketItemCount(list.length);
+      window.dispatchEvent(new CustomEvent('pricepulse:basket_updated', { detail: list }));
+    } catch (err) {
+      console.error('Add to basket error:', err);
+    }
+  };
+
+  // Populate active basket from Budget Optimizer
+  const handleApplyBudgetBasket = (optimizedItems) => {
+    try {
+      const newItems = optimizedItems.map((item, idx) => ({
+        id: `budget-${Date.now()}-${idx}`,
+        commodity_id: item.commodity_id,
+        commodity_name: item.name,
+        bangla_name: item.bnName,
+        quantity: item.quantity,
+        unit: item.unit,
+        matched: true,
+      }));
+      localStorage.setItem('pricepulse_active_basket', JSON.stringify(newItems));
+      setBasketItemCount(newItems.length);
+      window.dispatchEvent(new CustomEvent('pricepulse:basket_updated', { detail: newItems }));
+      setActiveTab('basket');
+    } catch (err) {
+      console.error('Apply budget basket error:', err);
+    }
+  };
 
   const allPulseItems = pulseData?.items || [];
   const activeAnomalyCount = anomaliesData?.anomalies_detected || 0;
@@ -348,7 +451,7 @@ export default function App() {
   }, [displayedPulseItems, topMover, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-150">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -358,16 +461,22 @@ export default function App() {
         isRefreshing={isRefreshing}
         onOpenReportModal={() => setIsManualModalOpen(true)}
         onOpenExportModal={() => setIsExportModalOpen(true)}
+        onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
         onTriggerSync={handleTriggerSync}
         isSyncing={isSyncing}
         syncToast={syncToast}
         lang={lang}
         onToggleLang={toggleLang}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        selectedDistrict={selectedDistrict}
+        onSelectDistrict={handleSelectDistrict}
       />
 
       {/* Horizontal Scrolling Live Market Ticker */}
       <MarketTicker
         items={allPulseItems}
+        lang={lang}
         onSelectItem={(item) => {
           const matched = commodities.find((x) => x.id === item.commodity_id);
           if (matched) setSelectedCommodity(matched);
@@ -375,13 +484,14 @@ export default function App() {
         }}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8">
         {/* TAB: BAZAAR BASKET */}
         {activeTab === 'basket' && (
           <ErrorBoundary title={t('nav_basket')}>
             <BazaarBasketView
               lang={lang}
               onBasketCountChange={setBasketItemCount}
+              onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
             />
           </ErrorBoundary>
         )}
@@ -390,9 +500,10 @@ export default function App() {
         {activeTab === 'pulse' && (
           <ErrorBoundary title={t('nav_pulse')}>
             <div>
-              <PulseSummaryCard pulseData={pulseData} anomalyCount={activeAnomalyCount} />
+              <PulseSummaryCard pulseData={pulseData} anomalyCount={activeAnomalyCount} lang={lang} />
 
               <RealtimeSearch
+                lang={lang}
                 onSelectCommodity={(searched) => {
                   const matched = commodities.find((c) => c.canonical_name === searched.canonical_name);
                   if (matched) setSelectedCommodity(matched);
@@ -403,11 +514,11 @@ export default function App() {
               {/* Category Filter Chips */}
               <div className="flex items-center justify-between mt-6 mb-2">
                 <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider font-outfit">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider font-outfit">
                     {t('cat_filter_title')}
                   </h3>
                 </div>
-                <span className="text-xs font-mono text-slate-400">
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                   {lang === 'bn' ? (
                     <span>{allPulseItems.length} {t('cat_showing')} {displayedPulseItems.length} টি</span>
                   ) : (
@@ -419,16 +530,17 @@ export default function App() {
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
                 itemsCountMap={categoryCounts}
+                lang={lang}
               />
 
               {/* Daily Staples Grid */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-white font-outfit">{t('pulse_title')}</h3>
-                    <p className="text-xs text-slate-400">{t('pulse_subtitle')}</p>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white font-outfit">{t('pulse_title')}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('pulse_subtitle')}</p>
                   </div>
-                  <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+                  <span className="text-xs font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
                     {pulseData?.date || (lang === 'bn' ? 'আজকের রেট' : 'Live Today')}
                   </span>
                 </div>
@@ -440,6 +552,8 @@ export default function App() {
                       <CommodityCard
                         item={topMover}
                         isHero={true}
+                        lang={lang}
+                        onAddToBasket={handleAddToBasket}
                         onClick={() => {
                           const c = commodities.find((x) => x.id === topMover.commodity_id);
                           if (c) setSelectedCommodity(c);
@@ -453,6 +567,8 @@ export default function App() {
                       <CommodityCard
                         key={item.commodity_id}
                         item={item}
+                        lang={lang}
+                        onAddToBasket={handleAddToBasket}
                         onClick={() => {
                           const c = commodities.find((x) => x.id === item.commodity_id);
                           if (c) setSelectedCommodity(c);
@@ -462,7 +578,7 @@ export default function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center rounded-xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
+                  <div className="p-8 text-center rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs shadow-sm">
                     {t('no_commodities_found')}
                   </div>
                 )}
@@ -772,10 +888,57 @@ export default function App() {
         commodityHistory={commodityHistory}
       />
 
+      {/* Family Budget Optimizer Modal */}
+      <BudgetOptimizerModal
+        isOpen={isBudgetModalOpen}
+        onClose={() => setIsBudgetModalOpen(false)}
+        commodities={commodities}
+        onApplyBasket={handleApplyBudgetBasket}
+        lang={lang}
+      />
+
       {/* Footer */}
-      <footer className="border-t border-slate-800 bg-slate-900/80 py-4 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 py-4 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-150">
         <p>{t('footer_text')}</p>
       </footer>
+
+      {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet viewports < 768px) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-xl px-2 py-1.5 flex items-center justify-around md:hidden transition-colors duration-150">
+        {[
+          { id: 'pulse', labelBn: 'আজকের দর', labelEn: 'Pulse', icon: Activity },
+          { id: 'basket', labelBn: 'বাজারের ফর্দ', labelEn: 'Basket', icon: ShoppingBasket, count: basketItemCount, isBasket: true },
+          { id: 'compare', labelBn: 'বাজার তুলনা', labelEn: 'Compare', icon: GitCompare },
+          { id: 'map', labelBn: 'জেলা ম্যাপ', labelEn: 'Map', icon: MapPin },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all relative ${
+                isActive
+                  ? tab.isBasket
+                    ? 'text-amber-600 dark:text-amber-400 font-bold'
+                    : 'text-emerald-600 dark:text-emerald-400 font-bold'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {tab.count > 0 && (
+                  <span className="absolute -top-1.5 -right-2 px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-amber-500 text-white animate-pulse">
+                    {tab.count}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] mt-0.5 tracking-tight font-medium">
+                {lang === 'bn' ? tab.labelBn : tab.labelEn}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

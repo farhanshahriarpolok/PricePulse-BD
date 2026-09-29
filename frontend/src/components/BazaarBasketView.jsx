@@ -87,7 +87,7 @@ const CHANNEL_CONFIG = {
 const BDT = (amount) =>
   `৳${Number(amount).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
-export default function BazaarBasketView({ onBasketCountChange, lang = 'bn' }) {
+export default function BazaarBasketView({ onBasketCountChange, onOpenBudgetModal, lang = 'bn' }) {
   const isEn = lang === 'en';
   const [activeSubTab, setActiveSubTab] = useState(() => {
     if (typeof window !== 'undefined' && window.location.hash.includes('saved')) {
@@ -97,11 +97,41 @@ export default function BazaarBasketView({ onBasketCountChange, lang = 'bn' }) {
   });
   const [commodities, setCommodities] = useState([]);
   const [presets, setPresets] = useState([]);
-  const [basket, setBasket] = useState([]); // {commodity_id, commodity_name, bangla_name, quantity, unit}
+  const [basket, setBasket] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('pricepulse_active_basket');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+    }
+    return [];
+  });
   const [result, setResult] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState(null);
   const [presetsLoaded, setPresetsLoaded] = useState(false);
+
+  // Sync basket from custom event if external components add items
+  useEffect(() => {
+    const handleBasketSync = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setBasket(e.detail);
+        setResult(null);
+      }
+    };
+    window.addEventListener('pricepulse:basket_updated', handleBasketSync);
+    return () => window.removeEventListener('pricepulse:basket_updated', handleBasketSync);
+  }, []);
+
+  // Persist basket changes to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pricepulse_active_basket', JSON.stringify(basket));
+    }
+  }, [basket]);
 
   // Saved Baskets state
   const [savedBaskets, setSavedBaskets] = useState([]);
@@ -575,6 +605,17 @@ export default function BazaarBasketView({ onBasketCountChange, lang = 'bn' }) {
             <span>{preset.label}</span>
           </button>
         ))}
+        {onOpenBudgetModal && (
+          <button
+            type="button"
+            onClick={onOpenBudgetModal}
+            id="budget-optimizer-trigger-btn"
+            className="bb-preset-btn bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 font-bold flex items-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>{lang === 'bn' ? '💡 বাজেট অপ্টিমাইজার' : '💡 Budget Optimizer'}</span>
+          </button>
+        )}
         {basket.length > 0 && (
           <button onClick={clearBasket} className="bb-clear-btn">
             <RotateCcw className="w-3.5 h-3.5" />
