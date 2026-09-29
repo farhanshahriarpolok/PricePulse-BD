@@ -1,9 +1,30 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import React, { useState } from 'react';
+import { TrendingUp, TrendingDown, Minus, X } from 'lucide-react';
 import { toBengaliNumeral } from './CommodityCard';
 
 export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) {
-  if (!items || items.length === 0) return null;
+  const [isDismissed, setIsDismissed] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        return window.sessionStorage.getItem('pricepulse_ticker_dismissed') === 'true';
+      }
+    } catch (e) {}
+    return false;
+  });
+
+  const [isPaused, setIsPaused] = useState(false);
+
+  if (isDismissed || !items || items.length === 0) return null;
+
+  const handleDismiss = (e) => {
+    e.stopPropagation();
+    setIsDismissed(true);
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.setItem('pricepulse_ticker_dismissed', 'true');
+      }
+    } catch (e) {}
+  };
 
   const formattedItems = items.map((item, index) => {
     let changePct = 0;
@@ -31,17 +52,24 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
   const marqueeItems = [...formattedItems, ...formattedItems];
 
   return (
-    <div className="w-full bg-slate-100/90 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800/80 overflow-hidden py-2 px-3 text-xs select-none transition-colors duration-150">
-      <div className="max-w-7xl mx-auto flex items-center">
+    <div 
+      className="w-full bg-slate-100/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800/80 py-1.5 px-3 text-xs select-none transition-colors duration-150 backdrop-blur-md"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         {/* Live Indicator Pill */}
-        <div className="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full shrink-0 z-10 mr-3 text-[11px] font-bold tracking-wider uppercase">
+        <div className="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full shrink-0 z-10 mr-1 sm:mr-3 text-[11px] font-bold tracking-wider uppercase">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping mr-0.5" />
-          <span>{lang === 'bn' ? 'লাইভ বাজারদর' : 'Market Ticker'}</span>
+          <span className="hidden xs:inline">{lang === 'bn' ? 'লাইভ বাজারদর' : 'Live Ticker'}</span>
+          <span className="xs:hidden">{lang === 'bn' ? 'লাইভ' : 'Live'}</span>
         </div>
 
-        {/* Marquee Container */}
+        {/* Marquee Container with Hover-Pause */}
         <div className="overflow-hidden flex-1 relative whitespace-nowrap">
-          <div className="animate-ticker flex items-center gap-4 sm:gap-6">
+          <div className={`animate-ticker flex items-center gap-4 sm:gap-6 ${isPaused ? 'paused' : ''}`}>
             {marqueeItems.map((item, idx) => {
               const isUp = item.changePct > 0;
               const isDown = item.changePct < 0;
@@ -79,6 +107,17 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
             })}
           </div>
         </div>
+
+        {/* Dismiss Button [×] */}
+        <button
+          type="button"
+          onClick={handleDismiss}
+          title={lang === 'bn' ? 'টিকার বন্ধ করুন' : 'Dismiss ticker'}
+          aria-label="Dismiss ticker"
+          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800/80 transition-colors shrink-0 ml-1"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );

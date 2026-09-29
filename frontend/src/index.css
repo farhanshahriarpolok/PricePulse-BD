@@ -69,11 +69,13 @@
 .animate-ticker {
   display: inline-flex;
   width: max-content;
-  animation: ticker-scroll 45s linear infinite;
+  animation: ticker-scroll 65s linear infinite;
 }
 
-.animate-ticker:hover {
-  animation-play-state: paused;
+.animate-ticker:hover,
+.animate-ticker:focus-within,
+.animate-ticker.paused {
+  animation-play-state: paused !important;
 }
 
 /* ═══════════════════════════════════════════════════════

@@ -356,8 +356,7 @@ fun BasketScreen(
                             Text(
                                 text = "এখনও কোনো বাস্কেট সংরক্ষণ করা হয়নি। উপরে '+' বাটনে চাপ দিয়ে আপনার বাস্কেট সেভ করুন।",
                                 color = TextSecondary,
-                                fontSize = 11.sp,
-                                leadingIcon = null
+                                fontSize = 11.sp
                             )
                         }
                     }

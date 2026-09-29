@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import Navbar from './components/Navbar';
+import BottomFloatingBar from './components/BottomFloatingBar';
 import PulseSummaryCard from './components/PulseSummaryCard';
 import RealtimeSearch from './components/RealtimeSearch';
 import ChannelComparisonCard from './components/ChannelComparisonCard';
@@ -258,6 +259,10 @@ export default function App() {
     } catch (err) {
       console.error('Update basket error:', err);
     }
+  };
+
+  const handleAddToBasket = (item) => {
+    handleUpdateBasketQuantity(item, 1);
   };
 
   // Populate active basket from Budget Optimizer
@@ -516,22 +521,23 @@ export default function App() {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        anomalyCount={activeAnomalyCount}
         basketCount={basketItemCount}
-        onRefresh={loadData}
-        isRefreshing={isRefreshing}
-        onOpenReportModal={() => setIsManualModalOpen(true)}
-        onOpenExportModal={() => setIsExportModalOpen(true)}
-        onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
-        onTriggerSync={handleTriggerSync}
-        isSyncing={isSyncing}
-        syncToast={syncToast}
-        lang={lang}
-        onToggleLang={toggleLang}
+        anomalyCount={activeAnomalyCount}
         theme={theme}
         onToggleTheme={toggleTheme}
+        lang={lang}
+        onToggleLang={toggleLang}
+        commodities={commodities}
         selectedDistrict={selectedDistrict}
         onSelectDistrict={handleSelectDistrict}
+        onSelectCommodity={(searched) => {
+          const matched = commodities.find((c) => 
+            c.canonical_name === searched.canonical_name || c.id === searched.commodity_id || c.id === searched.id
+          );
+          if (matched) setSelectedCommodity(matched);
+          else setSelectedCommodity(searched);
+          setActiveTab('explorer');
+        }}
       />
 
       {/* Horizontal Scrolling Live Market Ticker */}
@@ -926,47 +932,21 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 py-4 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-150">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 py-4 pb-24 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-150">
         <p>{t('footer_text')}</p>
       </footer>
 
-      {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet viewports < 768px) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-xl px-2 py-1.5 flex items-center justify-around md:hidden transition-colors duration-150">
-        {[
-          { id: 'pulse', labelBn: 'আজকের দর', labelEn: 'Pulse', icon: Activity },
-          { id: 'basket', labelBn: 'বাজারের ফর্দ', labelEn: 'Basket', icon: ShoppingBasket, count: basketItemCount, isBasket: true },
-          { id: 'compare', labelBn: 'বাজার তুলনা', labelEn: 'Compare', icon: GitCompare },
-          { id: 'map', labelBn: 'জেলা ম্যাপ', labelEn: 'Map', icon: MapPin },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all relative ${
-                isActive
-                  ? tab.isBasket
-                    ? 'text-amber-600 dark:text-amber-400 font-bold'
-                    : 'text-emerald-600 dark:text-emerald-400 font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <div className="relative">
-                <Icon className="w-5 h-5" />
-                {tab.count > 0 && (
-                  <span className="absolute -top-1.5 -right-2 px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-amber-500 text-white animate-pulse">
-                    {tab.count}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] mt-0.5 tracking-tight font-medium">
-                {lang === 'bn' ? tab.labelBn : tab.labelEn}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Universal Floating Island Navigation Bar (Desktop & Mobile) */}
+      <BottomFloatingBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        basketCount={basketItemCount}
+        anomalyCount={activeAnomalyCount}
+        lang={lang}
+        onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
+        onOpenReportModal={() => setIsManualModalOpen(true)}
+        onOpenExportModal={() => setIsExportModalOpen(true)}
+      />
     </div>
   );
 }

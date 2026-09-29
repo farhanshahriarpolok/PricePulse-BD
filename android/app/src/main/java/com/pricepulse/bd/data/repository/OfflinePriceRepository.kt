@@ -32,9 +32,9 @@ class OfflinePriceRepository(context: Context) {
                     CommodityEntity(
                         id = dto.id,
                         canonicalName = dto.canonicalName,
-                        banglaName = dto.banglaName,
-                        category = dto.category,
-                        defaultUnit = dto.defaultUnit
+                        banglaName = dto.banglaName ?: "",
+                        category = dto.category ?: "Staples",
+                        defaultUnit = dto.defaultUnit ?: "kg"
                     )
                 }
                 commodityDao.insertCommodities(list)
@@ -49,20 +49,20 @@ class OfflinePriceRepository(context: Context) {
 
     suspend fun refreshAnomalies(): Result<Int> {
         return try {
-            val response = api.getActiveAnomalies()
+            val response = api.getAnomalyMonitor()
             if (response.isSuccessful && response.body() != null) {
                 val anomalies = response.body()!!.anomalies.map { a ->
                     AnomalyEntity(
                         commodityId = a.commodityId,
-                        canonicalName = a.canonicalName,
-                        banglaName = a.banglaName,
+                        canonicalName = a.commodityName,
+                        banglaName = a.banglaName ?: "",
                         isAnomaly = a.isAnomaly,
-                        severity = a.anomalySeverity,
-                        direction = a.anomalyDirection,
-                        currentPrice = a.metrics.currentPrice,
-                        baselineSma14d = a.metrics.baselineSma14d ?: 0.0,
-                        zScore = a.metrics.zScore14d ?: 0.0,
-                        explanation = a.explanation
+                        severity = a.severity,
+                        direction = a.direction,
+                        currentPrice = a.metrics?.currentPrice ?: 0.0,
+                        baselineSma14d = a.metrics?.sma14d ?: 0.0,
+                        zScore = a.metrics?.zScore ?: 0.0,
+                        explanation = a.explanation ?: ""
                     )
                 }
                 anomalyDao.clearAnomalies()
