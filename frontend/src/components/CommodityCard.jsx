@@ -188,7 +188,7 @@ export default function CommodityCard({
     return (
       <div
         onClick={onClick}
-        className="col-span-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border-2 border-emerald-500/40 hover:border-emerald-500 shadow-md hover:shadow-xl cursor-pointer transition-all duration-300 group relative overflow-hidden text-slate-800 dark:text-slate-100"
+        className="col-span-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-sm cursor-pointer transition-all duration-200 group relative overflow-hidden text-slate-800 dark:text-slate-100"
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start gap-4">
@@ -324,12 +324,12 @@ export default function CommodityCard({
   return (
     <div
       onClick={onClick}
-      className="p-4 rounded-2xl bg-white dark:bg-slate-800/70 hover:bg-slate-50/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/70 hover:border-emerald-500/50 hover:shadow-lg transition-all duration-200 cursor-pointer group flex flex-col justify-between space-y-3.5"
+      className="p-5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50/60 dark:hover:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-sm transition-all duration-150 cursor-pointer group flex flex-col justify-between space-y-4 h-full"
     >
       {/* 1. Header Row: Category Vector Icon + Multi-line Wrapped Staple Name + English Subtitle */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-2.5 min-w-0 flex-1">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 flex items-center justify-center p-1.5 flex-shrink-0 group-hover:scale-105 transition-transform mt-0.5">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center p-2 flex-shrink-0 group-hover:scale-105 transition-transform mt-0.5">
             <CommodityIcon
               category={item.category}
               name={item.canonical_name}

@@ -13,7 +13,9 @@ import {
   Sparkles,
   Info,
   ShoppingBasket,
-  GitCompare
+  GitCompare,
+  LayoutGrid,
+  List
 } from 'lucide-react';
 
 import Navbar from './components/Navbar';
@@ -33,6 +35,7 @@ import CategoryFilter, { matchesCategory, CATEGORIES } from './components/Catego
 import ExportDataModal from './components/ExportDataModal';
 import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
+import CommodityTableView from './components/CommodityTableView';
 import BazaarBasketView from './components/BazaarBasketView';
 import BudgetOptimizerModal from './components/BudgetOptimizerModal';
 import CommodityDetailExplorer from './components/CommodityDetailExplorer';
@@ -157,6 +160,12 @@ export default function App() {
   const [spatialData, setSpatialData] = useState(null);
   const [activeProvenance, setActiveProvenance] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewMode, setViewMode] = useState(() => safeGetStorage('pricepulse_view_mode', 'grid'));
+
+  const handleToggleViewMode = (mode) => {
+    setViewMode(mode);
+    safeSetStorage('pricepulse_view_mode', mode);
+  };
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [basketItems, setBasketItems] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -578,14 +587,12 @@ export default function App() {
                 }}
               />
 
-              {/* Category Filter Chips (Sticky under search bar) */}
-              <div className="sticky top-[72px] z-20 backdrop-blur-md bg-slate-50/95 dark:bg-slate-900/95 py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-b border-slate-200/60 dark:border-slate-800/60 mb-5 transition-all shadow-xs">
-                <div className="flex items-center justify-between mb-1">
-                  <div>
-                    <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-outfit">
-                      {t('cat_filter_title')}
-                    </h3>
-                  </div>
+              {/* Segmented Flat Tab Bar (Integrated Naturally into Container) */}
+              <div className="my-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider font-outfit">
+                    {t('cat_filter_title')}
+                  </span>
                   <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                     {lang === 'bn' ? (
                       <span>{allPulseItems.length} {t('cat_showing')} {displayedPulseItems.length} টি</span>
@@ -602,54 +609,101 @@ export default function App() {
                 />
               </div>
 
-              {/* Daily Staples Grid */}
+              {/* Daily Staples Header & View Mode Switcher */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white font-outfit">{t('pulse_title')}</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{t('pulse_subtitle')}</p>
                   </div>
-                  <span className="text-xs font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
-                    {pulseData?.date || (lang === 'bn' ? 'আজকের রেট' : 'Live Today')}
-                  </span>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    {/* View Switcher: [ ⊞ গ্রিড ভিউ ] | [ ☰ তালিকা / টেবিল ভিউ ] */}
+                    <div className="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium select-none">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleViewMode('grid')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                          viewMode === 'grid'
+                            ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <LayoutGrid className="w-3.5 h-3.5" />
+                        <span>{lang === 'bn' ? '⊞ গ্রিড ভিউ' : 'Grid View'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleViewMode('table')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                          viewMode === 'table'
+                            ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <List className="w-3.5 h-3.5" />
+                        <span>{lang === 'bn' ? '☰ তালিকা / টেবিল ভিউ' : 'Table View'}</span>
+                      </button>
+                    </div>
+
+                    <span className="text-xs font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
+                      {pulseData?.date || (lang === 'bn' ? 'আজকের রেট' : 'Live Today')}
+                    </span>
+                  </div>
                 </div>
 
                 {displayedPulseItems.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {/* Top Market Mover Hero Card */}
-                    {topMover && selectedCategory === 'all' && (
-                      <CommodityCard
-                        item={topMover}
-                        isHero={true}
-                        lang={lang}
-                        basketQuantity={getBasketQuantity(topMover)}
-                        onAddToBasket={() => handleUpdateBasketQuantity(topMover, 1)}
-                        onUpdateQuantity={(delta) => handleUpdateBasketQuantity(topMover, delta)}
-                        onClick={() => {
-                          const c = commodities.find((x) => x.id === topMover.commodity_id);
-                          if (c) setSelectedCommodity(c);
-                          setActiveTab('explorer');
-                        }}
-                      />
-                    )}
+                  viewMode === 'table' ? (
+                    <CommodityTableView
+                      items={displayedPulseItems}
+                      lang={lang}
+                      getBasketQuantity={getBasketQuantity}
+                      onAddToBasket={(item) => handleUpdateBasketQuantity(item, 1)}
+                      onUpdateQuantity={(item, delta) => handleUpdateBasketQuantity(item, delta)}
+                      onSelectCommodity={(item) => {
+                        const c = commodities.find((x) => x.id === item.commodity_id || x.canonical_name === item.canonical_name);
+                        if (c) setSelectedCommodity(c);
+                        else setSelectedCommodity(item);
+                        setActiveTab('explorer');
+                      }}
+                    />
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {/* Top Market Mover Hero Card */}
+                      {topMover && selectedCategory === 'all' && (
+                        <CommodityCard
+                          item={topMover}
+                          isHero={true}
+                          lang={lang}
+                          basketQuantity={getBasketQuantity(topMover)}
+                          onAddToBasket={() => handleUpdateBasketQuantity(topMover, 1)}
+                          onUpdateQuantity={(delta) => handleUpdateBasketQuantity(topMover, delta)}
+                          onClick={() => {
+                            const c = commodities.find((x) => x.id === topMover.commodity_id);
+                            if (c) setSelectedCommodity(c);
+                            setActiveTab('explorer');
+                          }}
+                        />
+                      )}
 
-                    {/* High-Density Commodity Cards */}
-                    {remainingPulseItems.map((item) => (
-                      <CommodityCard
-                        key={item.commodity_id}
-                        item={item}
-                        lang={lang}
-                        basketQuantity={getBasketQuantity(item)}
-                        onAddToBasket={() => handleUpdateBasketQuantity(item, 1)}
-                        onUpdateQuantity={(delta) => handleUpdateBasketQuantity(item, delta)}
-                        onClick={() => {
-                          const c = commodities.find((x) => x.id === item.commodity_id);
-                          if (c) setSelectedCommodity(c);
-                          setActiveTab('explorer');
-                        }}
-                      />
-                    ))}
-                  </div>
+                      {/* High-Density Commodity Cards */}
+                      {remainingPulseItems.map((item) => (
+                        <CommodityCard
+                          key={item.commodity_id}
+                          item={item}
+                          lang={lang}
+                          basketQuantity={getBasketQuantity(item)}
+                          onAddToBasket={() => handleUpdateBasketQuantity(item, 1)}
+                          onUpdateQuantity={(delta) => handleUpdateBasketQuantity(item, delta)}
+                          onClick={() => {
+                            const c = commodities.find((x) => x.id === item.commodity_id);
+                            if (c) setSelectedCommodity(c);
+                            setActiveTab('explorer');
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )
                 ) : (
                   <div className="p-8 text-center rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs shadow-sm">
                     {t('no_commodities_found')}
