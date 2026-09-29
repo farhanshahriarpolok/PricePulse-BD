@@ -157,6 +157,19 @@ export default function App() {
   const [activeProvenance, setActiveProvenance] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [basketItems, setBasketItems] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('pricepulse_active_basket');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+    }
+    return [];
+  });
+
   const [basketItemCount, setBasketItemCount] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -170,32 +183,80 @@ export default function App() {
     return 0;
   });
 
-  // 1-Click Add to Basket from CommodityCard
-  const handleAddToBasket = (item) => {
+  // Listen to basket updates across components
+  useEffect(() => {
+    const handleBasketSync = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setBasketItems(e.detail);
+        setBasketItemCount(e.detail.length);
+      } else {
+        const stored = safeGetStorage('pricepulse_active_basket', '[]');
+        try {
+          const parsed = JSON.parse(stored);
+          setBasketItems(parsed);
+          setBasketItemCount(parsed.length);
+        } catch {}
+      }
+    };
+    window.addEventListener('pricepulse:basket_updated', handleBasketSync);
+    window.addEventListener('storage', handleBasketSync);
+    return () => {
+      window.removeEventListener('pricepulse:basket_updated', handleBasketSync);
+      window.removeEventListener('storage', handleBasketSync);
+    };
+  }, []);
+
+  // Get current active basket quantity for a commodity card
+  const getBasketQuantity = (item) => {
+    if (!item || !basketItems.length) return 0;
+    const found = basketItems.find(
+      (x) => (x.commodity_id && x.commodity_id === item.commodity_id) || x.commodity_name === item.canonical_name
+    );
+    return found ? (found.quantity || 1) : 0;
+  };
+
+  // Direct Stepper Quantity modifier from CommodityCard (+ / -)
+  const handleUpdateBasketQuantity = (item, delta) => {
     try {
       const stored = localStorage.getItem('pricepulse_active_basket');
-      const list = stored ? JSON.parse(stored) : [];
-      const existingIdx = list.findIndex(
+      let list = stored ? JSON.parse(stored) : [];
+      const idx = list.findIndex(
         (x) => (x.commodity_id && x.commodity_id === item.commodity_id) || x.commodity_name === item.canonical_name
       );
-      if (existingIdx >= 0) {
-        list[existingIdx].quantity = parseFloat(((list[existingIdx].quantity || 1) + 1).toFixed(2));
-      } else {
+
+      const isEgg = (
+        item.canonical_name === 'Farm Egg' ||
+        (item.canonical_name && item.canonical_name.toLowerCase().includes('egg') && !item.canonical_name.toLowerCase().includes('eggplant')) ||
+        (item.bangla_name && item.bangla_name.includes('ডিম') && !item.bangla_name.includes('বেগুন'))
+      );
+      const defaultUnit = isEgg ? 'হালি' : (item.unit || 'kg');
+
+      if (idx >= 0) {
+        const currentQty = Number(list[idx].quantity) || 1;
+        const newQty = currentQty + delta;
+        if (newQty <= 0) {
+          list.splice(idx, 1);
+        } else {
+          list[idx].quantity = parseFloat(newQty.toFixed(2));
+        }
+      } else if (delta > 0) {
         list.push({
           id: `card-${item.commodity_id || Date.now()}-${Date.now()}`,
           commodity_id: item.commodity_id || item.id,
           commodity_name: item.canonical_name,
           bangla_name: item.bangla_name || item.canonical_name,
-          quantity: 1,
-          unit: item.unit || 'kg',
+          quantity: delta,
+          unit: defaultUnit,
           matched: true,
         });
       }
+
       localStorage.setItem('pricepulse_active_basket', JSON.stringify(list));
+      setBasketItems([...list]);
       setBasketItemCount(list.length);
       window.dispatchEvent(new CustomEvent('pricepulse:basket_updated', { detail: list }));
     } catch (err) {
-      console.error('Add to basket error:', err);
+      console.error('Update basket error:', err);
     }
   };
 
@@ -212,6 +273,7 @@ export default function App() {
         matched: true,
       }));
       localStorage.setItem('pricepulse_active_basket', JSON.stringify(newItems));
+      setBasketItems(newItems);
       setBasketItemCount(newItems.length);
       window.dispatchEvent(new CustomEvent('pricepulse:basket_updated', { detail: newItems }));
       setActiveTab('basket');
@@ -510,27 +572,29 @@ export default function App() {
                 }}
               />
 
-              {/* Category Filter Chips */}
-              <div className="flex items-center justify-between mt-6 mb-2">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider font-outfit">
-                    {t('cat_filter_title')}
-                  </h3>
+              {/* Category Filter Chips (Sticky under search bar) */}
+              <div className="sticky top-[72px] z-20 backdrop-blur-md bg-slate-50/95 dark:bg-slate-900/95 py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-b border-slate-200/60 dark:border-slate-800/60 mb-5 transition-all shadow-xs">
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-outfit">
+                      {t('cat_filter_title')}
+                    </h3>
+                  </div>
+                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                    {lang === 'bn' ? (
+                      <span>{allPulseItems.length} {t('cat_showing')} {displayedPulseItems.length} টি</span>
+                    ) : (
+                      <span>Showing {displayedPulseItems.length} of {allPulseItems.length} items</span>
+                    )}
+                  </span>
                 </div>
-                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
-                  {lang === 'bn' ? (
-                    <span>{allPulseItems.length} {t('cat_showing')} {displayedPulseItems.length} টি</span>
-                  ) : (
-                    <span>Showing {displayedPulseItems.length} of {allPulseItems.length} items</span>
-                  )}
-                </span>
+                <CategoryFilter
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={setSelectedCategory}
+                  itemsCountMap={categoryCounts}
+                  lang={lang}
+                />
               </div>
-              <CategoryFilter
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                itemsCountMap={categoryCounts}
-                lang={lang}
-              />
 
               {/* Daily Staples Grid */}
               <div className="mb-8">
@@ -552,7 +616,9 @@ export default function App() {
                         item={topMover}
                         isHero={true}
                         lang={lang}
-                        onAddToBasket={handleAddToBasket}
+                        basketQuantity={getBasketQuantity(topMover)}
+                        onAddToBasket={() => handleUpdateBasketQuantity(topMover, 1)}
+                        onUpdateQuantity={(delta) => handleUpdateBasketQuantity(topMover, delta)}
                         onClick={() => {
                           const c = commodities.find((x) => x.id === topMover.commodity_id);
                           if (c) setSelectedCommodity(c);
@@ -567,7 +633,9 @@ export default function App() {
                         key={item.commodity_id}
                         item={item}
                         lang={lang}
-                        onAddToBasket={handleAddToBasket}
+                        basketQuantity={getBasketQuantity(item)}
+                        onAddToBasket={() => handleUpdateBasketQuantity(item, 1)}
+                        onUpdateQuantity={(delta) => handleUpdateBasketQuantity(item, delta)}
                         onClick={() => {
                           const c = commodities.find((x) => x.id === item.commodity_id);
                           if (c) setSelectedCommodity(c);

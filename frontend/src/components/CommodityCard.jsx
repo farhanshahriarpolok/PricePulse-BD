@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MiniSparkline from './MiniSparkline';
 import CommodityIcon from './media/CommodityIcon';
-import { ShoppingBasket, Check, ArrowRight, Clock } from 'lucide-react';
+import { ShoppingBasket, Check, ArrowRight, Clock, Plus, Minus } from 'lucide-react';
 
 /**
  * Converts English digits to Bengali numerals if language is 'bn'.
@@ -40,10 +40,61 @@ export function getTrendBadge(pctChange, lang = 'bn') {
   };
 }
 
+/**
+ * Standard Consumer Familiar Titles for Clean Bazaar Look
+ */
+export const FAMILIAR_NAMES = {
+  'Farm Egg': { bn: 'ফার্মের ডিম', en: 'Farm Egg' },
+  'Farm Eggs (Brown)': { bn: 'ফার্মের ডিম', en: 'Farm Egg' },
+  'Pasteurized Cow Milk': { bn: 'প্যাকেটজাত তরল দুধ', en: 'Pasteurized Milk' },
+  'Milk (Pasteurized)': { bn: 'প্যাকেটজাত তরল দুধ', en: 'Pasteurized Milk' },
+  'Soybean Oil (Bottled)': { bn: 'বোতলজাত সয়াবিন তেল', en: 'Bottled Soybean Oil' },
+  'Soybean Oil (Loose)': { bn: 'খোলা সয়াবিন তেল', en: 'Loose Soybean Oil' },
+  'Sugar (Refined White)': { bn: 'চিনি (সাদা পরিশোধিত)', en: 'White Refined Sugar' },
+  'Brinjal (Eggplant)': { bn: 'বেগুন (গোল/লম্বা)', en: 'Brinjal (Eggplant)' },
+  'Potato (Diamond)': { bn: 'গোল আলু (ডায়মন্ড)', en: 'Potato (Diamond)' },
+  'Onion (Local)': { bn: 'দেশি পেঁয়াজ', en: 'Local Onion' },
+  'Onion (Imported)': { bn: 'আমদানি পেঁয়াজ', en: 'Imported Onion' },
+  'Garlic (Local)': { bn: 'দেশি রসুন', en: 'Local Garlic' },
+  'Ginger (Local)': { bn: 'দেশি আদা', en: 'Local Ginger' },
+  'Green Chilli': { bn: 'কাঁচা মরিচ', en: 'Green Chilli' },
+  'Broiler Chicken': { bn: 'ব্রয়লার মুরগি', en: 'Broiler Chicken' },
+  'Deshi Chicken': { bn: 'দেশি মুরগি', en: 'Deshi Chicken' },
+  'Beef (Local with Bone)': { bn: 'গরুর মাংস (হাড়সহ)', en: 'Beef (with Bone)' },
+  'Mutton (Goat Meat)': { bn: 'খাসির মাংস', en: 'Mutton (Goat Meat)' },
+  'Rui Fish (Fresh)': { bn: 'রুই মাছ', en: 'Rui Fish (Fresh)' },
+  'Tilapia Fish': { bn: 'তেলাপিয়া মাছ', en: 'Tilapia Fish' },
+  'Pangas Fish (Farm)': { bn: 'পাঙ্গাশ মাছ', en: 'Pangas Fish' },
+  'Hilsa Fish (Medium)': { bn: 'ইলিশ মাছ (মাঝারি)', en: 'Hilsa Fish (Medium)' },
+  'Rice (Miniket)': { bn: 'মিনিকেট চাল', en: 'Miniket Rice' },
+  'Rice (Nazirshail)': { bn: 'নাজিরশাইল চাল', en: 'Nazirshail Rice' },
+  'Rice (Coarse)': { bn: 'মোটা চাল', en: 'Coarse Rice' },
+  'Masur Dal (Medium)': { bn: 'মসুর ডাল (মাঝারি)', en: 'Masur Dal (Medium)' },
+  'Masur Dal (Fine)': { bn: 'মসুর ডাল (চিকন)', en: 'Masur Dal (Fine)' },
+  'Salt (Iodized)': { bn: 'আয়োডিনযুক্ত লবণ', en: 'Iodized Salt' },
+  'Mustard Oil': { bn: 'খাঁটি সরিষার তেল', en: 'Mustard Oil' },
+  'Dry Red Chilli': { bn: 'শুকনা মরিচ', en: 'Dry Red Chilli' },
+  'Turmeric Powder': { bn: 'হলুদ গুঁড়া', en: 'Turmeric Powder' },
+  'Atta (Packaged)': { bn: 'প্যাকেটজাত আটা', en: 'Packaged Atta' },
+  'Maida (Packaged)': { bn: 'প্যাকেটজাত ময়দা', en: 'Packaged Maida' },
+  'Tomato': { bn: 'পাকা টমেটো', en: 'Fresh Tomato' },
+  'Papaya (Green)': { bn: 'কাঁচা পেঁপে', en: 'Green Papaya' },
+  'Cucumber': { bn: 'শসা', en: 'Fresh Cucumber' },
+  'Carrot': { bn: 'গাজর', en: 'Fresh Carrot' },
+};
+
+function formatBazaarPrice(val) {
+  if (val === null || val === undefined || isNaN(val)) return '--';
+  const rounded = Math.round(Number(val) * 2) / 2;
+  return rounded % 1 === 0 ? rounded : rounded.toFixed(1);
+}
+
 export default function CommodityCard({
   item,
   onClick,
   onAddToBasket,
+  onUpdateQuantity,
+  basketQuantity = 0,
   isHero = false,
   lang = 'bn',
 }) {
@@ -51,23 +102,65 @@ export default function CommodityCard({
 
   if (!item) return null;
 
-  const avgPrice = item.price_summary?.avg_price || item.avg_price || 0.0;
-  
-  // Calculate or extract realistic channel splits
-  const rawWs = item.wholesale_avg || item.channels?.wholesale_avg;
-  const rawRet = item.retail_avg || item.channels?.retail_avg || avgPrice;
-  const rawOn = item.online_avg || item.channels?.online_avg;
+  // Title formatting: Use consumer familiar titles
+  const familiar = FAMILIAR_NAMES[item.canonical_name];
+  const displayTitle = lang === 'bn' 
+    ? (familiar?.bn || item.bangla_name || item.canonical_name)
+    : (familiar?.en || item.canonical_name);
+  const displaySubtitle = lang === 'bn' 
+    ? (familiar?.en || item.canonical_name)
+    : (familiar?.bn || item.bangla_name || '');
 
-  const wholesale = rawWs || Math.round(avgPrice * 0.88);
-  const retail = rawRet || avgPrice;
-  const online = rawOn || Math.round(avgPrice * 1.05);
+  // Natural Egg Unit Conversion (pc -> হালি / 4 pcs)
+  const isEgg = (
+    item.canonical_name === 'Farm Egg' ||
+    item.canonical_name === 'Farm Eggs (Brown)' ||
+    (item.canonical_name && item.canonical_name.toLowerCase().includes('egg') && !item.canonical_name.toLowerCase().includes('eggplant')) ||
+    (item.bangla_name && item.bangla_name.includes('ডিম') && !item.bangla_name.includes('বেগুন'))
+  );
+
+  let rawAvg = item.price_summary?.avg_price || item.avg_price || 0.0;
+  let rawWs = item.wholesale_avg || item.channels?.wholesale_avg;
+  let rawRet = item.retail_avg || item.channels?.retail_avg || rawAvg;
+  let rawOn = item.online_avg || item.channels?.online_avg;
+
+  let displayUnit = item.unit || (lang === 'bn' ? 'কেজি' : 'kg');
+  let perPieceSubtext = null;
+  let sparklineMultiplier = 1;
+
+  if (isEgg) {
+    displayUnit = lang === 'bn' ? 'হালি' : 'Hali (4 pcs)';
+    if (rawAvg > 0 && rawAvg < 30) {
+      const perPiece = rawAvg;
+      rawAvg = rawAvg * 4;
+      rawWs = rawWs ? rawWs * 4 : Math.round(rawAvg * 0.85);
+      rawRet = rawRet ? rawRet * 4 : rawAvg;
+      rawOn = rawOn ? rawOn * 4 : Math.round(rawAvg * 1.08);
+      sparklineMultiplier = 4;
+      perPieceSubtext = lang === 'bn'
+        ? `প্রতি পিস ৳ ${toBengaliNumeral(formatBazaarPrice(perPiece), lang)}`
+        : `৳ ${formatBazaarPrice(perPiece)} / pc`;
+    } else if (rawAvg >= 30) {
+      const perPiece = rawAvg / 4;
+      perPieceSubtext = lang === 'bn'
+        ? `প্রতি পিস ৳ ${toBengaliNumeral(formatBazaarPrice(perPiece), lang)}`
+        : `৳ ${formatBazaarPrice(perPiece)} / pc`;
+    }
+  } else {
+    if ((displayUnit === 'kg' || displayUnit === 'কেজি') && lang === 'bn') displayUnit = 'কেজি';
+    if ((displayUnit === 'liter' || displayUnit === 'লিটার') && lang === 'bn') displayUnit = 'লিটার';
+  }
+
+  const wholesale = rawWs || Math.round(rawAvg * 0.88);
+  const retail = rawRet || rawAvg;
+  const online = rawOn || Math.round(rawAvg * 1.05);
 
   const pctChange = item.percentage_change_7d !== undefined ? item.percentage_change_7d : 0.0;
   const trend = getTrendBadge(pctChange, lang);
 
   const sparklineData = item.sparkline_7d && item.sparkline_7d.length > 0
-    ? item.sparkline_7d
-    : [avgPrice * 0.98, avgPrice * 0.99, avgPrice, avgPrice * 1.01, avgPrice];
+    ? item.sparkline_7d.map(val => val * sparklineMultiplier)
+    : [rawAvg * 0.98, rawAvg * 0.99, rawAvg, rawAvg * 1.01, rawAvg];
 
   const channels = [
     { id: 'ws', name: lang === 'bn' ? 'পাইকারি' : 'Wholesale', price: wholesale },
@@ -80,12 +173,14 @@ export default function CommodityCard({
   const handleAddClick = (e) => {
     e.stopPropagation();
     setJustAdded(true);
-    if (onAddToBasket) {
+    if (onUpdateQuantity) {
+      onUpdateQuantity(1);
+    } else if (onAddToBasket) {
       onAddToBasket(item);
     }
     setTimeout(() => {
       setJustAdded(false);
-    }, 1200);
+    }, 900);
   };
 
   // ── HERO CARD VARIANT ──────────────────────────────────────────────────────
@@ -114,10 +209,10 @@ export default function CommodityCard({
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                {lang === 'bn' ? (item.bangla_name || item.canonical_name) : item.canonical_name}
+                {displayTitle}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {lang === 'bn' ? item.canonical_name : (item.bangla_name || '')}
+                {displaySubtitle}
               </p>
             </div>
           </div>
@@ -126,12 +221,17 @@ export default function CommodityCard({
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono">
-                  ৳ {toBengaliNumeral(avgPrice > 0 ? (Number.isInteger(avgPrice) ? avgPrice : avgPrice.toFixed(1)) : '--', lang)}
+                  ৳ {toBengaliNumeral(formatBazaarPrice(rawAvg), lang)}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  / {item.unit || 'কেজি'}
+                  / {displayUnit}
                 </span>
               </div>
+              {perPieceSubtext && (
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium block mt-0.5">
+                  {perPieceSubtext}
+                </span>
+              )}
 
               {/* 3-Channel Comparison Strip */}
               <div className="mt-2.5 flex items-center gap-1.5 text-xs font-mono text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 rounded-lg p-1">
@@ -155,22 +255,57 @@ export default function CommodityCard({
             </div>
 
             <div className="flex items-center gap-2">
-              <button 
-                onClick={handleAddClick}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
-              >
-                {justAdded ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>{lang === 'bn' ? 'ফর্দে যুক্ত হয়েছে ✓' : 'Added to List ✓'}</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBasket className="w-4 h-4" />
-                    <span>{lang === 'bn' ? '+ ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
-                  </>
-                )}
-              </button>
+              {basketQuantity > 0 ? (
+                <div 
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center rounded-xl border-2 border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/50 p-1 shadow-sm gap-2"
+                >
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onUpdateQuantity) onUpdateQuantity(-1);
+                    }}
+                    aria-label="Decrease quantity"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-700 font-bold transition-colors active:scale-90"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+
+                  <span className="font-bold text-emerald-800 dark:text-emerald-200 px-2 font-mono text-sm select-none">
+                    {toBengaliNumeral(basketQuantity, lang)} {displayUnit}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onUpdateQuantity) onUpdateQuantity(1);
+                    }}
+                    aria-label="Increase quantity"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-bold transition-colors active:scale-90 shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={handleAddClick}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-95"
+                >
+                  {justAdded ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>{lang === 'bn' ? 'ফর্দে যুক্ত হয়েছে ✓' : 'Added to List ✓'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBasket className="w-4 h-4" />
+                      <span>{lang === 'bn' ? '+ ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
+                    </>
+                  )}
+                </button>
+              )}
 
               <button 
                 onClick={onClick}
@@ -191,10 +326,10 @@ export default function CommodityCard({
       onClick={onClick}
       className="p-4 rounded-2xl bg-white dark:bg-slate-800/70 hover:bg-slate-50/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/70 hover:border-emerald-500/50 hover:shadow-lg transition-all duration-200 cursor-pointer group flex flex-col justify-between space-y-3.5"
     >
-      {/* 1. Header Row: Category Vector Icon + Bold Bengali Staple Name + English Tag */}
+      {/* 1. Header Row: Category Vector Icon + Multi-line Wrapped Staple Name + English Subtitle */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 flex items-center justify-center p-1.5 flex-shrink-0 group-hover:scale-105 transition-transform">
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 flex items-center justify-center p-1.5 flex-shrink-0 group-hover:scale-105 transition-transform mt-0.5">
             <CommodityIcon
               category={item.category}
               name={item.canonical_name}
@@ -202,28 +337,40 @@ export default function CommodityCard({
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-tight truncate">
-              {lang === 'bn' ? (item.bangla_name || item.canonical_name) : item.canonical_name}
-            </h4>
+            <div className="min-h-[44px] flex flex-col justify-center">
+              <h4 
+                className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug line-clamp-2"
+                title={displayTitle}
+              >
+                {displayTitle}
+              </h4>
+            </div>
             <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate block mt-0.5">
-              {lang === 'bn' ? item.canonical_name : (item.bangla_name || '')}
+              {displaySubtitle}
             </span>
           </div>
         </div>
 
         {/* Compact Trend Pill */}
-        <span className={`px-2 py-0.5 text-[11px] font-bold rounded-lg whitespace-nowrap ${trend.className}`}>
+        <span className={`px-2 py-0.5 text-[11px] font-bold rounded-lg whitespace-nowrap flex-shrink-0 ${trend.className}`}>
           {trend.label}
         </span>
       </div>
 
       {/* 2. Hero Price & Sparkline Row */}
       <div className="flex items-baseline justify-between pt-0.5">
-        <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
-            ৳ {toBengaliNumeral(avgPrice > 0 ? (Number.isInteger(avgPrice) ? avgPrice : avgPrice.toFixed(1)) : '--', lang)}
-          </span>
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/{item.unit || 'কেজি'}</span>
+        <div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">
+              ৳ {toBengaliNumeral(formatBazaarPrice(rawAvg), lang)}
+            </span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/{displayUnit}</span>
+          </div>
+          {perPieceSubtext && (
+            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium block mt-0.5">
+              {perPieceSubtext}
+            </span>
+          )}
         </div>
 
         <MiniSparkline
@@ -265,30 +412,65 @@ export default function CommodityCard({
         </span>
       </div>
 
-      {/* 5. Action Bar: 1-Click '+ ফর্দে যোগ করুন' + 'বিস্তারিত →' */}
+      {/* 5. Action Bar: Active In-Card Stepper [- N +] or 1-Click '+ ফর্দে যোগ করুন' */}
       <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={handleAddClick}
-          className={`flex-1 py-1.5 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 ${
-            justAdded
-              ? 'bg-emerald-700 text-white'
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/20'
-          }`}
-          title={lang === 'bn' ? 'বাজারে যাওয়ার ফর্দে যুক্ত করুন' : 'Add to Shopping Basket'}
-        >
-          {justAdded ? (
-            <>
-              <Check className="w-3.5 h-3.5" />
-              <span>{lang === 'bn' ? 'যুক্ত হয়েছে ✓' : 'Added ✓'}</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBasket className="w-3.5 h-3.5" />
-              <span>{lang === 'bn' ? '+ ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
-            </>
-          )}
-        </button>
+        {basketQuantity > 0 ? (
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 flex items-center justify-between rounded-xl border-2 border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 p-0.5 text-xs shadow-xs"
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onUpdateQuantity) onUpdateQuantity(-1);
+              }}
+              aria-label="Decrease quantity"
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-700 font-bold transition-colors active:scale-90"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+
+            <span className="font-bold text-emerald-800 dark:text-emerald-200 px-1.5 font-mono text-center select-none truncate">
+              {toBengaliNumeral(basketQuantity, lang)} {displayUnit}
+            </span>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onUpdateQuantity) onUpdateQuantity(1);
+              }}
+              aria-label="Increase quantity"
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-bold transition-colors active:scale-90 shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAddClick}
+            className={`flex-1 py-1.5 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 ${
+              justAdded
+                ? 'bg-emerald-700 text-white'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/20'
+            }`}
+            title={lang === 'bn' ? 'বাজারে যাওয়ার ফর্দে যুক্ত করুন' : 'Add to Shopping Basket'}
+          >
+            {justAdded ? (
+              <>
+                <Check className="w-3.5 h-3.5" />
+                <span>{lang === 'bn' ? 'যুক্ত হয়েছে ✓' : 'Added ✓'}</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBasket className="w-3.5 h-3.5" />
+                <span>{lang === 'bn' ? '+ ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
+              </>
+            )}
+          </button>
+        )}
 
         <button
           type="button"

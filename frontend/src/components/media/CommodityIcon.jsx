@@ -107,9 +107,11 @@ export function AllStaplesIcon({ className = "w-6 h-6", color = "#10B981" }) {
   );
 }
 
+import { getCommodityCanonicalCategory } from '../../utils/taxonomy';
+
 /**
  * Smart Dispatcher: Returns the optimal bespoke vector icon
- * matching category and/or specific commodity naming.
+ * strictly matching the canonical commodity taxonomy category.
  */
 export default function CommodityIcon({
   category = "",
@@ -117,102 +119,23 @@ export default function CommodityIcon({
   className = "w-6 h-6",
   color = null,
 }) {
-  const normCat = (category || "").toLowerCase();
-  const normName = (name || "").toLowerCase();
+  const canonicalCategory = getCommodityCanonicalCategory({
+    category,
+    canonical_name: name,
+  });
 
-  // 1. Meat & Fish
-  if (
-    normCat.includes("meat") ||
-    normCat.includes("fish") ||
-    normCat.includes("protein") ||
-    normName.includes("chicken") ||
-    normName.includes("মুরগি") ||
-    normName.includes("beef") ||
-    normName.includes("গরু") ||
-    normName.includes("mutton") ||
-    normName.includes("খাসি") ||
-    normName.includes("fish") ||
-    normName.includes("মাছ") ||
-    normName.includes("rui") ||
-    normName.includes("hilsa") ||
-    normName.includes("tilapia") ||
-    normName.includes("pangas")
-  ) {
-    return <MeatFishIcon className={className} color={color || "#F43F5E"} />;
+  switch (canonicalCategory) {
+    case 'vegetables':
+      return <VegetableIcon className={className} color={color || "#10B981"} />;
+    case 'grains_pulses':
+      return <GrainIcon className={className} color={color || "#F59E0B"} />;
+    case 'meat_fish':
+      return <MeatFishIcon className={className} color={color || "#F43F5E"} />;
+    case 'eggs_dairy':
+      return <DairyEggIcon className={className} color={color || "#EAB308"} />;
+    case 'oils_spices':
+      return <OilSpiceIcon className={className} color={color || "#F97316"} />;
+    default:
+      return <AllStaplesIcon className={className} color={color || "#10B981"} />;
   }
-
-  // 2. Grains & Pulses
-  if (
-    normCat.includes("grain") ||
-    normCat.includes("pulse") ||
-    normCat.includes("flour") ||
-    normName.includes("rice") ||
-    normName.includes("চাল") ||
-    normName.includes("dal") ||
-    normName.includes("ডাল") ||
-    normName.includes("atta") ||
-    normName.includes("আটা") ||
-    normName.includes("maida") ||
-    normName.includes("ময়দা")
-  ) {
-    return <GrainIcon className={className} color={color || "#F59E0B"} />;
-  }
-
-  // 3. Dairy & Eggs
-  if (
-    normCat.includes("dairy") ||
-    normCat.includes("egg") ||
-    normName.includes("egg") ||
-    normName.includes("ডিম") ||
-    normName.includes("milk") ||
-    normName.includes("দুধ")
-  ) {
-    return <DairyEggIcon className={className} color={color || "#EAB308"} />;
-  }
-
-  // 4. Oils & Spices
-  if (
-    normCat.includes("oil") ||
-    normCat.includes("spice") ||
-    normName.includes("oil") ||
-    normName.includes("তেল") ||
-    normName.includes("sugar") ||
-    normName.includes("চিনি") ||
-    normName.includes("salt") ||
-    normName.includes("লবণ") ||
-    normName.includes("turmeric") ||
-    normName.includes("হলুদ") ||
-    normName.includes("chilli") ||
-    normName.includes("মরিচ") ||
-    normName.includes("garlic") ||
-    normName.includes("রসুন") ||
-    normName.includes("ginger") ||
-    normName.includes("আদা")
-  ) {
-    return <OilSpiceIcon className={className} color={color || "#F97316"} />;
-  }
-
-  // 5. Vegetables (Default for fresh agricultural produce)
-  if (
-    normCat.includes("veg") ||
-    normName.includes("onion") ||
-    normName.includes("পেঁয়াজ") ||
-    normName.includes("potato") ||
-    normName.includes("আলু") ||
-    normName.includes("brinjal") ||
-    normName.includes("বেগুন") ||
-    normName.includes("tomato") ||
-    normName.includes("টমেটো") ||
-    normName.includes("papaya") ||
-    normName.includes("পেঁপে") ||
-    normName.includes("cucumber") ||
-    normName.includes("শসা") ||
-    normName.includes("carrot") ||
-    normName.includes("গাজর")
-  ) {
-    return <VegetableIcon className={className} color={color || "#10B981"} />;
-  }
-
-  // Fallback
-  return <AllStaplesIcon className={className} color={color || "#10B981"} />;
 }
