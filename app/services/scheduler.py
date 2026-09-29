@@ -218,3 +218,15 @@ class BackgroundSyncScheduler:
 
 # Singleton scheduler instance
 sync_scheduler = BackgroundSyncScheduler()
+
+
+def start_background_scheduler() -> BackgroundSyncScheduler:
+    """Start and return the global background sync scheduler singleton."""
+    sync_scheduler.start()
+    return sync_scheduler
+
+
+def stop_background_scheduler() -> None:
+    """Shut down the global background sync scheduler singleton."""
+    sync_scheduler.shutdown()
+

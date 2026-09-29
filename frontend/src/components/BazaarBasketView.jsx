@@ -87,7 +87,8 @@ const CHANNEL_CONFIG = {
 const BDT = (amount) =>
   `৳${Number(amount).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
-export default function BazaarBasketView({ onBasketCountChange }) {
+export default function BazaarBasketView({ onBasketCountChange, lang = 'bn' }) {
+  const isEn = lang === 'en';
   const [activeSubTab, setActiveSubTab] = useState(() => {
     if (typeof window !== 'undefined' && window.location.hash.includes('saved')) {
       return 'saved';
@@ -292,17 +293,18 @@ export default function BazaarBasketView({ onBasketCountChange }) {
   const generateFardText = useCallback(() => {
     if (!basket || basket.length === 0) return '';
     const lines = [
-      '🛒 আজকের কাঁচাবাজারের ফর্দ (PricePulse BD):',
+      isEn ? '🛒 Today\'s Bazaar Shopping List (PricePulse BD):' : '🛒 আজকের কাঁচাবাজারের ফর্দ (PricePulse BD):',
     ];
 
     basket.forEach((item) => {
       const detail = result?.item_details?.find((d) => d.commodity_id === item.commodity_id);
-      const bQty = toBanglaNum(item.quantity);
-      const unitStr = item.unit || 'কেজি';
-      const name = item.bangla_name || item.commodity_name;
+      const bQty = isEn ? item.quantity : toBanglaNum(item.quantity);
+      const unitStr = item.unit || (isEn ? 'kg' : 'কেজি');
+      const name = isEn ? (item.commodity_name || item.bangla_name) : (item.bangla_name || item.commodity_name);
       let itemLine = `• ${name}: ${bQty} ${unitStr}`;
       if (detail && detail.line_total !== undefined && detail.line_total !== null) {
-        itemLine += ` (সম্ভাব্য: ৳${toBanglaNum(Math.round(detail.line_total))})`;
+        const costStr = isEn ? Math.round(detail.line_total) : toBanglaNum(Math.round(detail.line_total));
+        itemLine += ` (${isEn ? 'Est' : 'সম্ভাব্য'}: ৳${costStr})`;
       }
       lines.push(itemLine);
     });
@@ -310,23 +312,26 @@ export default function BazaarBasketView({ onBasketCountChange }) {
     lines.push('---------------------------');
 
     if (result && result.benchmark_total !== undefined && result.benchmark_total !== null) {
-      lines.push(`মোট সম্ভাব্য খরচ: ৳ ${toBanglaNum(Math.round(result.benchmark_total))}`);
+      const totStr = isEn ? Math.round(result.benchmark_total) : toBanglaNum(Math.round(result.benchmark_total));
+      lines.push(`${isEn ? 'Total Estimated Cost' : 'মোট সম্ভাব্য খরচ'}: ৳ ${totStr}`);
       const wholesale = result.wholesale_total ?? result.benchmark_total;
       const savings = Math.round(result.benchmark_total - wholesale);
       if (savings > 0) {
-        lines.push(`(পাইকারি বাজারে সাশ্রয়: ৳ ${toBanglaNum(savings)})`);
+        const saveStr = isEn ? savings : toBanglaNum(savings);
+        lines.push(`(${isEn ? 'Wholesale Savings' : 'পাইকারি বাজারে সাশ্রয়'}: ৳ ${saveStr})`);
       }
     } else {
-      lines.push(`মোট পণ্য: ${toBanglaNum(basket.length)} টি`);
+      const countStr = isEn ? basket.length : toBanglaNum(basket.length);
+      lines.push(`${isEn ? 'Total Items' : 'মোট পণ্য'}: ${countStr} ${isEn ? 'items' : 'টি'}`);
     }
 
     const host = typeof window !== 'undefined' && window.location.origin
       ? window.location.origin
       : 'http://localhost:8000';
-    lines.push(`যাচাই করুন: ${host}`);
+    lines.push(`${isEn ? 'Verify at' : 'যাচাই করুন'}: ${host}`);
 
     return lines.join('\n');
-  }, [basket, result]);
+  }, [basket, result, isEn]);
 
   const handleWhatsAppShare = () => {
     const text = generateFardText();
@@ -335,17 +340,30 @@ export default function BazaarBasketView({ onBasketCountChange }) {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleCopyFard = async () => {
+  const handleCopyFard = () => {
     const text = generateFardText();
     if (!text) return;
+
+    // Immediately trigger visual feedback
+    setCopiedFard(true);
+    setTimeout(() => setCopiedFard(false), 2500);
+
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-        setCopiedFard(true);
-        setTimeout(() => setCopiedFard(false), 2000);
-      }
-    } catch (e) {
-      console.error(e);
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch (err) {
+      // ignore
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
     }
   };
 
@@ -801,20 +819,20 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                   onClick={() => setShowShareModal(true)}
                   className="px-4 py-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
                   id="basket-share-fard-btn"
-                  title="হোয়াটসঅ্যাপ বা বন্ধুদের সাথে কাঁচাবাজারের ফর্দ শেয়ার করুন"
+                  title={isEn ? "Share shopping list on WhatsApp" : "হোয়াটসঅ্যাপ বা বন্ধুদের সাথে কাঁচাবাজারের ফর্দ শেয়ার করুন"}
                 >
                   <Share2 className="w-4 h-4 text-emerald-400" />
-                  <span>ফর্দ শেয়ার করুন</span>
+                  <span>{isEn ? 'Share Bazar List' : 'ফর্দ শেয়ার করুন'}</span>
                 </button>
 
                 <button
                   onClick={handlePrint}
                   className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
                   id="basket-print-fard-btn"
-                  title="বাজারে যাওয়ার আগে কাগজের ফর্দ প্রিন্ট করুন"
+                  title={isEn ? "Print paper shopping list" : "বাজারে যাওয়ার আগে কাগজের ফর্দ প্রিন্ট করুন"}
                 >
                   <Printer className="w-4 h-4 text-slate-300" />
-                  <span>প্রিন্ট ফর্দ</span>
+                  <span>{isEn ? 'Print Fard' : 'প্রিন্ট ফর্দ'}</span>
                 </button>
               </div>
             )}
@@ -1399,8 +1417,12 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                   <Share2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">ফর্দ শেয়ার করুন (Share Bazar List)</h3>
-                  <p className="text-[11px] text-slate-400">হোয়াটসঅ্যাপ বা বার্তায় ফরম্যাট করা বাজার ফর্দ পাঠান</p>
+                  <h3 className="text-sm font-bold text-white">
+                    {isEn ? 'Share Shopping List' : 'ফর্দ শেয়ার করুন (Share Bazar List)'}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    {isEn ? 'Send formatted grocery fard via WhatsApp or messaging' : 'হোয়াটসঅ্যাপ বা বার্তায় ফরম্যাট করা বাজার ফর্দ পাঠান'}
+                  </p>
                 </div>
               </div>
               <button
@@ -1414,8 +1436,10 @@ export default function BazaarBasketView({ onBasketCountChange }) {
             {/* Fard Formatted Preview Box */}
             <div className="space-y-1.5">
               <label className="text-[11px] font-semibold text-slate-300 flex items-center justify-between">
-                <span>বার্তা প্রিভিউ:</span>
-                <span className="text-[10px] text-emerald-400 font-medium">হোয়াটসঅ্যাপ রেডি ফরম্যাট</span>
+                <span>{isEn ? 'Message Preview:' : 'বার্তা প্রিভিউ:'}</span>
+                <span className="text-[10px] text-emerald-400 font-medium">
+                  {isEn ? 'WhatsApp Ready Format' : 'হোয়াটসঅ্যাপ রেডি ফরম্যাট'}
+                </span>
               </label>
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto select-all selection:bg-emerald-500 selection:text-white">
                 {generateFardText()}
@@ -1431,7 +1455,7 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                 id="modal-whatsapp-share-btn"
               >
                 <span className="text-base">💬</span>
-                <span>হোয়াটসঅ্যাপে পাঠান</span>
+                <span>{isEn ? 'Share on WhatsApp' : 'হোয়াটসঅ্যাপে পাঠান'}</span>
               </button>
 
               {/* Copy to Clipboard */}
@@ -1447,12 +1471,12 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                 {copiedFard ? (
                   <>
                     <Check className="w-4 h-4 text-emerald-400" />
-                    <span>কপি হয়েছে!</span>
+                    <span>{isEn ? 'Copied!' : 'কপি হয়েছে!'}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4 text-slate-300" />
-                    <span>ফর্দ কপি করুন</span>
+                    <span>{isEn ? 'Copy Fard' : 'ফর্দ কপি করুন'}</span>
                   </>
                 )}
               </button>
@@ -1466,7 +1490,7 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                   className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 flex items-center justify-center space-x-1.5 transition-all"
                 >
                   <Share2 className="w-3.5 h-3.5 text-sky-400" />
-                  <span>ডিভাইস শেয়ার</span>
+                  <span>{isEn ? 'Device Share' : 'ডিভাইস শেয়ার'}</span>
                 </button>
               )}
               <button
@@ -1477,7 +1501,7 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                 className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 flex items-center justify-center space-x-1.5 transition-all"
               >
                 <Printer className="w-3.5 h-3.5 text-amber-400" />
-                <span>কাগজে প্রিন্ট</span>
+                <span>{isEn ? 'Print Paper Fard' : 'কাগজে প্রিন্ট'}</span>
               </button>
             </div>
           </div>
