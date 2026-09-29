@@ -96,17 +96,17 @@ export default function ChannelComparisonCard({ channels, unit = 'kg', priceStat
       {spread_bdt != null && !isNaN(spread_bdt) && (
         <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-slate-300">
-            <span className="text-slate-400">Inter-Channel Gap:</span>
-            <span className="font-semibold text-white">BDT {toFixedSafe(spread_bdt, 2)}/{unit}</span>
+            <span className="text-slate-400">বাজারের মূল্য ব্যবধান (Price Spread):</span>
+            <span className="font-semibold text-white">৳ {toFixedSafe(spread_bdt, 2)}/{unit}</span>
             {markup_percentage != null && !isNaN(markup_percentage) && (
               <>
                 <span className="text-slate-500">•</span>
-                <span>Markup: <strong className="text-amber-400">+{toFixedSafe(markup_percentage, 1)}%</strong></span>
+                <span>ব্যবধান: <strong className="text-amber-400">+{toFixedSafe(markup_percentage, 1)}%</strong></span>
               </>
             )}
           </div>
           <div className="text-[11px] text-slate-400">
-            Comparing primary wholesale auction vs weighted retail retail/delivery
+            পাইকারি আড়ত বনাম সাধারণ খুচরা ও অনলাইন দর
           </div>
         </div>
       )}

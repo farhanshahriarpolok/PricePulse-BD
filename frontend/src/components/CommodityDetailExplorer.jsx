@@ -22,9 +22,9 @@ import HistoricalTrendChart from './HistoricalTrendChart';
 // ── Canonical Variety Descriptions for Bangladesh Staples ───────────────────────
 const VARIETY_TAGS = {
   'miniket': { bn: 'মাঝারি সরু দানার চাল', en: 'Medium Fine Slender Grain' },
-  'nazirshail': { bn: 'প্রিমিয়াম চিকন নাজিরশাইল', en: 'Premium Fine Nazirshail' },
+  'nazirshail': { bn: 'মাঝারি সরু দানার চাল', en: 'Medium Fine Slender Grain' },
   'swarna': { bn: 'স্বর্ণা মোটা চাল', en: 'Coarse Swarna Grain' },
-  'rice': { bn: 'স্ট্যান্ডার্ড ভোক্তা চাল', en: 'Standard Table Rice' },
+  'rice': { bn: 'মাঝারি সরু দানার চাল', en: 'Medium Fine Slender Grain' },
   'potato': { bn: 'হলুদ গোল ডায়মন্ড আলু', en: 'Yellow Round Diamond Potato' },
   'onion': { bn: 'ঝাঁঝালো পাবনা দেশি পেঁয়াজ', en: 'Pungent Local Onion' },
   'soybean': { bn: 'পরিশোধিত বোতলজাত সয়াবিন তেল', en: 'Refined Soybean Oil' },
@@ -301,10 +301,7 @@ export default function CommodityDetailExplorer({
               </span>
               {lang === 'bn' ? (
                 <span>
-                  আপনি যদি <strong className="text-emerald-950 dark:text-emerald-200 font-bold">{districtData.wholesaleHubBn}</strong> থেকে কেনেন তবে কেজিতে সাশ্রয় হবে প্রায়{' '}
-                  <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(wholesaleSavings, lang)}</strong>। 
-                  সাধারণ কাঁচাবাজারে কিনলেও অনলাইন ডেলিভারি থেকে বাঁচবে{' '}
-                  <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(retailVsOnlineSavings, lang)}/{unit}</strong>।
+                  আপনি যদি <strong className="text-emerald-950 dark:text-emerald-200 font-bold">{districtData.wholesaleHubBn}</strong> থেকে কেনেন তবে কেজিতে সাশ্রয় <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(wholesaleSavings, lang)}</strong>। সাধারণ কাঁচাবাজারে কিনলে অনলাইন থেকে বাঁচবে <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(retailVsOnlineSavings, lang)}/{unit}</strong>।
                 </span>
               ) : (
                 <span>
@@ -463,7 +460,7 @@ export default function CommodityDetailExplorer({
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-              {lang === 'bn' ? 'পাইকারিতে সর্বনিম্ন কেনা যাবে ৫ কেজি/১ পাল্লা অথবা পুরো বস্তা।' : 'Minimum wholesale lot: 5 kg (1 palla) or sack lot.'}
+              {lang === 'bn' ? 'পাইকারিতে সর্বনিম্ন কেনা যাবে ৫ কেজি/বস্তা।' : 'Minimum wholesale lot: 5 kg/sack lot.'}
             </p>
           </div>
 
