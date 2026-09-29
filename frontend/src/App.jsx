@@ -34,6 +34,7 @@ import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
 import BazaarBasketView from './components/BazaarBasketView';
 import BudgetOptimizerModal from './components/BudgetOptimizerModal';
+import CommodityDetailExplorer from './components/CommodityDetailExplorer';
 import ErrorBoundary from './components/ErrorBoundary';
 import { getTranslation } from './i18n/translations';
 
@@ -604,62 +605,23 @@ export default function App() {
         {/* TAB 3: COMMODITY EXPLORER */}
         {activeTab === 'explorer' && (
           <ErrorBoundary title={t('nav_explorer')}>
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-base font-bold text-white font-outfit">{t('explorer_title')}</h3>
-                  <p className="text-xs text-slate-400">{t('explorer_select')}</p>
-                </div>
-                <button
-                  onClick={() => setActiveTab('pulse')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold border border-slate-700 transition-all flex items-center space-x-1"
-                >
-                  <span>← {lang === 'bn' ? 'আজকের বাজারে ফিরুন' : 'Back to Market'}</span>
-                </button>
+            {selectedCommodity ? (
+              <CommodityDetailExplorer
+                commodity={selectedCommodity}
+                commodities={commodities}
+                onSelectCommodity={setSelectedCommodity}
+                historyData={commodityHistory}
+                spatialData={spatialData}
+                matchedPulse={allPulseItems.find((p) => p.commodity_id === selectedCommodity.id)}
+                onBack={() => setActiveTab('pulse')}
+                onAddToBasket={handleAddToBasket}
+                lang={lang}
+              />
+            ) : (
+              <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-sm shadow-sm">
+                {lang === 'bn' ? 'অনুগ্রহ করে একটি পণ্য নির্বাচন করুন।' : 'Please select a commodity.'}
               </div>
-
-              {/* Commodity Selector Pills */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-5 scrollbar-none">
-                {commodities.map((comm) => {
-                  const isSelected = selectedCommodity?.id === comm.id;
-                  return (
-                    <button
-                      key={comm.id}
-                      onClick={() => setSelectedCommodity(comm)}
-                      className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
-                        isSelected
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-sm'
-                          : 'bg-slate-800/60 text-slate-300 border-slate-700 hover:bg-slate-800'
-                      }`}
-                    >
-                      <span>{comm.bangla_name || comm.canonical_name}</span>
-                      <span className="ml-1.5 opacity-60 text-[10px]">({comm.canonical_name})</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {selectedCommodity ? (
-                <>
-                  <HistoricalTrendChart
-                    historyData={commodityHistory}
-                    commodityName={selectedCommodity.canonical_name}
-                    unit={selectedCommodity.default_unit}
-                  />
-
-                  {spatialData && (
-                    <ChannelComparisonCard
-                      channels={spatialData.spread_summary}
-                      unit={selectedCommodity.default_unit}
-                    />
-                  )}
-                </>
-              ) : (
-                <div className="p-8 text-center rounded-xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
-                  পণ্য সিলেক্ট করুন।
-                </div>
-              )}
-            </div>
+            )}
           </ErrorBoundary>
         )}
 
