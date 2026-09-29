@@ -23,6 +23,15 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Milestone 024 — Android SDK Packaging, WhatsApp Bazaar Fard Export & Background Ingestion Hardening** (2026-09-29):
+  - Added WhatsApp Bazar Fard export & sharing directly in the active basket section of `BazaarBasketView.jsx`, generating structured, colloquial Bengali shopping lists with line-item totals, total estimated cost, wholesale savings, and local verification link.
+  - Implemented interactive Share Modal with 1-click WhatsApp web launch, clipboard copy with visual feedback, and native device sharing.
+  - Modernized physical paper and PDF printable fard with `@media print` CSS rules, pen-checkable `[ ]` boxes, dual-language commodity labels, benchmark estimates, and handwritten note columns for physical traditional market shopping.
+  - Hardened autonomous background scheduler (`app/services/scheduler.py`) to run on 6-hour interval (`interval_seconds = 21600`) without blocking FastAPI ASGI loop, recording latency, fallback state, and error logs into `SourceHealthService`.
+  - Added loop execution support (`--all`, `--loop`, `--interval`) in `scripts/sync_daily_prices.py` and updated `docker-compose.yml` worker container profile to run continuously without container exits.
+  - Enhanced `scripts/build_android_apk.py` with automatic Windows Android SDK location discovery (`%LOCALAPPDATA%\Android\Sdk`, `C:\Android\Sdk`, `D:\Android\Sdk`, etc.), `android/local.properties` generation, and Gradle wrapper dry-run assembly check.
+  - Verification: 236/236 Pytest test suite 100% green, clean Vite frontend production build (0 errors), and all 6 production smoke tests passing.
+
 - **Milestone 023 — UI/UX Minimal Overhaul, Commodity Card Simplification & Navigation De-cluttering** (2026-09-29):
   - Overhauled `CommodityCard.jsx`: Replaced cluttered developer metrics and tags with consumer-focused visual hierarchy, human-friendly trend badges (`↑ ২.১% বেড়েছে`), bold prices formatted with Bengali numerals, clean 3-channel horizontal comparison strip with cheapest channel highlighting, and intuitive `বিস্তারিত দেখুন →` action link.
   - De-cluttered `Navbar.jsx`: Consolidated from 9 horizontal items to 5 core consumer tabs (`pulse`, `basket`, `compare`, `anomalies`, `map`) and placed technical tools in a clean "অন্যান্য" (More) dropdown. Fixed vertical clipping with enhanced `min-h-[72px]` header height.

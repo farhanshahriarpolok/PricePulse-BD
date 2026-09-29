@@ -143,10 +143,45 @@ def main():
         default=None,
         help="Run a single source collector (default: all sources: dam, chaldal, tcb, news)",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        default=False,
+        help="Explicitly sync all available sources (default behavior)",
+    )
+    parser.add_argument(
+        "--loop",
+        action="store_true",
+        default=False,
+        help="Run continuously in a loop at regular intervals without exiting",
+    )
+    parser.add_argument(
+        "--interval",
+        "--interval-seconds",
+        type=int,
+        dest="interval",
+        default=21600,
+        help="Interval in seconds between sync cycles when running in loop mode (default: 21600s / 6 hours)",
+    )
     args = parser.parse_args()
-    results = run_sync(args.source)
-    all_failed = all(r.get("status") not in ("ok",) for r in results.values())
-    sys.exit(1 if all_failed else 0)
+
+    if args.loop:
+        print(f"[Worker] Starting background sync loop (Interval: {args.interval}s / {args.interval/3600:.1f}h)...")
+        while True:
+            try:
+                run_sync(args.source)
+            except Exception as exc:
+                print(f"[ERROR] Sync cycle failed: {exc}", file=sys.stderr)
+            print(f"\n[Worker] Cycle complete. Sleeping for {args.interval}s until next sync...")
+            try:
+                time.sleep(args.interval)
+            except KeyboardInterrupt:
+                print("\n[Worker] Received shutdown signal. Exiting gracefully.")
+                sys.exit(0)
+    else:
+        results = run_sync(args.source)
+        all_failed = all(r.get("status") not in ("ok",) for r in results.values())
+        sys.exit(1 if all_failed else 0)
 
 
 if __name__ == "__main__":

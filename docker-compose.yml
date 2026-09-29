@@ -30,9 +30,10 @@ services:
       - worker
     environment:
       - DATABASE_URL=sqlite:////app/data/pricepulse.db
+      - PYTHONUNBUFFERED=1
     volumes:
       - pricepulse_data:/app/data
-    command: ["python", "scripts/sync_daily_prices.py", "--all"]
+    command: ["python", "scripts/sync_daily_prices.py", "--all", "--loop", "--interval", "21600"]
     depends_on:
       pricepulse-app:
         condition: service_healthy

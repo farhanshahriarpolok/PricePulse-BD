@@ -28,6 +28,8 @@ import {
   Clock,
   ArrowRight,
   BarChart2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import {
   getCommodities,
@@ -109,6 +111,10 @@ export default function BazaarBasketView({ onBasketCountChange }) {
   const [saveDescription, setSaveDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
+
+  // Share Fard state
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copiedFard, setCopiedFard] = useState(false);
 
   // Trend modal state
   const [trendModal, setTrendModal] = useState(null);
@@ -274,6 +280,90 @@ export default function BazaarBasketView({ onBasketCountChange }) {
   // ── Print handler ─────────────────────────────────────────────────────────
   const handlePrint = () => {
     window.print();
+  };
+
+  // ── Bengali numeral converter ─────────────────────────────────────────────
+  const toBanglaNum = (num) => {
+    if (num === null || num === undefined || isNaN(num)) return '';
+    return String(num).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d]);
+  };
+
+  // ── Formatted Bazaar Fard text generator (WhatsApp / SMS) ─────────────────
+  const generateFardText = useCallback(() => {
+    if (!basket || basket.length === 0) return '';
+    const lines = [
+      '🛒 আজকের কাঁচাবাজারের ফর্দ (PricePulse BD):',
+    ];
+
+    basket.forEach((item) => {
+      const detail = result?.item_details?.find((d) => d.commodity_id === item.commodity_id);
+      const bQty = toBanglaNum(item.quantity);
+      const unitStr = item.unit || 'কেজি';
+      const name = item.bangla_name || item.commodity_name;
+      let itemLine = `• ${name}: ${bQty} ${unitStr}`;
+      if (detail && detail.line_total !== undefined && detail.line_total !== null) {
+        itemLine += ` (সম্ভাব্য: ৳${toBanglaNum(Math.round(detail.line_total))})`;
+      }
+      lines.push(itemLine);
+    });
+
+    lines.push('---------------------------');
+
+    if (result && result.benchmark_total !== undefined && result.benchmark_total !== null) {
+      lines.push(`মোট সম্ভাব্য খরচ: ৳ ${toBanglaNum(Math.round(result.benchmark_total))}`);
+      const wholesale = result.wholesale_total ?? result.benchmark_total;
+      const savings = Math.round(result.benchmark_total - wholesale);
+      if (savings > 0) {
+        lines.push(`(পাইকারি বাজারে সাশ্রয়: ৳ ${toBanglaNum(savings)})`);
+      }
+    } else {
+      lines.push(`মোট পণ্য: ${toBanglaNum(basket.length)} টি`);
+    }
+
+    const host = typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : 'http://localhost:8000';
+    lines.push(`যাচাই করুন: ${host}`);
+
+    return lines.join('\n');
+  }, [basket, result]);
+
+  const handleWhatsAppShare = () => {
+    const text = generateFardText();
+    if (!text) return;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCopyFard = async () => {
+    const text = generateFardText();
+    if (!text) return;
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+        setCopiedFard(true);
+        setTimeout(() => setCopiedFard(false), 2000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeviceShare = async () => {
+    const text = generateFardText();
+    if (!text) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'আজকের কাঁচাবাজারের ফর্দ (PricePulse BD)',
+          text: text,
+        });
+        return;
+      } catch (e) {
+        // User dismissed
+      }
+    }
+    handleCopyFard();
   };
 
   // ── Clear basket ──────────────────────────────────────────────────────────
@@ -685,13 +775,13 @@ export default function BazaarBasketView({ onBasketCountChange }) {
               </div>
             )}
 
-            {/* Calculate CTA */}
+            {/* Action Buttons: Calculate + Share Fard + Print Fard */}
             {basket.length > 0 && (
-              <div className="bb-calculate-row">
+              <div className="bb-calculate-row flex flex-wrap items-center gap-2.5">
                 <button
                   onClick={calculate}
                   disabled={isCalculating || validBasketCount === 0}
-                  className="bb-calculate-btn"
+                  className="bb-calculate-btn flex-1 min-w-[170px]"
                   id="basket-calculate-btn"
                 >
                   {isCalculating ? (
@@ -705,6 +795,26 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                       <span>বাজার হিসাব করুন</span>
                     </>
                   )}
+                </button>
+
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="px-4 py-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                  id="basket-share-fard-btn"
+                  title="হোয়াটসঅ্যাপ বা বন্ধুদের সাথে কাঁচাবাজারের ফর্দ শেয়ার করুন"
+                >
+                  <Share2 className="w-4 h-4 text-emerald-400" />
+                  <span>ফর্দ শেয়ার করুন</span>
+                </button>
+
+                <button
+                  onClick={handlePrint}
+                  className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                  id="basket-print-fard-btn"
+                  title="বাজারে যাওয়ার আগে কাগজের ফর্দ প্রিন্ট করুন"
+                >
+                  <Printer className="w-4 h-4 text-slate-300" />
+                  <span>প্রিন্ট ফর্দ</span>
                 </button>
               </div>
             )}
@@ -852,19 +962,12 @@ export default function BazaarBasketView({ onBasketCountChange }) {
                   <span>বাজার লিস্ট প্রিন্ট</span>
                 </button>
                 <button
-                  onClick={() => {
-                    const text = `PricePulse BD বাজার বাস্কেট\nমোট: ${BDT(result.benchmark_total)}\nপাইকারি: ${BDT(result.wholesale_total)}\n${result.savings_explanation}`;
-                    if (navigator.share) {
-                      navigator.share({ title: 'বাজার হিসাব', text });
-                    } else {
-                      navigator.clipboard.writeText(text);
-                    }
-                  }}
+                  onClick={() => setShowShareModal(true)}
                   className="bb-action-btn bb-share-btn"
                   id="basket-share-btn"
                 >
                   <Share2 className="w-4 h-4" />
-                  <span>শেয়ার</span>
+                  <span>ফর্দ শেয়ার (WhatsApp)</span>
                 </button>
               </div>
             </div>
@@ -1286,41 +1389,177 @@ export default function BazaarBasketView({ onBasketCountChange }) {
         </div>
       )}
 
-      {/* ── Printable Receipt ─────────────────────────────────────────── */}
-      {result && (
+      {/* ── WhatsApp / Social Share Modal ────────────────────────────── */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <Share2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">ফর্দ শেয়ার করুন (Share Bazar List)</h3>
+                  <p className="text-[11px] text-slate-400">হোয়াটসঅ্যাপ বা বার্তায় ফরম্যাট করা বাজার ফর্দ পাঠান</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Fard Formatted Preview Box */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-slate-300 flex items-center justify-between">
+                <span>বার্তা প্রিভিউ:</span>
+                <span className="text-[10px] text-emerald-400 font-medium">হোয়াটসঅ্যাপ রেডি ফরম্যাট</span>
+              </label>
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto select-all selection:bg-emerald-500 selection:text-white">
+                {generateFardText()}
+              </div>
+            </div>
+
+            {/* Primary Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+              {/* WhatsApp Share Button */}
+              <button
+                onClick={handleWhatsAppShare}
+                className="py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-lg shadow-emerald-950/30"
+                id="modal-whatsapp-share-btn"
+              >
+                <span className="text-base">💬</span>
+                <span>হোয়াটসঅ্যাপে পাঠান</span>
+              </button>
+
+              {/* Copy to Clipboard */}
+              <button
+                onClick={handleCopyFard}
+                className={`py-2.5 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center space-x-2 transition-all ${
+                  copiedFard
+                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                    : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                }`}
+                id="modal-copy-fard-btn"
+              >
+                {copiedFard ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span>কপি হয়েছে!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-slate-300" />
+                    <span>ফর্দ কপি করুন</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Secondary Action Row */}
+            <div className="flex items-center space-x-2 pt-1 border-t border-slate-800">
+              {typeof navigator !== 'undefined' && navigator.share && (
+                <button
+                  onClick={handleDeviceShare}
+                  className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 flex items-center justify-center space-x-1.5 transition-all"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-sky-400" />
+                  <span>ডিভাইস শেয়ার</span>
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setShowShareModal(false);
+                  handlePrint();
+                }}
+                className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium border border-slate-700 flex items-center justify-center space-x-1.5 transition-all"
+              >
+                <Printer className="w-3.5 h-3.5 text-amber-400" />
+                <span>কাগজে প্রিন্ট</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Printable Shopping Fard Receipt ─────────────────────────── */}
+      {basket.length > 0 && (
         <div className="bb-print-receipt">
-          <h2 className="text-xl font-bold text-center mb-2">PricePulse BD • বাজার রসিদ</h2>
-          <p className="text-center text-sm text-gray-500 mb-4">
-            {new Date().toLocaleDateString('bn-BD', { dateStyle: 'full' })}
-          </p>
-          <table className="w-full text-sm border-collapse">
+          <div className="text-center border-b-2 border-slate-900 pb-3 mb-4">
+            <h1 className="text-xl font-bold tracking-tight text-slate-900">PricePulse BD • কাঁচাবাজারের ফর্দ</h1>
+            <p className="text-xs text-slate-600 mt-0.5">
+              তারিখ: {new Date().toLocaleDateString('bn-BD', { dateStyle: 'full' })}
+            </p>
+          </div>
+
+          <table className="w-full text-xs border-collapse">
             <thead>
-              <tr className="border-b border-gray-300">
-                <th className="text-left py-1">পণ্য</th>
-                <th className="text-right py-1">পরিমাণ</th>
-                <th className="text-right py-1">দাম</th>
+              <tr className="border-b-2 border-slate-700 bg-slate-100">
+                <th className="text-center py-2 px-1 w-8">✓</th>
+                <th className="text-left py-2 px-2">পণ্যের নাম</th>
+                <th className="text-center py-2 px-2">পরিমাণ</th>
+                <th className="text-right py-2 px-2">সম্ভাব্য মূল্য</th>
+                <th className="text-center py-2 px-2 w-28">কেনা দর (নোট)</th>
               </tr>
             </thead>
             <tbody>
-              {result.item_details.map((d, i) => (
-                <tr key={i} className="border-b border-gray-100">
-                  <td className="py-1">{d.bangla_name}</td>
-                  <td className="py-1 text-right">{d.quantity_normalized} {d.standard_unit}</td>
-                  <td className="py-1 text-right">{BDT(d.line_total)}</td>
-                </tr>
-              ))}
+              {basket.map((item, idx) => {
+                const detail = result?.item_details?.find((d) => d.commodity_id === item.commodity_id);
+                return (
+                  <tr key={idx} className="border-b border-slate-200">
+                    <td className="py-2 px-1 text-center text-slate-400">
+                      <span className="inline-block w-3.5 h-3.5 border border-slate-500 rounded-sm"></span>
+                    </td>
+                    <td className="py-2 px-2 font-medium text-slate-900">
+                      <span>{item.bangla_name || item.commodity_name}</span>
+                      {item.commodity_name && item.bangla_name !== item.commodity_name && (
+                        <span className="text-[10px] text-slate-500 block">{item.commodity_name}</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-2 text-center text-slate-700 font-mono">
+                      {item.quantity} {item.unit}
+                    </td>
+                    <td className="py-2 px-2 text-right font-semibold text-slate-900">
+                      {detail ? BDT(detail.line_total) : '—'}
+                    </td>
+                    <td className="py-2 px-2 border-l border-slate-200 text-center">
+                      <span className="text-[10px] text-slate-400">৳ .........</span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
-            <tfoot>
-              <tr className="border-t-2 border-gray-400 font-bold">
-                <td colSpan={2} className="py-2">মোট</td>
-                <td className="py-2 text-right">{BDT(result.benchmark_total)}</td>
-              </tr>
-              <tr>
-                <td colSpan={2} className="py-1 text-gray-600">পাইকারি বাজারে</td>
-                <td className="py-1 text-right text-green-700">{BDT(result.wholesale_total)}</td>
-              </tr>
-            </tfoot>
+            {result && (
+              <tfoot>
+                <tr className="border-t-2 border-slate-800 font-bold bg-slate-50">
+                  <td colSpan={3} className="py-2 px-2 text-right">মোট সম্ভাব্য খরচ:</td>
+                  <td className="py-2 px-2 text-right text-slate-950 font-extrabold">{BDT(result.benchmark_total)}</td>
+                  <td></td>
+                </tr>
+                <tr className="text-slate-700 font-medium">
+                  <td colSpan={3} className="py-1 px-2 text-right">পাইকারি বাজারে সম্ভাব্য দর:</td>
+                  <td className="py-1 px-2 text-right text-emerald-800 font-semibold">{BDT(result.wholesale_total)}</td>
+                  <td></td>
+                </tr>
+                {result.benchmark_total > result.wholesale_total && (
+                  <tr className="text-emerald-800 font-bold">
+                    <td colSpan={3} className="py-1 px-2 text-right">সম্ভাব্য সাশ্রয়:</td>
+                    <td className="py-1 px-2 text-right">
+                      {BDT(result.wholesale_savings ?? (result.benchmark_total - result.wholesale_total))}
+                    </td>
+                    <td></td>
+                  </tr>
+                )}
+              </tfoot>
+            )}
           </table>
+
+          <div className="mt-6 pt-3 border-t border-slate-300 text-[10px] text-slate-500 flex justify-between items-center">
+            <span>উৎস: PricePulse BD — তথ্যসূত্র: কৃষি বিপণন অধিদপ্তর ও সরকারি টিসিবি</span>
+            <span>যাচাই করুন: {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000'}</span>
+          </div>
         </div>
       )}
     </div>

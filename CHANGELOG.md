@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-09-29
+
+### Added
+- **Bazaar Basket Share, WhatsApp Fard Export & Printable Physical Shopping List (Milestone 024)**:
+  - `frontend/src/components/BazaarBasketView.jsx`:
+    - Added "ফর্দ শেয়ার করুন (Share Bazar List)" action button directly in the active basket section and results view.
+    - WhatsApp Share: Generates structured, human-readable text message with Bengali numerals, line-item quantities and estimated prices, total basket cost, wholesale market savings, and local verification URL.
+    - Interactive Share Modal: Integrated 1-click WhatsApp web dispatch (`https://api.whatsapp.com/send?text=...`), clipboard copy with instant visual checkmark feedback, and native device share via `navigator.share()`.
+    - Printable / PDF Fard: Added dedicated paper fard receipt (`.bb-print-receipt`) with checkable boxes `[ ]`, dual-language commodity labels, quantities, estimated market prices, and blank handwritten note columns for physical shopping in traditional bazaars.
+  - `frontend/src/index.css`:
+    - Modernized `@media print` CSS rules, cleanly hiding application chrome, navigation bars, and interactive modals while rendering full-width tabular styling for crisp paper and PDF printing.
+- **Background Ingestion Scheduler Resilience & Graceful Telemetry**:
+  - `app/services/scheduler.py`: Configured autonomous periodic price harvesting on a 6-hour interval (`interval_seconds = 21600`) without blocking the FastAPI event loop, and integrated detailed latency, fallback state, and error recording into `SourceHealthService`.
+  - `scripts/sync_daily_prices.py`: Added `--all`, `--loop`, and `--interval` command line options to support resilient daemonized execution.
+  - `docker-compose.yml`: Verified worker container profile with `python scripts/sync_daily_prices.py --all --loop --interval 21600` and `PYTHONUNBUFFERED=1` to run indefinitely without container exits.
+- **Android SDK Build Environment Auto-Detection & Packaging**:
+  - `scripts/build_android_apk.py`: Auto-detects standard Windows Android SDK installation paths (`%LOCALAPPDATA%\Android\Sdk`, `C:\Android\Sdk`, `D:\Android\Sdk`, `ANDROID_HOME`, `ANDROID_SDK_ROOT`), automatically generates/updates `android/local.properties` with escaped `sdk.dir`, and executes dry-run assembly check via Gradle wrapper.
+
 ## [2.4.0] - 2026-09-29
 
 ### Changed

@@ -381,17 +381,70 @@
 
 /* ── Print Receipt (print-only) ──────────────────────── */
 .bb-print-receipt {
-  @apply hidden;
+  display: none;
 }
+
 @media print {
-  body > * {
+  @page {
+    margin: 1.2cm;
+    size: portrait;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide regular UI elements when printing */
+  header,
+  footer,
+  nav,
+  .navbar,
+  .sidebar,
+  .bb-page-header,
+  .bb-presets-row,
+  .bb-left-panel,
+  .bb-right-panel,
+  .bb-card,
+  button,
+  input,
+  select,
+  .modal-backdrop,
+  [role="dialog"] {
     display: none !important;
   }
+
   .bb-print-receipt {
     display: block !important;
-    padding: 2rem;
-    color: #000;
-    font-family: 'Inter', sans-serif;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .bb-print-receipt table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .bb-print-receipt th,
+  .bb-print-receipt td {
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding: 8px 6px !important;
+    color: #0f172a !important;
+  }
+
+  .bb-print-receipt th {
+    background-color: #f8fafc !important;
+    font-weight: 700 !important;
   }
 }
 

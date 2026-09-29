@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class BackgroundSyncScheduler:
     """Manages periodic background harvests and asynchronous on-demand sync tasks."""
 
-    def __init__(self, interval_seconds: int = 43200):  # Default: every 12 hours
+    def __init__(self, interval_seconds: int = 21600):  # Default: every 6 hours (21600s)
         self.interval_seconds = interval_seconds
         self._loop_task: Optional[asyncio.Task] = None
         self._running = False
@@ -124,10 +124,12 @@ class BackgroundSyncScheduler:
             }
 
         def _sync_worker():
+            import time
             from app.collectors.dam_live_collector import DAMLiveCollector
             from app.collectors.chaldal_live_collector import ChaldalLiveCollector
             from app.collectors.tcb_collector import TCBCollector
             from app.collectors.news_collector import NewsCollector
+            from app.services.source_health import source_health_service
 
             with SessionLocal() as db:
                 pipeline = IngestionPipeline(db=db)
@@ -143,14 +145,34 @@ class BackgroundSyncScheduler:
                 total_skipped = 0
 
                 for collector in collectors:
+                    t0 = time.perf_counter()
+                    source_code = getattr(collector, "source_code", collector.__class__.__name__)
                     try:
                         report = pipeline.run_collector(collector)
+                        elapsed_ms = (time.perf_counter() - t0) * 1000
                         total_harvested += report.total_harvested
                         total_inserted += report.inserted
                         total_updated += report.updated
                         total_skipped += report.skipped
+
+                        is_fallback = getattr(report, "is_fallback", False) or report.total_harvested == 0
+                        source_health_service.record_attempt(
+                            source_code=source_code,
+                            latency_ms=elapsed_ms,
+                            success=True,
+                            is_fallback=is_fallback,
+                            error_message="Fallback / zero harvested items" if is_fallback else None,
+                        )
                     except Exception as err:
-                        logger.error(f"Collector {collector.source_code} failed: {err}")
+                        elapsed_ms = (time.perf_counter() - t0) * 1000
+                        logger.error(f"Collector {source_code} failed or throttled: {err}")
+                        source_health_service.record_attempt(
+                            source_code=source_code,
+                            latency_ms=elapsed_ms,
+                            success=False,
+                            is_fallback=False,
+                            error_message=str(err),
+                        )
 
                 return {
                     "total_harvested": total_harvested,
