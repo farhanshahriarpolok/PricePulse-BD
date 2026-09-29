@@ -104,6 +104,13 @@ class CommodityNormalizer:
         "প্রতিলিটার": ("liter", 1.0),
         "প্রতি হালি": ("pc", 4.0),
         "প্রতিহালি": ("pc", 4.0),
+        # Bundle units for greens (shak) -> bundle
+        "bundle": ("bundle", 1.0),
+        "আঁটি": ("bundle", 1.0),
+        "আটি": ("bundle", 1.0),
+        "মুঠি": ("bundle", 1.0),
+        "প্রতি আঁটি": ("bundle", 1.0),
+        "প্রতিআঁটি": ("bundle", 1.0),
     }
 
     def reload(self) -> None:

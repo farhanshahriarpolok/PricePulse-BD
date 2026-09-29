@@ -247,10 +247,21 @@ export default function App() {
 
       const isEgg = (
         item.canonical_name === 'Farm Egg' ||
+        item.canonical_name === 'Farm Eggs (Brown)' ||
+        item.canonical_name === 'Duck Egg' ||
         (item.canonical_name && item.canonical_name.toLowerCase().includes('egg') && !item.canonical_name.toLowerCase().includes('eggplant')) ||
         (item.bangla_name && item.bangla_name.includes('ডিম') && !item.bangla_name.includes('বেগুন'))
       );
-      const defaultUnit = isEgg ? 'হালি' : (item.unit || 'kg');
+      const isShak = item.canonical_name?.includes('Spinach') || item.bangla_name?.includes('শাক');
+      const isHaliProduce = item.canonical_name === 'Lemon' || item.canonical_name === 'Green Banana' || item.bangla_name?.includes('লেবু') || item.bangla_name?.includes('কাঁচকলা');
+      const isPieceProduce = item.canonical_name === 'Cauliflower' || item.canonical_name === 'Cabbage' || item.canonical_name === 'Bottle Gourd' || item.bangla_name?.includes('ফুলকপি') || item.bangla_name?.includes('বাঁধাকপি') || item.bangla_name?.includes('লাউ');
+
+      let defaultUnit = item.unit || 'kg';
+      if (isEgg || isHaliProduce) defaultUnit = 'হালি';
+      else if (isShak) defaultUnit = 'আঁটি';
+      else if (isPieceProduce) defaultUnit = 'পিস';
+      else if (defaultUnit === 'liter') defaultUnit = 'liter';
+      else defaultUnit = 'kg';
 
       if (idx >= 0) {
         const currentQty = Number(list[idx].quantity) || 1;

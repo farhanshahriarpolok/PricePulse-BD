@@ -49,6 +49,7 @@ const UNITS = [
   { value: 'liter', label: 'লিটার' },
   { value: 'হালি', label: 'হালি (4 পিস)' },
   { value: 'পিস', label: 'পিস' },
+  { value: 'আঁটি', label: 'আঁটি / মুঠি' },
   { value: 'পোয়া', label: 'পোয়া (250g)' },
   { value: 'g', label: 'গ্রাম' },
   { value: 'ml', label: 'মিলিলিটার' },

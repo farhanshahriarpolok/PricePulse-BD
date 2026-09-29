@@ -150,18 +150,40 @@ class BasketOptimizationService:
                 logger.warning("Basket: commodity_id=%d not found — skipping.", item.commodity_id)
                 continue
 
-            # Normalize the user-supplied unit to a base-unit quantity
-            try:
-                base_unit, multiplier = commodity_normalizer.normalize_unit(item.raw_unit)
-                quantity_normalized = round(item.quantity * multiplier, 4)
-            except ValueError:
-                logger.warning(
-                    "Basket: unrecognized unit '%s' for commodity %d — using raw quantity.",
-                    item.raw_unit,
-                    item.commodity_id,
-                )
-                base_unit = commodity.default_unit
+            # Normalize user-supplied unit relative to commodity's canonical default unit
+            comm_unit = (commodity.default_unit or "kg").lower()
+            raw_u = item.raw_unit.strip().lower() if item.raw_unit else comm_unit
+
+            if comm_unit in ("hali", "হালি"):
+                if raw_u in ("hali", "হালি", "প্রতি হালি", "প্রতিহালি"):
+                    quantity_normalized = item.quantity
+                    base_unit = "hali"
+                elif raw_u in ("pc", "pcs", "piece", "পিস", "টি", "টা"):
+                    quantity_normalized = round(item.quantity / 4.0, 4)
+                    base_unit = "hali"
+                else:
+                    try:
+                        _, mult = commodity_normalizer.normalize_unit(item.raw_unit)
+                        quantity_normalized = round(item.quantity * (mult / 4.0), 4)
+                        base_unit = "hali"
+                    except ValueError:
+                        quantity_normalized = item.quantity
+                        base_unit = comm_unit
+            elif comm_unit in ("bundle", "আঁটি", "আটি"):
                 quantity_normalized = item.quantity
+                base_unit = "bundle"
+            else:
+                try:
+                    base_unit, multiplier = commodity_normalizer.normalize_unit(item.raw_unit)
+                    quantity_normalized = round(item.quantity * multiplier, 4)
+                except ValueError:
+                    logger.warning(
+                        "Basket: unrecognized unit '%s' for commodity %d — using raw quantity.",
+                        item.raw_unit,
+                        item.commodity_id,
+                    )
+                    base_unit = commodity.default_unit
+                    quantity_normalized = item.quantity
 
             calc = _ItemCalc(
                 commodity_id=commodity.id,
