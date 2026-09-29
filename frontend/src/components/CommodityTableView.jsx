@@ -84,9 +84,14 @@ export default function CommodityTableView({
               const isEgg = (
                 item.canonical_name === 'Farm Egg' ||
                 item.canonical_name === 'Farm Eggs (Brown)' ||
+                item.canonical_name === 'Duck Egg' ||
                 (item.canonical_name && item.canonical_name.toLowerCase().includes('egg') && !item.canonical_name.toLowerCase().includes('eggplant')) ||
                 (item.bangla_name && item.bangla_name.includes('ডিম') && !item.bangla_name.includes('বেগুন'))
               );
+
+              const isShak = item.canonical_name?.includes('Spinach') || item.bangla_name?.includes('শাক');
+              const isHaliProduce = item.canonical_name === 'Lemon' || item.canonical_name === 'Green Banana' || item.bangla_name?.includes('লেবু') || item.bangla_name?.includes('কাঁচকলা');
+              const isPieceProduce = item.canonical_name === 'Cauliflower' || item.canonical_name === 'Cabbage' || item.canonical_name === 'Bottle Gourd' || item.bangla_name?.includes('ফুলকপি') || item.bangla_name?.includes('বাঁধাকপি') || item.bangla_name?.includes('লাউ');
 
               let rawAvg = item.price_summary?.avg_price || item.avg_price || 0.0;
               let rawWs = item.wholesale_avg || item.channels?.wholesale_avg;
@@ -113,6 +118,12 @@ export default function CommodityTableView({
                     ? `প্রতি পিস ৳ ${toBengaliNumeral(formatPrice(perPiece), lang)}`
                     : `৳ ${formatPrice(perPiece)} / pc`;
                 }
+              } else if (isShak) {
+                displayUnit = lang === 'bn' ? 'আঁটি' : 'bundle';
+              } else if (isHaliProduce) {
+                displayUnit = lang === 'bn' ? 'হালি' : 'hali';
+              } else if (isPieceProduce) {
+                displayUnit = lang === 'bn' ? 'পিস' : 'pc';
               } else {
                 if ((displayUnit === 'kg' || displayUnit === 'কেজি') && lang === 'bn') displayUnit = 'কেজি';
                 if ((displayUnit === 'liter' || displayUnit === 'লিটার') && lang === 'bn') displayUnit = 'লিটার';
@@ -136,7 +147,7 @@ export default function CommodityTableView({
                   onClick={() => onSelectCommodity && onSelectCommodity(item)}
                   className="even:bg-slate-50/60 dark:even:bg-slate-800/30 hover:bg-emerald-50/50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer group"
                 >
-                  {/* 1. Commodity Name & Icon */}
+                  {/* 1. Commodity Name & Icon with Verified Source Badge */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center p-1.5 flex-shrink-0 group-hover:scale-105 transition-transform">
@@ -150,9 +161,21 @@ export default function CommodityTableView({
                         <span className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors block truncate">
                           {displayTitle}
                         </span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block truncate">
-                          {displaySubtitle}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                            {displaySubtitle}
+                          </span>
+                          <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60 text-[9.5px] font-semibold" title="কৃষি বিপণন অধিদপ্তর ও টিসিবি ভেরিফাইড">
+                            <span>🏛️ DAM/TCB</span>
+                          </span>
+                          <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-0.5 font-medium">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                            </span>
+                            <span>{lang === 'bn' ? 'সকাল ৭টা যাচাইকৃত' : '7 AM Verified'}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </td>

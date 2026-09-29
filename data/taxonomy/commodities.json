@@ -5,19 +5,71 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "দেশি পেঁয়াজ", "language": "bn", "weight": 1.0},
-      {"alias": "দেশী পেঁয়াজ", "language": "bn", "weight": 0.98},
-      {"alias": "পেঁয়াজ (দেশি)", "language": "bn", "weight": 0.98},
-      {"alias": "পেঁয়াজ - দেশী", "language": "bn", "weight": 0.98},
-      {"alias": "পেঁয়াজ - দেশী", "language": "bn", "weight": 0.98},
-      {"alias": "পেঁয়াজ - দেশি", "language": "bn", "weight": 0.98},
-      {"alias": "deshi peyaj", "language": "phonetic", "weight": 0.95},
-      {"alias": "local onion", "language": "en", "weight": 0.95},
-      {"alias": "onion (local)", "language": "en", "weight": 1.0},
-      {"alias": "onion local", "language": "en", "weight": 0.95},
-      {"alias": "onion (deshi)", "language": "en", "weight": 0.98},
-      {"alias": "onion deshi", "language": "en", "weight": 0.98},
-      {"alias": "deshi onion", "language": "en", "weight": 0.95}
+      {
+        "alias": "দেশি পেঁয়াজ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "দেশী পেঁয়াজ",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "পেঁয়াজ (দেশি)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "পেঁয়াজ - দেশী",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "পেঁয়াজ - দেশী",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "পেঁয়াজ - দেশি",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "deshi peyaj",
+        "language": "phonetic",
+        "weight": 0.95
+      },
+      {
+        "alias": "local onion",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "onion (local)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "onion local",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "onion (deshi)",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "onion deshi",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "deshi onion",
+        "language": "en",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -26,12 +78,36 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "আমদানি পেঁয়াজ", "language": "bn", "weight": 1.0},
-      {"alias": "ভারতীয় পেঁয়াজ", "language": "bn", "weight": 0.95},
-      {"alias": "পেঁয়াজ (আমদানি)", "language": "bn", "weight": 0.98},
-      {"alias": "imported onion", "language": "en", "weight": 0.95},
-      {"alias": "onion (imported)", "language": "en", "weight": 1.0},
-      {"alias": "indian onion", "language": "en", "weight": 0.92}
+      {
+        "alias": "আমদানি পেঁয়াজ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ভারতীয় পেঁয়াজ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "পেঁয়াজ (আমদানি)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "imported onion",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "onion (imported)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "indian onion",
+        "language": "en",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -40,14 +116,46 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "ডায়মন্ড আলু", "language": "bn", "weight": 1.0},
-      {"alias": "আলু (ডায়মন্ড)", "language": "bn", "weight": 0.98},
-      {"alias": "গোল আলু", "language": "bn", "weight": 0.90},
-      {"alias": "আলু", "language": "bn", "weight": 0.85},
-      {"alias": "potato (diamond)", "language": "en", "weight": 1.0},
-      {"alias": "diamond potato", "language": "en", "weight": 0.95},
-      {"alias": "potato regular", "language": "en", "weight": 0.88},
-      {"alias": "alu diamond", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "ডায়মন্ড আলু",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "আলু (ডায়মন্ড)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "গোল আলু",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "আলু",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "potato (diamond)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "diamond potato",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "potato regular",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "alu diamond",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -56,15 +164,51 @@
     "category": "Grains",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "মিনিকেট চাল", "language": "bn", "weight": 1.0},
-      {"alias": "মিনিকেট", "language": "bn", "weight": 0.95},
-      {"alias": "চাল (মিনিকেট)", "language": "bn", "weight": 0.98},
-      {"alias": "আমন চাল - সরু", "language": "bn", "weight": 0.95},
-      {"alias": "বোরো চাল - সরু", "language": "bn", "weight": 0.95},
-      {"alias": "সরু চাল", "language": "bn", "weight": 0.95},
-      {"alias": "miniket rice", "language": "en", "weight": 0.95},
-      {"alias": "rice (miniket)", "language": "en", "weight": 1.0},
-      {"alias": "miniket chal", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "মিনিকেট চাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "মিনিকেট",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "চাল (মিনিকেট)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "আমন চাল - সরু",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "বোরো চাল - সরু",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "সরু চাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "miniket rice",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "rice (miniket)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "miniket chal",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -73,15 +217,51 @@
     "category": "Grains",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "নাজিরশাইল চাল", "language": "bn", "weight": 1.0},
-      {"alias": "নাজিরশাইল", "language": "bn", "weight": 0.95},
-      {"alias": "চাল (নাজিরশাইল)", "language": "bn", "weight": 0.98},
-      {"alias": "আমন চাল - মাঝারি", "language": "bn", "weight": 0.95},
-      {"alias": "বোরো চাল - মাঝারি", "language": "bn", "weight": 0.95},
-      {"alias": "মাঝারি চাল", "language": "bn", "weight": 0.95},
-      {"alias": "nazirshail rice", "language": "en", "weight": 0.95},
-      {"alias": "rice (nazirshail)", "language": "en", "weight": 1.0},
-      {"alias": "najirshail chal", "language": "phonetic", "weight": 0.90}
+      {
+        "alias": "নাজিরশাইল চাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "নাজিরশাইল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "চাল (নাজিরশাইল)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "আমন চাল - মাঝারি",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "বোরো চাল - মাঝারি",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মাঝারি চাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "nazirshail rice",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "rice (nazirshail)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "najirshail chal",
+        "language": "phonetic",
+        "weight": 0.9
+      }
     ]
   },
   {
@@ -90,14 +270,46 @@
     "category": "Grains",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "মোটা চাল", "language": "bn", "weight": 1.0},
-      {"alias": "আমন চাল - মোটা", "language": "bn", "weight": 0.95},
-      {"alias": "বোরো চাল - মোটা", "language": "bn", "weight": 0.95},
-      {"alias": "স্বর্ণা চাল", "language": "bn", "weight": 0.92},
-      {"alias": "চাল (মোটা)", "language": "bn", "weight": 0.98},
-      {"alias": "coarse rice", "language": "en", "weight": 0.95},
-      {"alias": "rice (coarse)", "language": "en", "weight": 1.0},
-      {"alias": "swarna rice", "language": "en", "weight": 0.92}
+      {
+        "alias": "মোটা চাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "আমন চাল - মোটা",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "বোরো চাল - মোটা",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "স্বর্ণা চাল",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "চাল (মোটা)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "coarse rice",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "rice (coarse)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "swarna rice",
+        "language": "en",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -106,12 +318,36 @@
     "category": "Edible Oils",
     "default_unit": "liter",
     "aliases": [
-      {"alias": "বোতলজাত সয়াবিন তেল", "language": "bn", "weight": 1.0},
-      {"alias": "সয়াবিন তেল (বোতল)", "language": "bn", "weight": 0.98},
-      {"alias": "সয়াবিন তেল", "language": "bn", "weight": 0.92},
-      {"alias": "bottled soybean oil", "language": "en", "weight": 0.95},
-      {"alias": "soybean oil (bottled)", "language": "en", "weight": 1.0},
-      {"alias": "soybean oil", "language": "en", "weight": 0.90}
+      {
+        "alias": "বোতলজাত সয়াবিন তেল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "সয়াবিন তেল (বোতল)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "সয়াবিন তেল",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "bottled soybean oil",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "soybean oil (bottled)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "soybean oil",
+        "language": "en",
+        "weight": 0.9
+      }
     ]
   },
   {
@@ -120,19 +356,71 @@
     "category": "Meat & Poultry",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "ব্রয়লার মুরগি", "language": "bn", "weight": 1.0},
-      {"alias": "ব্রয়লার মুরগী", "language": "bn", "weight": 0.98},
-      {"alias": "খামারের মুরগী", "language": "bn", "weight": 0.98},
-      {"alias": "খামারের মুরগি", "language": "bn", "weight": 0.98},
-      {"alias": "ব্রয়লার", "language": "bn", "weight": 0.95},
-      {"alias": "মুরগি (ব্রয়লার)", "language": "bn", "weight": 0.98},
-      {"alias": "মুরগি", "language": "bn", "weight": 0.85},
-      {"alias": "broiler chicken", "language": "en", "weight": 1.0},
-      {"alias": "chicken broiler", "language": "en", "weight": 0.95},
-      {"alias": "broiler", "language": "en", "weight": 0.90},
-      {"alias": "chicken", "language": "en", "weight": 0.85},
-      {"alias": "broiler murgi", "language": "phonetic", "weight": 0.95},
-      {"alias": "murgi", "language": "phonetic", "weight": 0.85}
+      {
+        "alias": "ব্রয়লার মুরগি",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ব্রয়লার মুরগী",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "খামারের মুরগী",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "খামারের মুরগি",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "ব্রয়লার",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মুরগি (ব্রয়লার)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মুরগি",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "broiler chicken",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "chicken broiler",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "broiler",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "chicken",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "broiler murgi",
+        "language": "phonetic",
+        "weight": 0.95
+      },
+      {
+        "alias": "murgi",
+        "language": "phonetic",
+        "weight": 0.85
+      }
     ]
   },
   {
@@ -141,19 +429,71 @@
     "category": "Eggs & Dairy",
     "default_unit": "pc",
     "aliases": [
-      {"alias": "ফার্মের ডিম", "language": "bn", "weight": 1.0},
-      {"alias": "ফার্মের মুরগির ডিম", "language": "bn", "weight": 0.98},
-      {"alias": "মুরগির ডিম", "language": "bn", "weight": 0.95},
-      {"alias": "ডিম (ফার্ম)", "language": "bn", "weight": 0.98},
-      {"alias": "ডিম", "language": "bn", "weight": 0.85},
-      {"alias": "লাল ডিম", "language": "bn", "weight": 0.90},
-      {"alias": "farm egg", "language": "en", "weight": 1.0},
-      {"alias": "egg (farm)", "language": "en", "weight": 0.98},
-      {"alias": "chicken egg", "language": "en", "weight": 0.95},
-      {"alias": "egg", "language": "en", "weight": 0.85},
-      {"alias": "eggs", "language": "en", "weight": 0.85},
-      {"alias": "dim", "language": "phonetic", "weight": 0.85},
-      {"alias": "farm er dim", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "ফার্মের ডিম",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ফার্মের মুরগির ডিম",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মুরগির ডিম",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "ডিম (ফার্ম)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "ডিম",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "লাল ডিম",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "farm egg",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "egg (farm)",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "chicken egg",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "egg",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "eggs",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "dim",
+        "language": "phonetic",
+        "weight": 0.85
+      },
+      {
+        "alias": "farm er dim",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -162,18 +502,66 @@
     "category": "Pulses",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "মসুর ডাল (মাঝারি)", "language": "bn", "weight": 1.0},
-      {"alias": "মসুর ডাল", "language": "bn", "weight": 0.95},
-      {"alias": "মশুর ডাল", "language": "bn", "weight": 0.92},
-      {"alias": "ডাল (মসুর)", "language": "bn", "weight": 0.98},
-      {"alias": "মাঝারি মসুর ডাল", "language": "bn", "weight": 0.95},
-      {"alias": "ডাল", "language": "bn", "weight": 0.80},
-      {"alias": "masur dal (medium)", "language": "en", "weight": 1.0},
-      {"alias": "masur dal", "language": "en", "weight": 0.95},
-      {"alias": "masoor dal", "language": "en", "weight": 0.95},
-      {"alias": "medium masur dal", "language": "en", "weight": 0.95},
-      {"alias": "red lentil", "language": "en", "weight": 0.90},
-      {"alias": "lentil", "language": "en", "weight": 0.85}
+      {
+        "alias": "মসুর ডাল (মাঝারি)",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "মসুর ডাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মশুর ডাল",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "ডাল (মসুর)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মাঝারি মসুর ডাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "ডাল",
+        "language": "bn",
+        "weight": 0.8
+      },
+      {
+        "alias": "masur dal (medium)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "masur dal",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "masoor dal",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "medium masur dal",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "red lentil",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "lentil",
+        "language": "en",
+        "weight": 0.85
+      }
     ]
   },
   {
@@ -182,17 +570,61 @@
     "category": "Spices",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "দেশি রসুন", "language": "bn", "weight": 1.0},
-      {"alias": "দেশী রসুন", "language": "bn", "weight": 0.98},
-      {"alias": "রসুন (দেশি)", "language": "bn", "weight": 0.98},
-      {"alias": "রসুন", "language": "bn", "weight": 0.85},
-      {"alias": "দেশি রশুন", "language": "bn", "weight": 0.92},
-      {"alias": "local garlic", "language": "en", "weight": 0.95},
-      {"alias": "garlic (local)", "language": "en", "weight": 1.0},
-      {"alias": "garlic local", "language": "en", "weight": 0.95},
-      {"alias": "deshi roshun", "language": "phonetic", "weight": 0.95},
-      {"alias": "garlic deshi", "language": "en", "weight": 0.95},
-      {"alias": "roshun", "language": "phonetic", "weight": 0.85}
+      {
+        "alias": "দেশি রসুন",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "দেশী রসুন",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "রসুন (দেশি)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "রসুন",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "দেশি রশুন",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "local garlic",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "garlic (local)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "garlic local",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "deshi roshun",
+        "language": "phonetic",
+        "weight": 0.95
+      },
+      {
+        "alias": "garlic deshi",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "roshun",
+        "language": "phonetic",
+        "weight": 0.85
+      }
     ]
   },
   {
@@ -201,17 +633,61 @@
     "category": "Meat & Poultry",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "গরুর মাংস (হাড়সহ)", "language": "bn", "weight": 1.0},
-      {"alias": "গরুর মাংস", "language": "bn", "weight": 0.95},
-      {"alias": "হাড়সহ গরুর মাংস", "language": "bn", "weight": 0.98},
-      {"alias": "গরু মাংস", "language": "bn", "weight": 0.92},
-      {"alias": "গরু", "language": "bn", "weight": 0.80},
-      {"alias": "beef (local with bone)", "language": "en", "weight": 1.0},
-      {"alias": "beef with bone", "language": "en", "weight": 0.95},
-      {"alias": "local beef", "language": "en", "weight": 0.92},
-      {"alias": "beef", "language": "en", "weight": 0.88},
-      {"alias": "gorur mangsho", "language": "phonetic", "weight": 0.92},
-      {"alias": "gorur mangsho hade shoho", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "গরুর মাংস (হাড়সহ)",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "গরুর মাংস",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "হাড়সহ গরুর মাংস",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "গরু মাংস",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "গরু",
+        "language": "bn",
+        "weight": 0.8
+      },
+      {
+        "alias": "beef (local with bone)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "beef with bone",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "local beef",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "beef",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "gorur mangsho",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "gorur mangsho hade shoho",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -220,16 +696,56 @@
     "category": "Meat & Poultry",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "খাসির মাংস", "language": "bn", "weight": 1.0},
-      {"alias": "খাসি মাংস", "language": "bn", "weight": 0.98},
-      {"alias": "খাসী", "language": "bn", "weight": 0.95},
-      {"alias": "মেষ শাবকের মাংস", "language": "bn", "weight": 0.90},
-      {"alias": "খাসি", "language": "bn", "weight": 0.88},
-      {"alias": "mutton (goat meat)", "language": "en", "weight": 1.0},
-      {"alias": "goat meat", "language": "en", "weight": 0.95},
-      {"alias": "mutton", "language": "en", "weight": 0.92},
-      {"alias": "khashi mangsho", "language": "phonetic", "weight": 0.92},
-      {"alias": "khashi", "language": "phonetic", "weight": 0.85}
+      {
+        "alias": "খাসির মাংস",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "খাসি মাংস",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "খাসী",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মেষ শাবকের মাংস",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "খাসি",
+        "language": "bn",
+        "weight": 0.88
+      },
+      {
+        "alias": "mutton (goat meat)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "goat meat",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "mutton",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "khashi mangsho",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "khashi",
+        "language": "phonetic",
+        "weight": 0.85
+      }
     ]
   },
   {
@@ -238,15 +754,51 @@
     "category": "Fish & Seafood",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "রুই মাছ", "language": "bn", "weight": 1.0},
-      {"alias": "রুই", "language": "bn", "weight": 0.95},
-      {"alias": "রোহিত মাছ", "language": "bn", "weight": 0.90},
-      {"alias": "rui fish (fresh)", "language": "en", "weight": 1.0},
-      {"alias": "rui fish", "language": "en", "weight": 0.95},
-      {"alias": "rohu fish", "language": "en", "weight": 0.92},
-      {"alias": "rohu", "language": "en", "weight": 0.88},
-      {"alias": "rui mach", "language": "phonetic", "weight": 0.92},
-      {"alias": "rui", "language": "phonetic", "weight": 0.85}
+      {
+        "alias": "রুই মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "রুই",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "রোহিত মাছ",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "rui fish (fresh)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "rui fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "rohu fish",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "rohu",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "rui mach",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "rui",
+        "language": "phonetic",
+        "weight": 0.85
+      }
     ]
   },
   {
@@ -255,14 +807,46 @@
     "category": "Fish & Seafood",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "পাঙ্গাস মাছ", "language": "bn", "weight": 1.0},
-      {"alias": "পাঙ্গাস", "language": "bn", "weight": 0.95},
-      {"alias": "পাঙ্গাশ মাছ", "language": "bn", "weight": 0.95},
-      {"alias": "pangas fish (farm)", "language": "en", "weight": 1.0},
-      {"alias": "pangas fish", "language": "en", "weight": 0.95},
-      {"alias": "pangasius", "language": "en", "weight": 0.90},
-      {"alias": "pangas mach", "language": "phonetic", "weight": 0.92},
-      {"alias": "pangash", "language": "phonetic", "weight": 0.88}
+      {
+        "alias": "পাঙ্গাস মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "পাঙ্গাস",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "পাঙ্গাশ মাছ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "pangas fish (farm)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "pangas fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "pangasius",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "pangas mach",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "pangash",
+        "language": "phonetic",
+        "weight": 0.88
+      }
     ]
   },
   {
@@ -271,14 +855,46 @@
     "category": "Fish & Seafood",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "ইলিশ মাছ", "language": "bn", "weight": 1.0},
-      {"alias": "ইলিশ", "language": "bn", "weight": 0.95},
-      {"alias": "ইলিস মাছ", "language": "bn", "weight": 0.92},
-      {"alias": "hilsa fish (medium)", "language": "en", "weight": 1.0},
-      {"alias": "hilsa fish", "language": "en", "weight": 0.95},
-      {"alias": "hilsha", "language": "en", "weight": 0.92},
-      {"alias": "ilish mach", "language": "phonetic", "weight": 0.92},
-      {"alias": "ilish", "language": "phonetic", "weight": 0.88}
+      {
+        "alias": "ইলিশ মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ইলিশ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "ইলিস মাছ",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "hilsa fish (medium)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "hilsa fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "hilsha",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "ilish mach",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "ilish",
+        "language": "phonetic",
+        "weight": 0.88
+      }
     ]
   },
   {
@@ -287,18 +903,66 @@
     "category": "Dairy",
     "default_unit": "liter",
     "aliases": [
-      {"alias": "প্যাকেটজাত তরল দুধ", "language": "bn", "weight": 1.0},
-      {"alias": "প্যাকেট দুধ", "language": "bn", "weight": 0.95},
-      {"alias": "তরল দুধ", "language": "bn", "weight": 0.92},
-      {"alias": "দুধ", "language": "bn", "weight": 0.85},
-      {"alias": "গরুর দুধ", "language": "bn", "weight": 0.90},
-      {"alias": "pasteurized cow milk", "language": "en", "weight": 1.0},
-      {"alias": "pasteurized milk", "language": "en", "weight": 0.95},
-      {"alias": "liquid milk", "language": "en", "weight": 0.92},
-      {"alias": "cow milk", "language": "en", "weight": 0.88},
-      {"alias": "milk", "language": "en", "weight": 0.85},
-      {"alias": "dudh", "language": "phonetic", "weight": 0.85},
-      {"alias": "packet dudh", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "প্যাকেটজাত তরল দুধ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "প্যাকেট দুধ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "তরল দুধ",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "দুধ",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "গরুর দুধ",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "pasteurized cow milk",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "pasteurized milk",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "liquid milk",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "cow milk",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "milk",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "dudh",
+        "language": "phonetic",
+        "weight": 0.85
+      },
+      {
+        "alias": "packet dudh",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -307,16 +971,56 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "কাঁচা মরিচ", "language": "bn", "weight": 1.0},
-      {"alias": "কাচা মরিচ", "language": "bn", "weight": 0.98},
-      {"alias": "সবুজ মরিচ", "language": "bn", "weight": 0.95},
-      {"alias": "মরিচ (কাঁচা)", "language": "bn", "weight": 0.98},
-      {"alias": "মরিচ", "language": "bn", "weight": 0.85},
-      {"alias": "green chilli", "language": "en", "weight": 1.0},
-      {"alias": "green chili", "language": "en", "weight": 0.98},
-      {"alias": "green pepper", "language": "en", "weight": 0.85},
-      {"alias": "kacha morich", "language": "phonetic", "weight": 0.92},
-      {"alias": "morich", "language": "phonetic", "weight": 0.82}
+      {
+        "alias": "কাঁচা মরিচ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "কাচা মরিচ",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "সবুজ মরিচ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মরিচ (কাঁচা)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মরিচ",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "green chilli",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "green chili",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "green pepper",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "kacha morich",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "morich",
+        "language": "phonetic",
+        "weight": 0.82
+      }
     ]
   },
   {
@@ -325,16 +1029,56 @@
     "category": "Sweeteners",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "চিনি (সাদা পরিশোধিত)", "language": "bn", "weight": 1.0},
-      {"alias": "সাদা চিনি", "language": "bn", "weight": 0.98},
-      {"alias": "চিনি", "language": "bn", "weight": 0.92},
-      {"alias": "পরিশোধিত চিনি", "language": "bn", "weight": 0.95},
-      {"alias": "sugar (refined white)", "language": "en", "weight": 1.0},
-      {"alias": "refined sugar", "language": "en", "weight": 0.95},
-      {"alias": "white sugar", "language": "en", "weight": 0.95},
-      {"alias": "sugar", "language": "en", "weight": 0.88},
-      {"alias": "chini", "language": "phonetic", "weight": 0.88},
-      {"alias": "shada chini", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "চিনি (সাদা পরিশোধিত)",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "সাদা চিনি",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "চিনি",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "পরিশোধিত চিনি",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "sugar (refined white)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "refined sugar",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "white sugar",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "sugar",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "chini",
+        "language": "phonetic",
+        "weight": 0.88
+      },
+      {
+        "alias": "shada chini",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -343,16 +1087,56 @@
     "category": "Condiments",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "আয়োডিনযুক্ত লবণ", "language": "bn", "weight": 1.0},
-      {"alias": "আয়োডিন লবণ", "language": "bn", "weight": 0.95},
-      {"alias": "লবণ", "language": "bn", "weight": 0.88},
-      {"alias": "সৈন্ধব লবণ", "language": "bn", "weight": 0.85},
-      {"alias": "salt (iodized)", "language": "en", "weight": 1.0},
-      {"alias": "iodized salt", "language": "en", "weight": 0.95},
-      {"alias": "table salt", "language": "en", "weight": 0.88},
-      {"alias": "salt", "language": "en", "weight": 0.85},
-      {"alias": "noon", "language": "phonetic", "weight": 0.85},
-      {"alias": "ayodine noon", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "আয়োডিনযুক্ত লবণ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "আয়োডিন লবণ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "লবণ",
+        "language": "bn",
+        "weight": 0.88
+      },
+      {
+        "alias": "সৈন্ধব লবণ",
+        "language": "bn",
+        "weight": 0.85
+      },
+      {
+        "alias": "salt (iodized)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "iodized salt",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "table salt",
+        "language": "en",
+        "weight": 0.88
+      },
+      {
+        "alias": "salt",
+        "language": "en",
+        "weight": 0.85
+      },
+      {
+        "alias": "noon",
+        "language": "phonetic",
+        "weight": 0.85
+      },
+      {
+        "alias": "ayodine noon",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -361,15 +1145,51 @@
     "category": "Edible Oils",
     "default_unit": "liter",
     "aliases": [
-      {"alias": "সরিষার তেল", "language": "bn", "weight": 1.0},
-      {"alias": "সরষের তেল", "language": "bn", "weight": 0.98},
-      {"alias": "খাঁটি সরিষার তেল", "language": "bn", "weight": 0.95},
-      {"alias": "সরিষা তেল", "language": "bn", "weight": 0.95},
-      {"alias": "mustard oil", "language": "en", "weight": 1.0},
-      {"alias": "sarisha oil", "language": "phonetic", "weight": 0.92},
-      {"alias": "sarisher tel", "language": "phonetic", "weight": 0.90},
-      {"alias": "mustard oil (pure)", "language": "en", "weight": 0.95},
-      {"alias": "pure mustard oil", "language": "en", "weight": 0.92}
+      {
+        "alias": "সরিষার তেল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "সরষের তেল",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "খাঁটি সরিষার তেল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "সরিষা তেল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "mustard oil",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "sarisha oil",
+        "language": "phonetic",
+        "weight": 0.92
+      },
+      {
+        "alias": "sarisher tel",
+        "language": "phonetic",
+        "weight": 0.9
+      },
+      {
+        "alias": "mustard oil (pure)",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "pure mustard oil",
+        "language": "en",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -378,14 +1198,46 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "দেশি আদা", "language": "bn", "weight": 1.0},
-      {"alias": "আদা (দেশি)", "language": "bn", "weight": 0.98},
-      {"alias": "আদা", "language": "bn", "weight": 0.90},
-      {"alias": "ginger", "language": "en", "weight": 0.95},
-      {"alias": "local ginger", "language": "en", "weight": 0.98},
-      {"alias": "ginger (local)", "language": "en", "weight": 1.0},
-      {"alias": "ada", "language": "phonetic", "weight": 0.90},
-      {"alias": "deshi ada", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "দেশি আদা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "আদা (দেশি)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "আদা",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "ginger",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "local ginger",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "ginger (local)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "ada",
+        "language": "phonetic",
+        "weight": 0.9
+      },
+      {
+        "alias": "deshi ada",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -394,13 +1246,41 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "বেগুন", "language": "bn", "weight": 1.0},
-      {"alias": "গোল বেগুন", "language": "bn", "weight": 0.95},
-      {"alias": "লম্বা বেগুন", "language": "bn", "weight": 0.95},
-      {"alias": "brinjal", "language": "en", "weight": 1.0},
-      {"alias": "eggplant", "language": "en", "weight": 0.98},
-      {"alias": "aubergine", "language": "en", "weight": 0.90},
-      {"alias": "begun", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "বেগুন",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "গোল বেগুন",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "লম্বা বেগুন",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "brinjal",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "eggplant",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "aubergine",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "begun",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -409,12 +1289,36 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "টমেটো", "language": "bn", "weight": 1.0},
-      {"alias": "পাকা টমেটো", "language": "bn", "weight": 0.98},
-      {"alias": "দেশি টমেটো", "language": "bn", "weight": 0.95},
-      {"alias": "tomato", "language": "en", "weight": 1.0},
-      {"alias": "ripe tomato", "language": "en", "weight": 0.95},
-      {"alias": "tometo", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "টমেটো",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "পাকা টমেটো",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "দেশি টমেটো",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "tomato",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "ripe tomato",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "tometo",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -423,13 +1327,41 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "কাঁচা পেঁপে", "language": "bn", "weight": 1.0},
-      {"alias": "পেঁপে (কাঁচা)", "language": "bn", "weight": 0.98},
-      {"alias": "পেঁপে", "language": "bn", "weight": 0.90},
-      {"alias": "green papaya", "language": "en", "weight": 1.0},
-      {"alias": "raw papaya", "language": "en", "weight": 0.98},
-      {"alias": "papaya", "language": "en", "weight": 0.90},
-      {"alias": "kacha pepe", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "কাঁচা পেঁপে",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "পেঁপে (কাঁচা)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "পেঁপে",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "green papaya",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "raw papaya",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "papaya",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "kacha pepe",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -438,11 +1370,31 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "শসা", "language": "bn", "weight": 1.0},
-      {"alias": "দেশি শসা", "language": "bn", "weight": 0.98},
-      {"alias": "ক্ষীরা", "language": "bn", "weight": 0.92},
-      {"alias": "cucumber", "language": "en", "weight": 1.0},
-      {"alias": "shosha", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "শসা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "দেশি শসা",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "ক্ষীরা",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "cucumber",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "shosha",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -451,10 +1403,26 @@
     "category": "Vegetables",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "গাজর", "language": "bn", "weight": 1.0},
-      {"alias": "দেশি গাজর", "language": "bn", "weight": 0.95},
-      {"alias": "carrot", "language": "en", "weight": 1.0},
-      {"alias": "gajor", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "গাজর",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "দেশি গাজর",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "carrot",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "gajor",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -463,14 +1431,46 @@
     "category": "Grains",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "প্যাকেট আটা", "language": "bn", "weight": 1.0},
-      {"alias": "আটা (প্যাকেট)", "language": "bn", "weight": 0.98},
-      {"alias": "আটা", "language": "bn", "weight": 0.90},
-      {"alias": "গম আটা", "language": "bn", "weight": 0.92},
-      {"alias": "wheat flour", "language": "en", "weight": 0.95},
-      {"alias": "atta", "language": "en", "weight": 0.95},
-      {"alias": "packaged atta", "language": "en", "weight": 1.0},
-      {"alias": "atta (packaged)", "language": "en", "weight": 1.0}
+      {
+        "alias": "প্যাকেট আটা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "আটা (প্যাকেট)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "আটা",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "গম আটা",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "wheat flour",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "atta",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "packaged atta",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "atta (packaged)",
+        "language": "en",
+        "weight": 1.0
+      }
     ]
   },
   {
@@ -479,13 +1479,41 @@
     "category": "Grains",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "প্যাকেট ময়দা", "language": "bn", "weight": 1.0},
-      {"alias": "ময়দা (প্যাকেট)", "language": "bn", "weight": 0.98},
-      {"alias": "ময়দা", "language": "bn", "weight": 0.90},
-      {"alias": "all purpose flour", "language": "en", "weight": 0.92},
-      {"alias": "white flour", "language": "en", "weight": 0.92},
-      {"alias": "maida", "language": "en", "weight": 0.95},
-      {"alias": "packaged maida", "language": "en", "weight": 1.0}
+      {
+        "alias": "প্যাকেট ময়দা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ময়দা (প্যাকেট)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "ময়দা",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "all purpose flour",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "white flour",
+        "language": "en",
+        "weight": 0.92
+      },
+      {
+        "alias": "maida",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "packaged maida",
+        "language": "en",
+        "weight": 1.0
+      }
     ]
   },
   {
@@ -494,12 +1522,36 @@
     "category": "Pulses",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "মসুর ডাল (চিকন)", "language": "bn", "weight": 1.0},
-      {"alias": "চিকন মসুর ডাল", "language": "bn", "weight": 0.98},
-      {"alias": "দেশি মসুর ডাল", "language": "bn", "weight": 0.95},
-      {"alias": "lentil (fine)", "language": "en", "weight": 1.0},
-      {"alias": "fine red lentil", "language": "en", "weight": 0.95},
-      {"alias": "chikon masur dal", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "মসুর ডাল (চিকন)",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "চিকন মসুর ডাল",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "দেশি মসুর ডাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "lentil (fine)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "fine red lentil",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "chikon masur dal",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -508,13 +1560,41 @@
     "category": "Meat & Poultry",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "দেশি মুরগি", "language": "bn", "weight": 1.0},
-      {"alias": "দেশী মুরগী", "language": "bn", "weight": 0.98},
-      {"alias": "মুরগি (দেশি)", "language": "bn", "weight": 0.98},
-      {"alias": "দেশি মোরগ", "language": "bn", "weight": 0.92},
-      {"alias": "deshi chicken", "language": "en", "weight": 1.0},
-      {"alias": "local chicken", "language": "en", "weight": 0.95},
-      {"alias": "free range chicken", "language": "en", "weight": 0.90}
+      {
+        "alias": "দেশি মুরগি",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "দেশী মুরগী",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মুরগি (দেশি)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "দেশি মোরগ",
+        "language": "bn",
+        "weight": 0.92
+      },
+      {
+        "alias": "deshi chicken",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "local chicken",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "free range chicken",
+        "language": "en",
+        "weight": 0.9
+      }
     ]
   },
   {
@@ -523,11 +1603,31 @@
     "category": "Fish & Seafood",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "তেলাপিয়া মাছ", "language": "bn", "weight": 1.0},
-      {"alias": "তেলাপিয়া", "language": "bn", "weight": 0.98},
-      {"alias": "মাছ (তেলাপিয়া)", "language": "bn", "weight": 0.95},
-      {"alias": "tilapia", "language": "en", "weight": 1.0},
-      {"alias": "tilapia fish", "language": "en", "weight": 1.0}
+      {
+        "alias": "তেলাপিয়া মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "তেলাপিয়া",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "মাছ (তেলাপিয়া)",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "tilapia",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "tilapia fish",
+        "language": "en",
+        "weight": 1.0
+      }
     ]
   },
   {
@@ -536,12 +1636,36 @@
     "category": "Edible Oils",
     "default_unit": "liter",
     "aliases": [
-      {"alias": "খোলা সয়াবিন তেল", "language": "bn", "weight": 1.0},
-      {"alias": "খোলা তেল", "language": "bn", "weight": 0.95},
-      {"alias": "সয়াবিন তেল (খোলা)", "language": "bn", "weight": 0.98},
-      {"alias": "loose soybean oil", "language": "en", "weight": 1.0},
-      {"alias": "soybean oil (loose)", "language": "en", "weight": 1.0},
-      {"alias": "khola tel", "language": "phonetic", "weight": 0.92}
+      {
+        "alias": "খোলা সয়াবিন তেল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "খোলা তেল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "সয়াবিন তেল (খোলা)",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "loose soybean oil",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "soybean oil (loose)",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "khola tel",
+        "language": "phonetic",
+        "weight": 0.92
+      }
     ]
   },
   {
@@ -550,14 +1674,46 @@
     "category": "Spices",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "শুকনা মরিচ", "language": "bn", "weight": 1.0},
-      {"alias": "শুকনো মরিচ", "language": "bn", "weight": 0.98},
-      {"alias": "লাল মরিচ (শুকনা)", "language": "bn", "weight": 0.95},
-      {"alias": "মরিচ (শুকনা)", "language": "bn", "weight": 0.95},
-      {"alias": "dry chilli", "language": "en", "weight": 1.0},
-      {"alias": "dry red chili", "language": "en", "weight": 1.0},
-      {"alias": "red chilli (dry)", "language": "en", "weight": 0.98},
-      {"alias": "shukna morich", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "শুকনা মরিচ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "শুকনো মরিচ",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "লাল মরিচ (শুকনা)",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "মরিচ (শুকনা)",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "dry chilli",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "dry red chili",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "red chilli (dry)",
+        "language": "en",
+        "weight": 0.98
+      },
+      {
+        "alias": "shukna morich",
+        "language": "phonetic",
+        "weight": 0.95
+      }
     ]
   },
   {
@@ -566,13 +1722,756 @@
     "category": "Spices",
     "default_unit": "kg",
     "aliases": [
-      {"alias": "হলুদ গুঁড়া", "language": "bn", "weight": 1.0},
-      {"alias": "হলুদের গুঁড়া", "language": "bn", "weight": 0.98},
-      {"alias": "গুঁড়া হলুদ", "language": "bn", "weight": 0.95},
-      {"alias": "হলুদ", "language": "bn", "weight": 0.88},
-      {"alias": "turmeric powder", "language": "en", "weight": 1.0},
-      {"alias": "turmeric", "language": "en", "weight": 0.90},
-      {"alias": "halud gura", "language": "phonetic", "weight": 0.95}
+      {
+        "alias": "হলুদ গুঁড়া",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "হলুদের গুঁড়া",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "গুঁড়া হলুদ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "হলুদ",
+        "language": "bn",
+        "weight": 0.88
+      },
+      {
+        "alias": "turmeric powder",
+        "language": "en",
+        "weight": 1.0
+      },
+      {
+        "alias": "turmeric",
+        "language": "en",
+        "weight": 0.9
+      },
+      {
+        "alias": "halud gura",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Red Spinach",
+    "bangla_name": "লাল শাক",
+    "category": "Vegetables",
+    "default_unit": "bundle",
+    "aliases": [
+      {
+        "alias": "লাল শাক",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "red spinach",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "lal shak",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Spinach",
+    "bangla_name": "পালং শাক",
+    "category": "Vegetables",
+    "default_unit": "bundle",
+    "aliases": [
+      {
+        "alias": "পালং শাক",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "spinach",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "palong shak",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Malabar Spinach",
+    "bangla_name": "পুঁই শাক",
+    "category": "Vegetables",
+    "default_unit": "bundle",
+    "aliases": [
+      {
+        "alias": "পুঁই শাক",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "malabar spinach",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "pui shak",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cauliflower",
+    "bangla_name": "ফুলকপি",
+    "category": "Vegetables",
+    "default_unit": "pc",
+    "aliases": [
+      {
+        "alias": "ফুলকপি",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "cauliflower",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "fulkopi",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cabbage",
+    "bangla_name": "বাঁধাকপি",
+    "category": "Vegetables",
+    "default_unit": "pc",
+    "aliases": [
+      {
+        "alias": "বাঁধাকপি",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "cabbage",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "badhakopi",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Country Beans",
+    "bangla_name": "শিম",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "শিম",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "country beans",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "shim",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Okra",
+    "bangla_name": "ঢ্যাঁড়শ",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "ঢ্যাঁড়শ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "ভেন্ডি",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "okra",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "dherosh",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Bottle Gourd",
+    "bangla_name": "লাউ",
+    "category": "Vegetables",
+    "default_unit": "pc",
+    "aliases": [
+      {
+        "alias": "লাউ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "কদু",
+        "language": "bn",
+        "weight": 0.9
+      },
+      {
+        "alias": "bottle gourd",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "lau",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Green Banana",
+    "bangla_name": "কাঁচকলা",
+    "category": "Vegetables",
+    "default_unit": "hali",
+    "aliases": [
+      {
+        "alias": "কাঁচকলা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "green banana",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "kachkola",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Lemon",
+    "bangla_name": "লেবু",
+    "category": "Vegetables",
+    "default_unit": "hali",
+    "aliases": [
+      {
+        "alias": "লেবু",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "কাগজি লেবু",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "lemon",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "lebu",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Pointed Gourd",
+    "bangla_name": "পটল",
+    "category": "Vegetables",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "পটল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "pointed gourd",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "potol",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Chinigura Rice",
+    "bangla_name": "চিনিগুঁড়া পোলাও চাল",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "চিনিগুঁড়া পোলাও চাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "পোলাও চাল",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "chinigura rice",
+        "language": "en",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Paijam Rice",
+    "bangla_name": "পাইজাম চাল",
+    "category": "Grains",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "পাইজাম চাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "paijam rice",
+        "language": "en",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Khesari Dal",
+    "bangla_name": "খেসারি ডাল",
+    "category": "Pulses",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "খেসারি ডাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "khesari dal",
+        "language": "en",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Moong Dal",
+    "bangla_name": "মুগ ডাল",
+    "category": "Pulses",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "মুগ ডাল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "moong dal",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "mug dal",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Pabda Fish",
+    "bangla_name": "পাবদা মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "পাবদা মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "pabda fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "pabda",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Tengra Fish",
+    "bangla_name": "টেংরা মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "টেংরা মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "tengra fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "tengra",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Shrimp (Prawn)",
+    "bangla_name": "চিংড়ি মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "চিংড়ি মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "চিংড়ি",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "shrimp",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "prawn",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "chingri",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Pomfret (Rupchanda)",
+    "bangla_name": "রূপচাঁদা মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "রূপচাঁদা মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "রূপচাঁদা",
+        "language": "bn",
+        "weight": 0.98
+      },
+      {
+        "alias": "pomfret",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "rupchanda",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Shing Fish",
+    "bangla_name": "শিং মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "শিং মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "shing fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "shing",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Catla Fish",
+    "bangla_name": "কাতলা মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "কাতলা মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "catla fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "katla",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Koi Fish",
+    "bangla_name": "কই মাছ",
+    "category": "Fish & Seafood",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "কই মাছ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "koi fish",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "koi",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Duck Egg",
+    "bangla_name": "হাঁসের ডিম",
+    "category": "Eggs & Dairy",
+    "default_unit": "hali",
+    "aliases": [
+      {
+        "alias": "হাঁসের ডিম",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "duck egg",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "haser dim",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cinnamon",
+    "bangla_name": "দারুচিনি",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "দারুচিনি",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "cinnamon",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "daruchini",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cardamom",
+    "bangla_name": "ছোট এলাচ",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "ছোট এলাচ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "এলাচ",
+        "language": "bn",
+        "weight": 0.95
+      },
+      {
+        "alias": "cardamom",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "elachi",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cloves",
+    "bangla_name": "লবঙ্গ",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "লবঙ্গ",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "cloves",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "lobongo",
+        "language": "phonetic",
+        "weight": 0.95
+      },
+      {
+        "alias": "long",
+        "language": "phonetic",
+        "weight": 0.92
+      }
+    ]
+  },
+  {
+    "canonical_name": "Bay Leaves",
+    "bangla_name": "তেজপাতা",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "তেজপাতা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "bay leaves",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "tej pata",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Cumin Seeds",
+    "bangla_name": "জিরা",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "জিরা",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "cumin seeds",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "jira",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Coriander Powder",
+    "bangla_name": "ধনিয়া গুঁড়া",
+    "category": "Spices",
+    "default_unit": "kg",
+    "aliases": [
+      {
+        "alias": "ধনিয়া গুঁড়া",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "coriander powder",
+        "language": "en",
+        "weight": 0.95
+      },
+      {
+        "alias": "dhonia gura",
+        "language": "phonetic",
+        "weight": 0.95
+      }
+    ]
+  },
+  {
+    "canonical_name": "Sunflower Oil",
+    "bangla_name": "সূর্যমুখী তেল",
+    "category": "Edible Oils",
+    "default_unit": "liter",
+    "aliases": [
+      {
+        "alias": "সূর্যমুখী তেল",
+        "language": "bn",
+        "weight": 1.0
+      },
+      {
+        "alias": "sunflower oil",
+        "language": "en",
+        "weight": 0.95
+      }
     ]
   }
 ]

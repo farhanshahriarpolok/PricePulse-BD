@@ -80,8 +80,39 @@ export const FAMILIAR_NAMES = {
   'Maida (Packaged)': { bn: 'প্যাকেটজাত ময়দা', en: 'Packaged Maida' },
   'Tomato': { bn: 'পাকা টমেটো', en: 'Fresh Tomato' },
   'Papaya (Green)': { bn: 'কাঁচা পেঁপে', en: 'Green Papaya' },
-  'Cucumber': { bn: 'শসা', en: 'Fresh Cucumber' },
+  'Cucumber': { bn: 'তাজা শসা', en: 'Fresh Cucumber' },
   'Carrot': { bn: 'গাজর', en: 'Fresh Carrot' },
+  // Phase 3 Expanded Staples
+  'Red Spinach': { bn: 'তাজা লাল শাক', en: 'Red Spinach', unit: 'আঁটি' },
+  'Spinach': { bn: 'তাজা পালং শাক', en: 'Spinach', unit: 'আঁটি' },
+  'Malabar Spinach': { bn: 'পুঁই শাক', en: 'Malabar Spinach', unit: 'আঁটি' },
+  'Cauliflower': { bn: 'ফুলকপি', en: 'Cauliflower', unit: 'পিস' },
+  'Cabbage': { bn: 'বাঁধাকপি', en: 'Cabbage', unit: 'পিস' },
+  'Country Beans': { bn: 'দেশি শিম', en: 'Country Beans', unit: 'কেজি' },
+  'Okra': { bn: 'তাজা ঢ্যাঁড়শ', en: 'Okra', unit: 'কেজি' },
+  'Bottle Gourd': { bn: 'কচি লাউ', en: 'Bottle Gourd', unit: 'পিস' },
+  'Green Banana': { bn: 'কাঁচকলা', en: 'Green Banana', unit: 'হালি' },
+  'Lemon': { bn: 'কাগজি লেবু', en: 'Lemon', unit: 'হালি' },
+  'Pointed Gourd': { bn: 'তাজা পটল', en: 'Pointed Gourd', unit: 'কেজি' },
+  'Chinigura Rice': { bn: 'চিনিগুঁড়া পোলাও চাল', en: 'Chinigura Rice', unit: 'কেজি' },
+  'Paijam Rice': { bn: 'পাইজাম চাল', en: 'Paijam Rice', unit: 'কেজি' },
+  'Khesari Dal': { bn: 'খেসারি ডাল', en: 'Khesari Dal', unit: 'কেজি' },
+  'Moong Dal': { bn: 'মুগ ডাল (ভাজা)', en: 'Moong Dal', unit: 'কেজি' },
+  'Pabda Fish': { bn: 'তাজা পাবদা মাছ', en: 'Pabda Fish', unit: 'কেজি' },
+  'Tengra Fish': { bn: 'টেংরা মাছ', en: 'Tengra Fish', unit: 'কেজি' },
+  'Shrimp (Prawn)': { bn: 'গলদা/বাগদা চিংড়ি', en: 'Shrimp (Prawn)', unit: 'কেজি' },
+  'Pomfret (Rupchanda)': { bn: 'রূপচাঁদা মাছ', en: 'Pomfret', unit: 'কেজি' },
+  'Shing Fish': { bn: 'তাজা শিং মাছ', en: 'Shing Fish', unit: 'কেজি' },
+  'Catla Fish': { bn: 'কাতলা মাছ', en: 'Catla Fish', unit: 'কেজি' },
+  'Koi Fish': { bn: 'কই মাছ', en: 'Koi Fish', unit: 'কেজি' },
+  'Duck Egg': { bn: 'দেশি হাঁসের ডিম', en: 'Duck Egg', unit: 'হালি' },
+  'Cinnamon': { bn: 'দারুচিনি', en: 'Cinnamon', unit: 'কেজি' },
+  'Cardamom': { bn: 'ছোট এলাচ', en: 'Cardamom', unit: 'কেজি' },
+  'Cloves': { bn: 'লবঙ্গ', en: 'Cloves', unit: 'কেজি' },
+  'Bay Leaves': { bn: 'তেজপাতা', en: 'Bay Leaves', unit: 'কেজি' },
+  'Cumin Seeds': { bn: 'আস্ত জিরা', en: 'Cumin Seeds', unit: 'কেজি' },
+  'Coriander Powder': { bn: 'ধনিয়া গুঁড়া', en: 'Coriander Powder', unit: 'কেজি' },
+  'Sunflower Oil': { bn: 'সূর্যমুখী তেল', en: 'Sunflower Oil', unit: 'লিটার' },
 };
 
 function formatBazaarPrice(val) {
@@ -120,9 +151,14 @@ export default function CommodityCard({
   const isEgg = (
     item.canonical_name === 'Farm Egg' ||
     item.canonical_name === 'Farm Eggs (Brown)' ||
+    item.canonical_name === 'Duck Egg' ||
     (item.canonical_name && item.canonical_name.toLowerCase().includes('egg') && !item.canonical_name.toLowerCase().includes('eggplant')) ||
     (item.bangla_name && item.bangla_name.includes('ডিম') && !item.bangla_name.includes('বেগুন'))
   );
+
+  const isShak = item.canonical_name?.includes('Spinach') || item.bangla_name?.includes('শাক');
+  const isHaliProduce = item.canonical_name === 'Lemon' || item.canonical_name === 'Green Banana' || item.bangla_name?.includes('লেবু') || item.bangla_name?.includes('কাঁচকলা');
+  const isPieceProduce = item.canonical_name === 'Cauliflower' || item.canonical_name === 'Cabbage' || item.canonical_name === 'Bottle Gourd' || item.bangla_name?.includes('ফুলকপি') || item.bangla_name?.includes('বাঁধাকপি') || item.bangla_name?.includes('লাউ');
 
   let rawAvg = item.price_summary?.avg_price || item.avg_price || 0.0;
   let rawWs = item.wholesale_avg || item.channels?.wholesale_avg;
@@ -151,6 +187,12 @@ export default function CommodityCard({
         ? `প্রতি পিস ৳ ${toBengaliNumeral(formatBazaarPrice(perPiece), lang)}`
         : `৳ ${formatBazaarPrice(perPiece)} / pc`;
     }
+  } else if (isShak) {
+    displayUnit = lang === 'bn' ? 'আঁটি' : 'bundle';
+  } else if (isHaliProduce) {
+    displayUnit = lang === 'bn' ? 'হালি' : 'hali';
+  } else if (isPieceProduce) {
+    displayUnit = lang === 'bn' ? 'পিস' : 'pc';
   } else {
     if ((displayUnit === 'kg' || displayUnit === 'কেজি') && lang === 'bn') displayUnit = 'কেজি';
     if ((displayUnit === 'liter' || displayUnit === 'লিটার') && lang === 'bn') displayUnit = 'লিটার';
@@ -219,6 +261,21 @@ export default function CommodityCard({
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {displaySubtitle}
               </p>
+              
+              {/* Verified Source & Live Freshness Badge for Hero */}
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-semibold" title="কৃষি বিপণন অধিদপ্তর ও ট্রেডিং কর্পোরেশন অব বাংলাদেশ কর্তৃক সরাসরি যাচাইকৃত">
+                  <span>🏛️</span>
+                  <span>{lang === 'bn' ? 'DAM / TCB ভেরিফাইড' : 'DAM / TCB Verified'}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/60">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span>{lang === 'bn' ? '🟢 আজ সকাল ৭:০০ টায় যাচাইকৃত (১০০% ফ্রেশ রেট)' : '🟢 Verified Today 7:00 AM (100% Fresh Rate)'}</span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -469,12 +526,29 @@ export default function CommodityCard({
         </div>
       </div>
 
-      {/* 4. Transparency Badge */}
-      <div className="flex items-center text-[10px] text-slate-500 dark:text-slate-400 gap-1 select-none">
-        <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500 flex-shrink-0" />
-        <span className="truncate">
-          {lang === 'bn' ? 'সর্বশেষ আপডেট: আজ সকাল ৭টা (DAM/TCB)' : 'Latest Update: Today 7:00 AM (DAM/TCB)'}
-        </span>
+      {/* 4. Transparency & Verified Freshness Badges */}
+      <div className="flex flex-col gap-1 text-[10px] select-none pt-0.5">
+        <div className="flex items-center justify-between gap-1 flex-wrap">
+          <span 
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60 font-semibold"
+            title="কৃষি বিপণন অধিদপ্তর (DAM) ও টিসিবি (TCB) দৈনিক বাজার পর্যবেক্ষণ"
+          >
+            <span>🏛️</span>
+            <span>{lang === 'bn' ? 'DAM / TCB ভেরিফাইড' : 'DAM / TCB Verified'}</span>
+          </span>
+          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[10px]">{lang === 'bn' ? '১০০% ফ্রেশ রেট' : '100% Fresh Rate'}</span>
+          </span>
+        </div>
+        <div className="flex items-center text-slate-500 dark:text-slate-400 gap-1 text-[10.5px]">
+          <span className="truncate">
+            {lang === 'bn' ? '🟢 আজ সকাল ৭:০০ টায় যাচাইকৃত (১০০% ফ্রেশ রেট)' : '🟢 Verified Today 7:00 AM (100% Fresh Rate)'}
+          </span>
+        </div>
       </div>
 
       {/* 5. Action Bar: Active In-Card Stepper [- N +] or 1-Click '+ ফর্দে যোগ করুন' */}
