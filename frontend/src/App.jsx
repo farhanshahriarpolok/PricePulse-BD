@@ -50,21 +50,31 @@ import {
   getSyncTaskStatus,
 } from './api/endpoints';
 
+function safeGetStorage(key, fallback) {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return localStorage.getItem(key) || fallback;
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+function safeSetStorage(key, val) {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem(key, val);
+    }
+  } catch (e) {}
+}
+
 export default function App() {
   // Localization State - Default natural colloquial Bangla
-  const [lang, setLang] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('pricepulse_lang') || 'bn';
-    }
-    return 'bn';
-  });
+  const [lang, setLang] = useState(() => safeGetStorage('pricepulse_lang', 'bn'));
 
   const toggleLang = () => {
     setLang((prev) => {
       const next = prev === 'bn' ? 'en' : 'bn';
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('pricepulse_lang', next);
-      }
+      safeSetStorage('pricepulse_lang', next);
       return next;
     });
   };
@@ -72,12 +82,7 @@ export default function App() {
   const t = (key) => getTranslation(key, lang);
 
   // Dynamic Theme State: Clean Light Mode as Default
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('pricepulse_theme') || 'light';
-    }
-    return 'light';
-  });
+  const [theme, setTheme] = useState(() => safeGetStorage('pricepulse_theme', 'light'));
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -86,7 +91,7 @@ export default function App() {
       } else {
         document.documentElement.classList.remove('dark');
       }
-      localStorage.setItem('pricepulse_theme', theme);
+      safeSetStorage('pricepulse_theme', theme);
     }
   }, [theme]);
 
@@ -95,18 +100,11 @@ export default function App() {
   };
 
   // Sticky District Selector State
-  const [selectedDistrict, setSelectedDistrict] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('pricepulse_district') || 'dhaka_karwan';
-    }
-    return 'dhaka_karwan';
-  });
+  const [selectedDistrict, setSelectedDistrict] = useState(() => safeGetStorage('pricepulse_district', 'dhaka_karwan'));
 
   const handleSelectDistrict = (dist) => {
     setSelectedDistrict(dist);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('pricepulse_district', dist);
-    }
+    safeSetStorage('pricepulse_district', dist);
   };
 
   // Active Tab State with URL query & hash synchronization
@@ -605,14 +603,14 @@ export default function App() {
         {/* TAB 3: COMMODITY EXPLORER */}
         {activeTab === 'explorer' && (
           <ErrorBoundary title={t('nav_explorer')}>
-            {selectedCommodity ? (
+            {(selectedCommodity || (commodities && commodities.length > 0)) ? (
               <CommodityDetailExplorer
-                commodity={selectedCommodity}
-                commodities={commodities}
+                commodity={selectedCommodity || commodities[0]}
+                commodities={commodities || []}
                 onSelectCommodity={setSelectedCommodity}
-                historyData={commodityHistory}
+                historyData={commodityHistory || []}
                 spatialData={spatialData}
-                matchedPulse={allPulseItems.find((p) => p.commodity_id === selectedCommodity.id)}
+                matchedPulse={(allPulseItems || []).find((p) => p.commodity_id === (selectedCommodity || commodities[0])?.id)}
                 onBack={() => setActiveTab('pulse')}
                 onAddToBasket={handleAddToBasket}
                 lang={lang}

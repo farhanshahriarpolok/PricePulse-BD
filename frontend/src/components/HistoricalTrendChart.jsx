@@ -23,18 +23,19 @@ export default function HistoricalTrendChart({
 
   const toFixedSafe = (val, d = 1) => (val != null && !isNaN(val)) ? Number(val).toFixed(d) : '0';
 
-  // Process and slice history data by active range filter
+  // Process and slice history data by active range filter safely
   const activeSlice = useMemo(() => {
-    if (!historyData || historyData.length === 0) return [];
+    if (!historyData || !Array.isArray(historyData) || historyData.length === 0) return [];
     return historyData.slice(-dayRange);
   }, [historyData, dayRange]);
 
   const chartData = useMemo(() => {
+    if (!Array.isArray(activeSlice)) return [];
     return activeSlice.map((item) => ({
-      date: item.date,
-      price: item.avg_price != null ? Number(item.avg_price) : null,
-      min: item.min_price != null ? Number(item.min_price) : null,
-      max: item.max_price != null ? Number(item.max_price) : null,
+      date: item?.date || '',
+      price: item?.avg_price != null && !isNaN(item.avg_price) ? Number(item.avg_price) : null,
+      min: item?.min_price != null && !isNaN(item.min_price) ? Number(item.min_price) : null,
+      max: item?.max_price != null && !isNaN(item.max_price) ? Number(item.max_price) : null,
     }));
   }, [activeSlice]);
 

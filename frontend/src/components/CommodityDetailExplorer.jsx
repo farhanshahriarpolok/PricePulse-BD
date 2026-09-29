@@ -123,22 +123,42 @@ export default function CommodityDetailExplorer({
   const [selectedDistrictKey, setSelectedDistrictKey] = useState('dhaka');
   const [selectedMarketId, setSelectedMarketId] = useState('dhaka_karwan');
 
-  // Active district & market resolution
-  const districtData = DISTRICT_LOCAL_MARKETS[selectedDistrictKey] || DISTRICT_LOCAL_MARKETS.dhaka;
-  const currentMarket = districtData.markets.find((m) => m.id === selectedMarketId) || districtData.markets[0];
+  // Active district & market resolution with safe fallbacks
+  const districtData = DISTRICT_LOCAL_MARKETS[selectedDistrictKey] || DISTRICT_LOCAL_MARKETS.dhaka || {
+    districtBn: 'ঢাকা',
+    districtEn: 'Dhaka',
+    wholesaleHubBn: 'কারওয়ান বাজার আড়ত',
+    wholesaleHubEn: 'Karwan Bazar Wholesale Hub',
+    markets: [{ id: 'dhaka_karwan', nameBn: 'কারওয়ান বাজার (পাইকারি/খুচরা)', nameEn: 'Karwan Bazar', offset: 0 }]
+  };
+  const currentMarket = districtData?.markets?.find((m) => m.id === selectedMarketId) || districtData?.markets?.[0] || {
+    id: 'default',
+    nameBn: 'কারওয়ান বাজার (পাইকারি/খুচরা)',
+    nameEn: 'Karwan Bazar (Wholesale/Retail)',
+    offset: 0
+  };
 
-  // Base prices
+  // Safe numerical base prices with fallback defaults
   const unit = commodity?.default_unit || matchedPulse?.unit || 'কেজি';
-  const avgBase = matchedPulse?.price_summary?.avg_price || matchedPulse?.retail_price || 65;
-  const wholesaleBase = matchedPulse?.wholesale_price || spatialData?.spread_summary?.wholesale_avg || Math.round(avgBase * 0.82);
-  const retailBase = matchedPulse?.retail_price || spatialData?.spread_summary?.retail_avg || avgBase;
-  const onlineBase = matchedPulse?.online_price || spatialData?.spread_summary?.online_avg || Math.round(avgBase * 1.08);
-  const benchmarkRate = matchedPulse?.benchmark_price || Math.round(avgBase * 0.95);
+  const rawAvg = Number(matchedPulse?.price_summary?.avg_price) || Number(matchedPulse?.retail_price) || 65;
+  const avgBase = isNaN(rawAvg) || rawAvg <= 0 ? 65 : rawAvg;
+  
+  const rawWholesale = Number(matchedPulse?.wholesale_price) || Number(spatialData?.spread_summary?.wholesale_avg);
+  const wholesaleBase = !isNaN(rawWholesale) && rawWholesale > 0 ? rawWholesale : Math.round(avgBase * 0.82);
+
+  const rawRetail = Number(matchedPulse?.retail_price) || Number(spatialData?.spread_summary?.retail_avg);
+  const retailBase = !isNaN(rawRetail) && rawRetail > 0 ? rawRetail : avgBase;
+
+  const rawOnline = Number(matchedPulse?.online_price) || Number(spatialData?.spread_summary?.online_avg);
+  const onlineBase = !isNaN(rawOnline) && rawOnline > 0 ? rawOnline : Math.round(avgBase * 1.08);
+
+  const rawBenchmark = Number(matchedPulse?.benchmark_price);
+  const benchmarkRate = !isNaN(rawBenchmark) && rawBenchmark > 0 ? rawBenchmark : Math.round(avgBase * 0.95);
 
   // Adjusted prices for selected physical market
   const marketRetailPrice = retailBase + (currentMarket?.offset || 0);
   const marketWholesalePrice = wholesaleBase;
-  const wholesaleDiff = marketRetailPrice - marketWholesalePrice;
+  const wholesaleDiff = Math.max(0, marketRetailPrice - marketWholesalePrice);
 
   // Best Buying Decision Savings calculations
   const wholesaleSavings = Math.max(8, marketRetailPrice - marketWholesalePrice);

@@ -1,5 +1,5 @@
 // PricePulse BD Service Worker for Offline PWA Support
-const CACHE_NAME = 'pricepulse-v1';
+const CACHE_NAME = 'pricepulse-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -36,6 +36,22 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
+  // For HTML / navigation requests: ALWAYS NETWORK FIRST to prevent stale chunk 404s
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match('/index.html')))
+    );
+    return;
+  }
+
   // For API commodity requests, try network first, then cache
   if (url.pathname.startsWith('/api/v1/')) {
     event.respondWith(
@@ -68,3 +84,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
