@@ -6,6 +6,7 @@ import {
   FAMILIAR_NAMES 
 } from './CommodityCard';
 import { getCommodityCanonicalCategory } from '../utils/taxonomy';
+import { getMarketById, calculateMarketPrice } from '../utils/markets';
 import { ShoppingBasket, Plus, Minus, ArrowRight, Check } from 'lucide-react';
 
 const CATEGORY_LABELS = {
@@ -29,8 +30,11 @@ export default function CommodityTableView({
   onAddToBasket,
   onUpdateQuantity,
   onSelectCommodity,
+  selectedMarketId = 'dhaka_mirpur1',
 }) {
   if (!items || items.length === 0) return null;
+
+  const activeMarket = getMarketById(selectedMarketId);
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
@@ -182,9 +186,14 @@ export default function CommodityTableView({
                     ৳ {toBengaliNumeral(Math.round(wholesale), lang)}
                   </td>
 
-                  {/* 5. Retail */}
-                  <td className="py-3 px-3 font-mono text-slate-700 dark:text-slate-300 font-medium">
-                    ৳ {toBengaliNumeral(Math.round(retail), lang)}
+                  {/* 5. Retail (Selected Market Rate & Tag) */}
+                  <td className="py-3 px-3">
+                    <div className="font-mono text-slate-700 dark:text-slate-300 font-medium">
+                      ৳ {toBengaliNumeral(Math.round(calculateMarketPrice(retail, selectedMarketId)), lang)}
+                    </div>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans block truncate">
+                      ({lang === 'bn' ? activeMarket.shortBn : activeMarket.shortEn})
+                    </span>
                   </td>
 
                   {/* 6. Online */}

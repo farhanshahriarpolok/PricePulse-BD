@@ -36,6 +36,7 @@ import ExportDataModal from './components/ExportDataModal';
 import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
 import CommodityTableView from './components/CommodityTableView';
+import LocationBanner from './components/LocationBanner';
 import BazaarBasketView from './components/BazaarBasketView';
 import BudgetOptimizerModal from './components/BudgetOptimizerModal';
 import CommodityDetailExplorer from './components/CommodityDetailExplorer';
@@ -109,6 +110,16 @@ export default function App() {
   const handleSelectDistrict = (dist) => {
     setSelectedDistrict(dist);
     safeSetStorage('pricepulse_district', dist);
+  };
+
+  // Selected Physical Market State (Phase 2 Location Granularity)
+  const [selectedMarketId, setSelectedMarketId] = useState(() => 
+    safeGetStorage('pricepulse_selected_market', 'dhaka_mirpur1')
+  );
+
+  const handleSelectMarket = (mId) => {
+    setSelectedMarketId(mId);
+    safeSetStorage('pricepulse_selected_market', mId);
   };
 
   // Active Tab State with URL query & hash synchronization
@@ -587,6 +598,13 @@ export default function App() {
                 }}
               />
 
+              {/* Prominent Location Banner & Quick Switcher (Phase 2) */}
+              <LocationBanner
+                selectedMarketId={selectedMarketId}
+                onSelectMarket={handleSelectMarket}
+                lang={lang}
+              />
+
               {/* Segmented Flat Tab Bar (Integrated Naturally into Container) */}
               <div className="my-4">
                 <div className="flex items-center justify-between mb-1.5">
@@ -657,6 +675,7 @@ export default function App() {
                     <CommodityTableView
                       items={displayedPulseItems}
                       lang={lang}
+                      selectedMarketId={selectedMarketId}
                       getBasketQuantity={getBasketQuantity}
                       onAddToBasket={(item) => handleUpdateBasketQuantity(item, 1)}
                       onUpdateQuantity={(item, delta) => handleUpdateBasketQuantity(item, delta)}
@@ -675,6 +694,7 @@ export default function App() {
                           item={topMover}
                           isHero={true}
                           lang={lang}
+                          selectedMarketId={selectedMarketId}
                           basketQuantity={getBasketQuantity(topMover)}
                           onAddToBasket={() => handleUpdateBasketQuantity(topMover, 1)}
                           onUpdateQuantity={(delta) => handleUpdateBasketQuantity(topMover, delta)}
@@ -692,6 +712,7 @@ export default function App() {
                           key={item.commodity_id}
                           item={item}
                           lang={lang}
+                          selectedMarketId={selectedMarketId}
                           basketQuantity={getBasketQuantity(item)}
                           onAddToBasket={() => handleUpdateBasketQuantity(item, 1)}
                           onUpdateQuantity={(delta) => handleUpdateBasketQuantity(item, delta)}

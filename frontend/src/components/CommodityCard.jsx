@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import MiniSparkline from './MiniSparkline';
 import CommodityIcon from './media/CommodityIcon';
-import { ShoppingBasket, Check, ArrowRight, Clock, Plus, Minus } from 'lucide-react';
+import { ShoppingBasket, Check, ArrowRight, Clock, Plus, Minus, MapPin } from 'lucide-react';
+import { getMarketById, getTopMarketsForDistrict, calculateMarketPrice } from '../utils/markets';
 
 /**
  * Converts English digits to Bengali numerals if language is 'bn'.
@@ -97,10 +98,14 @@ export default function CommodityCard({
   basketQuantity = 0,
   isHero = false,
   lang = 'bn',
+  selectedMarketId = 'dhaka_mirpur1',
 }) {
   const [justAdded, setJustAdded] = useState(false);
 
   if (!item) return null;
+
+  const activeMarket = getMarketById(selectedMarketId);
+  const localMarkets = getTopMarketsForDistrict(activeMarket?.districtId || 'dhaka');
 
   // Title formatting: Use consumer familiar titles
   const familiar = FAMILIAR_NAMES[item.canonical_name];
@@ -248,6 +253,30 @@ export default function CommodityCard({
                     >
                       {isCheapest && <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
                       {ch.name}: ৳{toBengaliNumeral(Math.round(ch.price), lang)}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* Local Markets Spread Strip for Hero Card */}
+              <div className="mt-2 flex items-center gap-1.5 text-xs font-mono text-slate-700 dark:text-slate-300">
+                <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1 shrink-0">
+                  <MapPin className="w-2.5 h-2.5 text-emerald-600" />
+                  <span>{lang === 'bn' ? 'স্থানীয় দর:' : 'Local:'}</span>
+                </span>
+                {localMarkets.map((m) => {
+                  const isSelected = m.id === selectedMarketId;
+                  const mPrice = calculateMarketPrice(retail, m.id);
+                  return (
+                    <span
+                      key={m.id}
+                      className={`px-2 py-0.5 rounded text-[11px] border transition-all ${
+                        isSelected
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-700/60 shadow-2xs'
+                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700/60'
+                      }`}
+                    >
+                      {lang === 'bn' ? m.shortBn : m.shortEn}: ৳{toBengaliNumeral(Math.round(mPrice), lang)}
                     </span>
                   );
                 })}
@@ -402,6 +431,42 @@ export default function CommodityCard({
             </div>
           );
         })}
+      </div>
+
+      {/* 3.5. Local Markets Spread Strip */}
+      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/80 p-1.5 select-none">
+        <div className="flex items-center justify-between mb-1 px-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1">
+            <MapPin className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+            <span>{lang === 'bn' ? 'স্থানীয় বাজারের দর' : 'Local Markets Spread'}</span>
+          </span>
+          <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+            {lang === 'bn' ? activeMarket?.districtBn : activeMarket?.districtEn}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-1 text-[11px] font-mono text-center">
+          {localMarkets.map((m) => {
+            const isSelected = m.id === selectedMarketId;
+            const mPrice = calculateMarketPrice(retail, m.id);
+            return (
+              <div
+                key={m.id}
+                className={`py-1 px-1 rounded-lg flex flex-col justify-center transition-all ${
+                  isSelected
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700/60 shadow-2xs'
+                    : 'bg-white/80 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800'
+                }`}
+              >
+                <span className="text-[9px] font-sans truncate block leading-tight">
+                  {lang === 'bn' ? m.shortBn : m.shortEn}
+                </span>
+                <span className="leading-tight mt-0.5">
+                  ৳{toBengaliNumeral(Math.round(mPrice), lang)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* 4. Transparency Badge */}
