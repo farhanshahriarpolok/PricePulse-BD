@@ -12,11 +12,13 @@ Performs an automated end-to-end validation of all 6 mission-critical system pil
 
 import sys
 import json
-import httpx
+from pathlib import Path
 from datetime import datetime
+import httpx
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 BASE_URL = "http://127.0.0.1:8000"
 

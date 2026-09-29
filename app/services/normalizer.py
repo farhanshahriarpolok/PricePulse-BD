@@ -130,7 +130,7 @@ class CommodityNormalizer:
         normalized = normalized.lower()
         # Collapse multiple spaces and trim punctuation
         normalized = re.sub(r"[\t\r\n]+", " ", normalized)
-        normalized = re.sub(r"[\(\)\[\],:\/_]+", " ", normalized)
+        normalized = re.sub(r"[\(\)\[\],:\/_\-]+", " ", normalized)
         return " ".join(normalized.split())
 
     def _load_taxonomy(self) -> None:
@@ -193,7 +193,13 @@ class CommodityNormalizer:
         if cleaned in self._alias_index:
             return self._alias_index[cleaned]
 
-        # 2. Tokenized / whole-phrase match across aliases (respecting word boundaries)
+        # 2. Token set match (handles word reordering e.g. "পেঁয়াজ দেশি" <-> "দেশি পেঁয়াজ")
+        cleaned_tokens = set(cleaned.split())
+        for alias_key, item in self._alias_index.items():
+            if set(alias_key.split()) == cleaned_tokens:
+                return item
+
+        # 3. Tokenized / whole-phrase match across aliases (respecting word boundaries)
         cleaned_padded = f" {cleaned} "
         for alias_key, item in self._alias_index.items():
             alias_padded = f" {alias_key} "

@@ -35,6 +35,14 @@ class MarketAnalyticsResult:
 class AnalyticsService:
     """Computes price statistics, channel markups, and price pressure classifications."""
 
+    @staticmethod
+    def clean_price(val: Optional[float]) -> Optional[float]:
+        """Round consumer-facing prices to clean integers or realistic half-taka increments (e.g. 50.0, 52.5, 125.0)."""
+        if val is None:
+            return None
+        half_rounded = round(val * 2) / 2.0
+        return half_rounded if half_rounded != int(half_rounded) else float(int(half_rounded))
+
     def compute_analytics(self, observations: List[PriceObservation]) -> MarketAnalyticsResult:
         if not observations:
             return MarketAnalyticsResult(
@@ -44,9 +52,9 @@ class AnalyticsService:
             )
 
         prices = [obs.normalized_price for obs in observations]
-        min_p = round(min(prices), 2)
-        max_p = round(max(prices), 2)
-        avg_p = round(sum(prices) / len(prices), 2)
+        min_p = self.clean_price(min(prices))
+        max_p = self.clean_price(max(prices))
+        avg_p = self.clean_price(sum(prices) / len(prices))
 
         # Categorize by channel
         wholesale_prices: List[float] = []
@@ -66,13 +74,13 @@ class AnalyticsService:
                 retail_prices.append(obs.normalized_price)
 
         wholesale_avg = (
-            round(sum(wholesale_prices) / len(wholesale_prices), 2) if wholesale_prices else None
+            self.clean_price(sum(wholesale_prices) / len(wholesale_prices)) if wholesale_prices else None
         )
         retail_avg = (
-            round(sum(retail_prices) / len(retail_prices), 2) if retail_prices else None
+            self.clean_price(sum(retail_prices) / len(retail_prices)) if retail_prices else None
         )
         online_avg = (
-            round(sum(online_prices) / len(online_prices), 2) if online_prices else None
+            self.clean_price(sum(online_prices) / len(online_prices)) if online_prices else None
         )
 
         # Calculate spread between retail and wholesale

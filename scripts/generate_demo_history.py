@@ -288,6 +288,7 @@ def generate_history(session=None):
 
 
 generate_demo_history = generate_history
+seed_demo_history = generate_history
 
 
 if __name__ == "__main__":

@@ -8,8 +8,9 @@
       {"alias": "দেশি পেঁয়াজ", "language": "bn", "weight": 1.0},
       {"alias": "দেশী পেঁয়াজ", "language": "bn", "weight": 0.98},
       {"alias": "পেঁয়াজ (দেশি)", "language": "bn", "weight": 0.98},
-      {"alias": "দেশি পেঁয়াজ", "language": "bn", "weight": 1.0},
-      {"alias": "পেঁয়াজ (দেশি)", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁয়াজ - দেশী", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁয়াজ - দেশী", "language": "bn", "weight": 0.98},
+      {"alias": "পেঁয়াজ - দেশি", "language": "bn", "weight": 0.98},
       {"alias": "deshi peyaj", "language": "phonetic", "weight": 0.95},
       {"alias": "local onion", "language": "en", "weight": 0.95},
       {"alias": "onion (local)", "language": "en", "weight": 1.0},
@@ -58,6 +59,9 @@
       {"alias": "মিনিকেট চাল", "language": "bn", "weight": 1.0},
       {"alias": "মিনিকেট", "language": "bn", "weight": 0.95},
       {"alias": "চাল (মিনিকেট)", "language": "bn", "weight": 0.98},
+      {"alias": "আমন চাল - সরু", "language": "bn", "weight": 0.95},
+      {"alias": "বোরো চাল - সরু", "language": "bn", "weight": 0.95},
+      {"alias": "সরু চাল", "language": "bn", "weight": 0.95},
       {"alias": "miniket rice", "language": "en", "weight": 0.95},
       {"alias": "rice (miniket)", "language": "en", "weight": 1.0},
       {"alias": "miniket chal", "language": "phonetic", "weight": 0.92}
@@ -72,6 +76,9 @@
       {"alias": "নাজিরশাইল চাল", "language": "bn", "weight": 1.0},
       {"alias": "নাজিরশাইল", "language": "bn", "weight": 0.95},
       {"alias": "চাল (নাজিরশাইল)", "language": "bn", "weight": 0.98},
+      {"alias": "আমন চাল - মাঝারি", "language": "bn", "weight": 0.95},
+      {"alias": "বোরো চাল - মাঝারি", "language": "bn", "weight": 0.95},
+      {"alias": "মাঝারি চাল", "language": "bn", "weight": 0.95},
       {"alias": "nazirshail rice", "language": "en", "weight": 0.95},
       {"alias": "rice (nazirshail)", "language": "en", "weight": 1.0},
       {"alias": "najirshail chal", "language": "phonetic", "weight": 0.90}
@@ -84,6 +91,8 @@
     "default_unit": "kg",
     "aliases": [
       {"alias": "মোটা চাল", "language": "bn", "weight": 1.0},
+      {"alias": "আমন চাল - মোটা", "language": "bn", "weight": 0.95},
+      {"alias": "বোরো চাল - মোটা", "language": "bn", "weight": 0.95},
       {"alias": "স্বর্ণা চাল", "language": "bn", "weight": 0.92},
       {"alias": "চাল (মোটা)", "language": "bn", "weight": 0.98},
       {"alias": "coarse rice", "language": "en", "weight": 0.95},
@@ -113,6 +122,8 @@
     "aliases": [
       {"alias": "ব্রয়লার মুরগি", "language": "bn", "weight": 1.0},
       {"alias": "ব্রয়লার মুরগী", "language": "bn", "weight": 0.98},
+      {"alias": "খামারের মুরগী", "language": "bn", "weight": 0.98},
+      {"alias": "খামারের মুরগি", "language": "bn", "weight": 0.98},
       {"alias": "ব্রয়লার", "language": "bn", "weight": 0.95},
       {"alias": "মুরগি (ব্রয়লার)", "language": "bn", "weight": 0.98},
       {"alias": "মুরগি", "language": "bn", "weight": 0.85},
@@ -211,6 +222,7 @@
     "aliases": [
       {"alias": "খাসির মাংস", "language": "bn", "weight": 1.0},
       {"alias": "খাসি মাংস", "language": "bn", "weight": 0.98},
+      {"alias": "খাসী", "language": "bn", "weight": 0.95},
       {"alias": "মেষ শাবকের মাংস", "language": "bn", "weight": 0.90},
       {"alias": "খাসি", "language": "bn", "weight": 0.88},
       {"alias": "mutton (goat meat)", "language": "en", "weight": 1.0},

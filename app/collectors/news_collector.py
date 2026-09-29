@@ -35,8 +35,9 @@ class NewsCollector(BaseCollector):
 
     DEFAULT_LIVE_URL = "https://www.prothomalo.com/topic/%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0-%E0%A6%A6%E0%A6%B0"
     FALLBACK_LIVE_URLS = [
+        "https://www.jugantor.com/topic/%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0-%E0%A6%A6%E0%A6%B0",
+        "https://samakal.com/topic/%E0%A6%AC%E0%A6%BE%E0%A6%9C%E0%A6%BE%E0%A6%B0%E0%A6%A6%E0%A6%B0",
         "https://www.prothomalo.com/business",
-        "https://www.ittefaq.com.bd/business",
     ]
 
     def __init__(
@@ -179,103 +180,128 @@ class NewsCollector(BaseCollector):
             return "pc"
         return "কেজি"
 
+    COMMODITY_PATTERNS = [
+        ("ফার্মের ডিম", r"(?:ফার্মের\s+(?:মুরগির\s+)?)?(?:লাল\s+|সাদা\s+)?ডিম(?:ের)?", "হালি"),
+        ("বোতলজাত সয়াবিন তেল", r"(?:বোতলজাত\s+)?(?:সয়াবিন|সয়াবিন)\s+তেল(?:ের)?", "লিটার"),
+        ("ব্রয়লার মুরগি", r"(?:ব্রয়লার|ব্রয়লার|খামারের|সোনালী)?\s*মুরগি(?:র)?", "কেজি"),
+        ("গোল আলু", r"(?:ডায়মন্ড\s+জাতের\s+|ডায়মন্ড\s+জাতের\s+)?(?:গোল\s+|নতুন\s+)?আলু(?:র)?", "কেজি"),
+        ("দেশি পেঁয়াজ", r"(?:দেশি\s+|আমদানি\s+)?(?:পেঁয়াজ|পেঁয়াজ)(?:ের)?", "কেজি"),
+        ("দেশি রসুন", r"(?:দেশি\s+|আমদানি\s+)?রসুন(?:ের)?", "কেজি"),
+        ("কাঁচা মরিচ", r"কাঁচা\s+মরিচ(?:ের)?", "কেজি"),
+        ("ইলিশ মাছ", r"ইলিশ(?:\s+মাছ)?(?:ের)?", "কেজি"),
+        ("রুই মাছ", r"রুই(?:\s+মাছ)?(?:ের)?", "কেজি"),
+        ("চিনি", r"(?:দেশি\s+|আমদানি\s+)?চিনি(?:র)?", "কেজি"),
+        ("আটা", r"(?:প্যাকেট\s+|মোড়কজাত\s+|খোলা\s+)?আটা(?:র)?", "কেজি"),
+        ("গরুর মাংস", r"গরু(?:র)?\s*(?:মাংস)?(?:ের)?", "কেজি"),
+        ("খাসির মাংস", r"খাসি(?:র)?\s*(?:মাংস)?(?:ের)?", "কেজি"),
+        ("মোটা চাল", r"(?:মোটা\s+|সরু\s+|নাজিরশাইল\s+|মিনিকেট\s+)?চাল(?:ের)?", "কেজি"),
+        ("মসুর ডাল", r"(?:মসুর|মশুর|মুগ)\s+ডাল(?:ের)?", "কেজি"),
+    ]
+
     def parse_snippet(self, text: str, default_market: str) -> Optional[RawObservation]:
         """
         Apply deterministic regex rules to extract commodity, unit, and price quotation.
+        Prioritizes canonical food staples and rejects spurious non-commodity numeric phrases.
         """
-        # Rule 1: Bengali range: "দেশি পেঁয়াজ বিক্রি হচ্ছে প্রতি কেজি ১২০ থেকে ১৩০ টাকায়"
-        bn_range = re.search(
-            r"([^\s।,]+(?:\s+[^\s।,]+)?)\s+(?:বিক্রি\s+হচ্ছে|দরে\s+বিক্রি|দাম)\s+(?:প্রতি)?\s*([^\s।,]+)?\s*([০-৯]+)\s*(?:থেকে|-|–)\s*([০-৯]+)\s*টাকা",
-            text,
-        )
-        if bn_range:
-            raw_name = bn_range.group(1).strip()
-            raw_unit = self._sanitize_unit(bn_range.group(2))
-            p1 = self._convert_num(bn_range.group(3))
-            p2 = self._convert_num(bn_range.group(4))
-            if p1 and p2:
-                avg_price = round((p1 + p2) / 2.0, 2)
-                return RawObservation(
-                    source_code=self.source_code,
-                    market_name=default_market,
-                    raw_commodity_name=raw_name,
-                    raw_unit=raw_unit,
-                    raw_price=avg_price,
-                    price_type="retail_avg",
-                    observation_date=self.target_date,
-                    completeness_score=0.85,
-                    is_fallback=False,
-                )
+        # Tier 1: Match against anchored staple commodity patterns
+        for raw_name, pat, default_unit in self.COMMODITY_PATTERNS:
+            unit = default_unit
+            is_dozen = "ডজন" in text
+            if "হালি" in text:
+                unit = "হালি"
+            elif is_dozen:
+                unit = "হালি" if "ডিম" in raw_name else "pc"
+            elif "লিটার" in text:
+                unit = "লিটার"
+            elif "কেজি" in text:
+                unit = "কেজি"
 
-        # Rule 2: Bengali single/hyphen price: "নতুন আলু প্রতি কেজি ৫৫-৬০ টাকা"
-        bn_single = re.search(
-            r"([^\s।,]+(?:\s+[^\s।,]+)?)\s+প্রতি\s*([^\s।,]+)\s*([০-৯]+)(?:\s*[-–]\s*([০-৯]+))?\s*টাকা",
-            text,
-        )
-        if bn_single:
-            raw_name = bn_single.group(1).strip()
-            raw_unit = self._sanitize_unit(bn_single.group(2))
-            p1 = self._convert_num(bn_single.group(3))
-            p2 = self._convert_num(bn_single.group(4)) if bn_single.group(4) else p1
-            if p1 and p2:
-                avg_price = round((p1 + p2) / 2.0, 2)
-                return RawObservation(
-                    source_code=self.source_code,
-                    market_name=default_market,
-                    raw_commodity_name=raw_name,
-                    raw_unit=raw_unit,
-                    raw_price=avg_price,
-                    price_type="retail_avg",
-                    observation_date=self.target_date,
-                    completeness_score=0.85,
-                    is_fallback=False,
-                )
+            # Helper to adjust price if unit was per-dozen
+            def adjust_p(val: float) -> float:
+                if is_dozen:
+                    return round(val / 3.0, 2) if "ডিম" in raw_name else round(val / 12.0, 2)
+                return val
 
-        # Rule 3: Headline pattern with price first or middle: "২২০০ টাকা কেজি ইলিশ" or "সয়াবিন তেলের দাম হয় ২০৪ টাকা"
-        bn_headline_inverted = re.search(
-            r"([০-৯]+(?:\.[০-৯]+)?|\d+(?:\.\d+)?)\s*টাকা\s*(?:কেজি|লিটার|হালি)?\s*([^\s।,]+(?:\s+[^\s।,]+)?)",
-            text,
-        )
-        if bn_headline_inverted:
-            p_val = self._convert_num(bn_headline_inverted.group(1))
-            raw_name = bn_headline_inverted.group(2).strip()
-            unit_guess = "লিটার" if "তেল" in raw_name or "লিটার" in text else ("pc" if "ডিম" in raw_name or "হালি" in text else "কেজি")
-            if p_val and p_val > 10 and len(raw_name) > 1 and not any(k in raw_name for k in ["বেশি", "কম", "কমেছে", "বাড়তি", "কারণ", "বাজার"]):
-                return RawObservation(
-                    source_code=self.source_code,
-                    market_name=default_market,
-                    raw_commodity_name=raw_name,
-                    raw_unit=unit_guess,
-                    raw_price=p_val,
-                    price_type="retail_avg",
-                    observation_date=self.target_date,
-                    completeness_score=0.85,
-                    is_fallback=False,
-                )
+            # 1.1 Range: [Commodity] ... [p1] থেকে/to/- [p2] টাকা
+            m_range = re.search(
+                pat + r".{0,35}?(?:প্রতি\s*(?:কেজি|লিটার|হালি|ডজন)?)?\s*([০-৯0-9]+)\s*(?:থেকে|-|–|to)\s*([০-৯0-9]+)\s*(?:টাকা)?",
+                text,
+            )
+            if m_range:
+                v1 = self._convert_num(m_range.group(1))
+                v2 = self._convert_num(m_range.group(2))
+                if v1 and v2 and 15 <= v1 <= 5000 and 15 <= v2 <= 5000:
+                    avg_v = adjust_p(round((v1 + v2) / 2.0, 2))
+                    return RawObservation(
+                        source_code=self.source_code,
+                        market_name=default_market,
+                        raw_commodity_name=raw_name,
+                        raw_unit=unit,
+                        raw_price=avg_v,
+                        price_type="retail_avg",
+                        observation_date=self.target_date,
+                        completeness_score=0.88,
+                        is_fallback=False,
+                    )
 
-        # Rule 4: Verb pattern: "বোতলজাত সয়াবিন তেলের দাম হয় ২০৪ টাকা" or "খোলা আটা ৫০ টাকায় বিক্রি হচ্ছে"
-        bn_verb_pattern = re.search(
-            r"([^\s।,]+(?:\s+[^\s।,]+)?)\s+(?:দাম\s+হয়|দাম\s+দাঁড়িয়েছে|বিক্রি\s+হচ্ছে)\s+([০-৯]+|\d+)\s*টাকা",
-            text,
-        )
-        if bn_verb_pattern:
-            raw_name = bn_verb_pattern.group(1).strip()
-            p_val = self._convert_num(bn_verb_pattern.group(2))
-            unit_guess = "লিটার" if "তেল" in raw_name else ("pc" if "ডিম" in raw_name else "কেজি")
-            if p_val and p_val > 10 and len(raw_name) > 1 and not any(k in raw_name for k in ["টিসিবি", "সরকার"]):
-                return RawObservation(
-                    source_code=self.source_code,
-                    market_name=default_market,
-                    raw_commodity_name=raw_name,
-                    raw_unit=unit_guess,
-                    raw_price=p_val,
-                    price_type="retail_avg",
-                    observation_date=self.target_date,
-                    completeness_score=0.85,
-                    is_fallback=False,
-                )
+            # 1.2 Single: [Commodity] ... [price] টাকা
+            m_single = re.search(
+                pat + r".{0,35}?(?:নতুন\s+দাম|দাম\s+হয়|দাম|বিক্রি\s+হচ্ছে|দরে)?\s*(?:প্রতি\s*(?:কেজি|লিটার|হালি|ডজন)?)?\s*([০-৯0-9]+)\s*টাকা",
+                text,
+            )
+            if m_single:
+                v = self._convert_num(m_single.group(1))
+                if v and 15 <= v <= 5000:
+                    return RawObservation(
+                        source_code=self.source_code,
+                        market_name=default_market,
+                        raw_commodity_name=raw_name,
+                        raw_unit=unit,
+                        raw_price=adjust_p(v),
+                        price_type="retail_avg",
+                        observation_date=self.target_date,
+                        completeness_score=0.88,
+                        is_fallback=False,
+                    )
 
-        # Rule 5: English quotation: "local onion quoted at Tk 120-130 per kg"
+            # 1.3 Inverted: [price] টাকা [কেজি/হালি] [Commodity] (e.g. "২২০০ টাকা কেজি ইলিশ")
+            m_inv = re.search(
+                r"([০-৯0-9]+)\s*টাকা\s*(?:কেজি|লিটার|হালি|ডজন)?\s*(?:দরে\s+বিক্রি\s+হচ্ছে\s*)?" + pat,
+                text,
+            )
+            if m_inv:
+                v = self._convert_num(m_inv.group(1))
+                if v and 15 <= v <= 5000:
+                    return RawObservation(
+                        source_code=self.source_code,
+                        market_name=default_market,
+                        raw_commodity_name=raw_name,
+                        raw_unit=unit,
+                        raw_price=adjust_p(v),
+                        price_type="retail_avg",
+                        observation_date=self.target_date,
+                        completeness_score=0.88,
+                        is_fallback=False,
+                    )
+
+            # 1.4 Headline short form (e.g. "ডিমের হালি ৫০")
+            m_short = re.search(pat + r".{0,15}?(?:হালি|কেজি|লিটার)\s*([০-৯0-9]+)", text)
+            if m_short:
+                v = self._convert_num(m_short.group(1))
+                if v and 15 <= v <= 5000:
+                    return RawObservation(
+                        source_code=self.source_code,
+                        market_name=default_market,
+                        raw_commodity_name=raw_name,
+                        raw_unit=unit,
+                        raw_price=adjust_p(v),
+                        price_type="retail_avg",
+                        observation_date=self.target_date,
+                        completeness_score=0.88,
+                        is_fallback=False,
+                    )
+
+        # Tier 2: English quotation: "local onion quoted at Tk 120-130 per kg"
         en_quote = re.search(
             r"([a-zA-Z\s]+?)\s+(?:quoted at|retailing between|selling at|sold at)\s+(?:Tk\.?|BDT)?\s*(\d+(?:\.\d+)?)\s*(?:to|-|and)\s*(\d+(?:\.\d+)?)\s*(?:per|\/)\s*([a-zA-Z]+)",
             text,
@@ -298,6 +324,31 @@ class NewsCollector(BaseCollector):
                 completeness_score=0.85,
                 is_fallback=False,
             )
+
+        # Tier 3: Bengali general phrase fallback with food staple verification
+        bn_range = re.search(
+            r"([^\s।,]+(?:\s+[^\s।,]+)?)\s+(?:বিক্রি\s+হচ্ছে|দরে\s+বিক্রি|দাম)\s+(?:প্রতি)?\s*([^\s।,]+)?\s*([০-৯]+)\s*(?:থেকে|-|–)\s*([০-৯]+)\s*টাকা",
+            text,
+        )
+        if bn_range:
+            raw_name = bn_range.group(1).strip()
+            # Reject non-commodity phrases
+            if not any(k in raw_name for k in ["কারণ", "ট্রাক", "ভাড়া", "মধ্যে", "আশপাশে", "হয়েছে", "বেশি", "কম", "কমেছে", "বাড়তি", "টিসিবি", "সরকার"]):
+                raw_unit = self._sanitize_unit(bn_range.group(2))
+                p1 = self._convert_num(bn_range.group(3))
+                p2 = self._convert_num(bn_range.group(4))
+                if p1 and p2 and 15 <= p1 <= 5000 and 15 <= p2 <= 5000:
+                    return RawObservation(
+                        source_code=self.source_code,
+                        market_name=default_market,
+                        raw_commodity_name=raw_name,
+                        raw_unit=raw_unit,
+                        raw_price=round((p1 + p2) / 2.0, 2),
+                        price_type="retail_avg",
+                        observation_date=self.target_date,
+                        completeness_score=0.85,
+                        is_fallback=False,
+                    )
 
         return None
 

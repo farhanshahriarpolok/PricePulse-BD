@@ -60,23 +60,27 @@ class RealtimePriceService:
         return self.db.scalars(stmt_db).first()
 
     def _trigger_on_demand_harvest(self, target_date: date) -> None:
-        """Execute on-demand collector suite to refresh observations."""
-        pipeline = IngestionPipeline(db=self.db, normalizer=self.normalizer)
-        dam_collector = DAMFixtureCollector(target_date=target_date)
-        chaldal_collector = ChaldalCollector(target_date=target_date)
+        """Execute on-demand collector suite to refresh observations with real live sources."""
+        from app.collectors.dam_live_collector import DAMLiveCollector
+        from app.collectors.tcb_collector import TCBCollector
+        from app.collectors.news_collector import NewsCollector
+        from app.collectors.chaldal_collector import ChaldalCollector
 
-        pipeline.run_collector(dam_collector)
-        pipeline.run_collector(chaldal_collector)
+        pipeline = IngestionPipeline(db=self.db, normalizer=self.normalizer)
+        pipeline.run_collector(DAMLiveCollector(target_date=target_date))
+        pipeline.run_collector(TCBCollector(target_date=target_date))
+        pipeline.run_collector(NewsCollector(target_date=target_date))
+        pipeline.run_collector(ChaldalCollector(target_date=target_date))
 
     def _query_observations(self, commodity_id: int, obs_date: date) -> List[PriceObservation]:
-        """Fetch all observations for a commodity on a given date."""
+        """Fetch all observations for a commodity on a given date, prioritizing high-reliability live sources."""
         stmt = (
             select(PriceObservation)
             .where(
                 PriceObservation.commodity_id == commodity_id,
                 PriceObservation.observation_date == obs_date,
             )
-            .order_by(desc(PriceObservation.confidence_score))
+            .order_by(desc(PriceObservation.confidence_score), desc(PriceObservation.scraped_at))
         )
         return list(self.db.scalars(stmt).all())
 

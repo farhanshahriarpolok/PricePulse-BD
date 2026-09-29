@@ -11,7 +11,7 @@ import re
 import time
 from datetime import date
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 import httpx
 from bs4 import BeautifulSoup
 

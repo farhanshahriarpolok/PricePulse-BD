@@ -41,8 +41,8 @@ class DAMLiveCollector(BaseCollector):
         live_url: Optional[str] = None,
         fixture_path: Optional[Path] = None,
         target_date: Optional[date] = None,
-        timeout_seconds: float = 12.0,
-        max_retries: int = 1,
+        timeout_seconds: float = 15.0,
+        max_retries: int = 2,
         base_delay: float = 0.5,
     ):
         self.live_url = live_url or self.DEFAULT_LIVE_URL
@@ -97,6 +97,7 @@ class DAMLiveCollector(BaseCollector):
                             test_soup = BeautifulSoup(resp.text, "html.parser")
                             has_price_content = (
                                 len(test_soup.find_all(class_="item-row")) > 0
+                                or len(test_soup.find_all(class_="stockbox")) > 0
                                 or any(
                                     any(k in t.get_text() for k in ["পণ্যের নাম", "খুচরা", "পাইকারি"])
                                     and len(t.find_all("tr")) >= 3
@@ -280,6 +281,59 @@ class DAMLiveCollector(BaseCollector):
                     pass
 
         observations: List[RawObservation] = []
+
+        # Strategy 1: Check for live stockbox elements (used on DAM daily market price portal ticker)
+        stockboxes = soup.find_all(class_="stockbox")
+        if stockboxes:
+            for s in stockboxes:
+                stext = s.get_text(strip=True)
+                m = re.match(r"^(.*?):\s*([০-৯0-9\.]+)\s*-\s*([০-৯0-9\.]+)", stext)
+                if m:
+                    comm_name = m.group(1).strip()
+                    p_min = self._convert_num(m.group(2))
+                    p_max = self._convert_num(m.group(3))
+
+                    if any(u in comm_name for u in ["ডিম", "হালি"]):
+                        unit = "হালি"
+                    elif any(u in comm_name for u in ["তেল", "লিটার"]):
+                        unit = "লিটার"
+                    else:
+                        unit = "কেজি"
+
+                    market_name = "Dhaka Central Market"
+                    if p_min is not None and p_min > 0:
+                        observations.append(
+                            RawObservation(
+                                source_code=self.source_code,
+                                market_name=market_name,
+                                raw_commodity_name=comm_name,
+                                raw_unit=unit,
+                                raw_price=p_min,
+                                price_type="wholesale_avg",
+                                observation_date=obs_date,
+                                completeness_score=1.0 if not is_fallback else 0.90,
+                                is_fallback=is_fallback,
+                            )
+                        )
+                    if p_max is not None and p_max > 0:
+                        observations.append(
+                            RawObservation(
+                                source_code=self.source_code,
+                                market_name=market_name,
+                                raw_commodity_name=comm_name,
+                                raw_unit=unit,
+                                raw_price=p_max,
+                                price_type="retail_avg",
+                                observation_date=obs_date,
+                                completeness_score=1.0 if not is_fallback else 0.90,
+                                is_fallback=is_fallback,
+                            )
+                        )
+            if observations:
+                logger.info(f"DAM Collector harvested {len(observations)} live ticker observations (Fallback={is_fallback})")
+                return observations
+
+        # Strategy 2: Tabular market sections
         market_sections = soup.find_all("div", class_="market-section")
 
         if market_sections:

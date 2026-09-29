@@ -202,22 +202,22 @@ class BasketOptimizationService:
             qty = calc.quantity_normalized
 
             # Retail benchmark for this item
-            benchmark_price = prices.benchmark() or 0.0
-            line_benchmark = round(benchmark_price * qty, 2)
+            benchmark_price = self._clean_price(prices.benchmark() or 0.0)
+            line_benchmark = self._clean_price(benchmark_price * qty) or 0.0
             benchmark_total += line_benchmark
 
             # Channel line totals (fall back to benchmark if channel absent)
-            wh_price = prices.wholesale or benchmark_price
-            re_price = prices.retail or benchmark_price
-            on_price = prices.online or benchmark_price
+            wh_price = self._clean_price(prices.wholesale or benchmark_price)
+            re_price = self._clean_price(prices.retail or benchmark_price)
+            on_price = self._clean_price(prices.online or benchmark_price)
 
-            wholesale_total += round(wh_price * qty, 2)
-            retail_total += round(re_price * qty, 2)
-            online_total += round(on_price * qty, 2)
+            wholesale_total += self._clean_price(wh_price * qty) or 0.0
+            retail_total += self._clean_price(re_price * qty) or 0.0
+            online_total += self._clean_price(on_price * qty) or 0.0
 
             # 7-day ago total (for inflation shift)
-            week_bench = calc.week_prices.benchmark() or benchmark_price
-            week_total += round(week_bench * qty, 2)
+            week_bench = self._clean_price(calc.week_prices.benchmark() or benchmark_price)
+            week_total += self._clean_price(week_bench * qty) or 0.0
 
             item_details.append(
                 BasketItemCostDetail(
@@ -226,12 +226,12 @@ class BasketOptimizationService:
                     bangla_name=calc.bangla_name,
                     quantity_normalized=round(qty, 3),
                     standard_unit=calc.standard_unit,
-                    unit_price=round(benchmark_price, 2),
+                    unit_price=benchmark_price,
                     line_total=line_benchmark,
                     channel_prices={
-                        "wholesale": round(wh_price, 2),
-                        "retail": round(re_price, 2),
-                        "online": round(on_price, 2),
+                        "wholesale": wh_price,
+                        "retail": re_price,
+                        "online": on_price,
                     },
                 )
             )
@@ -323,6 +323,14 @@ class BasketOptimizationService:
     # Private helpers
     # ---------------------------------------------------------------------------
 
+    @staticmethod
+    def _clean_price(val: Optional[float]) -> Optional[float]:
+        """Round consumer-facing prices to clean integers or realistic half-taka formats (e.g. 50.0, 52.5, 125.0)."""
+        if val is None:
+            return None
+        half_rounded = round(val * 2) / 2.0
+        return half_rounded if half_rounded != int(half_rounded) else float(int(half_rounded))
+
     def _fetch_channel_prices(
         self,
         db: Session,
@@ -331,12 +339,12 @@ class BasketOptimizationService:
     ) -> _ChannelPrices:
         """
         Fetch the most recent price observation for each channel within a 14-day
-        window ending at target_date.  Uses a single aggregated SQL query for
-        efficiency.
+        window ending at target_date, prioritizing today's live DAM and TCB observations.
         """
         window_start = target_date - timedelta(days=14)
 
-        rows = db.execute(
+        # 1. Prioritize observations on target_date specifically (e.g. today's live DAM/TCB)
+        rows_today = db.execute(
             select(
                 PriceObservation.price_type,
                 Market.market_type,
@@ -348,8 +356,7 @@ class BasketOptimizationService:
             .join(Source, PriceObservation.source_id == Source.id)
             .where(
                 PriceObservation.commodity_id == commodity_id,
-                PriceObservation.observation_date >= window_start,
-                PriceObservation.observation_date <= target_date,
+                PriceObservation.observation_date == target_date,
             )
             .group_by(
                 PriceObservation.price_type,
@@ -358,6 +365,32 @@ class BasketOptimizationService:
                 Source.code,
             )
         ).all()
+
+        rows = rows_today
+        if not rows:
+            # 2. Fallback to 14-day historical window if no observation exists on target_date
+            rows = db.execute(
+                select(
+                    PriceObservation.price_type,
+                    Market.market_type,
+                    Source.source_type,
+                    Source.code.label("source_code"),
+                    func.avg(PriceObservation.normalized_price).label("avg_price"),
+                )
+                .join(Market, PriceObservation.market_id == Market.id)
+                .join(Source, PriceObservation.source_id == Source.id)
+                .where(
+                    PriceObservation.commodity_id == commodity_id,
+                    PriceObservation.observation_date >= window_start,
+                    PriceObservation.observation_date <= target_date,
+                )
+                .group_by(
+                    PriceObservation.price_type,
+                    Market.market_type,
+                    Source.source_type,
+                    Source.code,
+                )
+            ).all()
 
         channel = _ChannelPrices()
         wholesale_prices: list[float] = []
@@ -383,11 +416,11 @@ class BasketOptimizationService:
                 retail_prices.append(price)
 
         if wholesale_prices:
-            channel.wholesale = round(sum(wholesale_prices) / len(wholesale_prices), 2)
+            channel.wholesale = self._clean_price(sum(wholesale_prices) / len(wholesale_prices))
         if retail_prices:
-            channel.retail = round(sum(retail_prices) / len(retail_prices), 2)
+            channel.retail = self._clean_price(sum(retail_prices) / len(retail_prices))
         if online_prices:
-            channel.online = round(sum(online_prices) / len(online_prices), 2)
+            channel.online = self._clean_price(sum(online_prices) / len(online_prices))
 
         return channel
 

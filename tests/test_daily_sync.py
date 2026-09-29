@@ -71,7 +71,7 @@ class TestCollectorContract:
     def test_dam_live_collector_falls_back_to_fixture(self):
         """DAMLiveCollector must fall back gracefully when network is down."""
         from app.collectors.dam_live_collector import DAMLiveCollector
-        with patch("httpx.get", side_effect=Exception("Simulated network down")):
+        with patch("httpx.Client.get", side_effect=Exception("Simulated network down")):
             collector = DAMLiveCollector()
             items = collector.collect()
         assert isinstance(items, list)
@@ -79,7 +79,7 @@ class TestCollectorContract:
     def test_chaldal_live_collector_falls_back_gracefully(self):
         """ChaldalLiveCollector must fall back when network is unreachable."""
         from app.collectors.chaldal_live_collector import ChaldalLiveCollector
-        with patch("httpx.get", side_effect=Exception("Simulated timeout")):
+        with patch("httpx.Client.get", side_effect=Exception("Simulated timeout")):
             collector = ChaldalLiveCollector()
             items = collector.collect()
         assert isinstance(items, list)
