@@ -23,6 +23,14 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Phase 1 — Real Data Integration Foundation + Data Quality & Validation Hardening** (2026-09-30):
+  - Hardened `CommodityNormalizer` with token-boundary constraint: multi-token phrase containment only, single-token aliases restricted to exact match to prevent taxonomy bleed on multi-word branded items.
+  - Added all canonical sources (`SHWAPNO_RETAIL`, `MEENA_BAZAR_RETAIL`, `PANDAMART_MODELED`) to `scripts/init_db.py` seed routines, ensuring isolated fresh database deployments have 100% complete source registries.
+  - Aligned `SourceHealthService` initial state with real endpoint status (Chaldal marked as fallback due to live 404, Shwapno & Meena Bazar initialized to UNKNOWN prior to harvest).
+  - Resolved local variable scoping bug in `commodities.py` store endpoints.
+  - Added 33 new regression tests in `tests/test_phase1_regression.py` across taxonomy safety, cultural unit scaling, clean DB initialization, and provenance isolation.
+  - Full suite verified: **285/285 tests passed (100% green)**, Vite production build successful.
+
 - **Milestone 025 — Multi-Store Retail Collector Trio, `/commodities/{id}/stores` API & Detail Page Store Panel** (2026-09-30):
   - Added three new retail harvest connectors registered in `app/collectors/__init__.py`:
     - `ShwapnoCollector` (`SHWAPNO_RETAIL`, reliability 0.90): Live network harvest across 4 category APIs (fresh-vegetables, rice, oil, eggs) with explicit taxonomy mapping and fixture fallback.

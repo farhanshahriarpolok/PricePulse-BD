@@ -317,21 +317,41 @@ def get_commodity_stores(
             ).first()
 
         if obs and obs.normalized_price > 0:
-            is_live = obs.confidence_score >= 0.90 and cfg["id"] in ("shwapno", "meenabazar")
-            is_fallback = not is_live and cfg["id"] != "pandamart"
+            # Provenance: derive collection_status from actual source health telemetry,
+            # not from confidence_score heuristic.
+            from app.services.source_health import source_health_service
+            src_telemetry = source_health_service.get_source_status(cfg["source_code"])
 
             if cfg["id"] == "pandamart":
-                status = "MODELED"
+                # Pandamart is always MODELED regardless of observation presence
+                coll_status = "MODELED"
+                is_live = False
+                is_fallback = False
                 label_bn = "এক্সপ্রেস প্রাক্কলন (+৮%)"
                 label_en = "Express Est. (+8%)"
-            elif is_live:
-                status = "LIVE"
+            elif (
+                src_telemetry
+                and src_telemetry.get("status") == "HEALTHY"
+                and not src_telemetry.get("is_fallback", True)
+            ):
+                coll_status = "LIVE"
+                is_live = True
+                is_fallback = False
                 label_bn = "লাইভ দাম"
                 label_en = "Live Observed"
-            else:
-                status = "FALLBACK"
+            elif src_telemetry and src_telemetry.get("is_fallback", True):
+                coll_status = "FALLBACK"
+                is_live = False
+                is_fallback = True
                 label_bn = "ফলব্যাক বেঞ্চমার্ক"
                 label_en = "Catalog Benchmark ✓"
+            else:
+                # Status UNKNOWN or OFFLINE but observation exists in DB from a prior run
+                coll_status = "FALLBACK"
+                is_live = False
+                is_fallback = True
+                label_bn = "ক্যাশড ডেটা"
+                label_en = "Cached Observation"
 
             stores_out.append(
                 StorePriceOut(
@@ -341,7 +361,7 @@ def get_commodity_stores(
                     name_en=cfg["name_en"],
                     price=round(obs.normalized_price, 2),
                     unit=obs.normalized_unit or commodity.default_unit,
-                    collection_status=status,
+                    collection_status=coll_status,
                     status_label_bn=label_bn,
                     status_label_en=label_en,
                     is_live=is_live,
@@ -351,20 +371,21 @@ def get_commodity_stores(
                     raw_name=obs.raw_name,
                 )
             )
+
         else:
-            # Modeled fallback spread
+            # No DB observation found — use modeled fallback spread
             modeled_price = round(base_retail * (1.0 + cfg["default_spread"]), 2)
             if cfg["id"] == "chaldal":
-                status = "FALLBACK"
+                coll_status = "FALLBACK"
                 label_bn = "ফলব্যাক বেঞ্চমার্ক"
                 label_en = "Catalog Benchmark ✓"
             elif cfg["id"] == "pandamart":
-                status = "MODELED"
+                coll_status = "MODELED"
                 label_bn = "এক্সপ্রেস প্রাক্কলন (+৮%)"
                 label_en = "Express Est. (+8%)"
             else:
                 pct = int(cfg["default_spread"] * 100)
-                status = "MODELED"
+                coll_status = "MODELED"
                 label_bn = f"সুপারশপ প্রাক্কলন (+{pct}%)"
                 label_en = f"Superstore Est. (+{pct}%)"
 
@@ -376,11 +397,11 @@ def get_commodity_stores(
                     name_en=cfg["name_en"],
                     price=modeled_price,
                     unit=commodity.default_unit,
-                    collection_status=status,
+                    collection_status=coll_status,
                     status_label_bn=label_bn,
                     status_label_en=label_en,
                     is_live=False,
-                    is_fallback=status == "FALLBACK",
+                    is_fallback=(coll_status == "FALLBACK"),
                     url=cfg["url"],
                     observation_date=None,
                     raw_name=None,

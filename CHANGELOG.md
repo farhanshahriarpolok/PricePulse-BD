@@ -29,8 +29,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - New store price comparison panel fetching and rendering per-store prices on commodity detail open.
     - `LIVE` / `FALLBACK` / `MODELED` badges with distinct visual styling, BDT price per normalized unit, Bengali-first store names, and direct outbound links per store.
   - `data/fixtures/meena_bazar_catalog_sample.json`, `pandamart_modeled_sample.json`, `shwapno_catalog_sample.json`: Verified local fixture snapshots for offline deterministic testing.
-  - `tests/test_meena_bazar_collector.py`, `tests/test_pandamart_collector.py`, `tests/test_shwapno_collector.py`: 16 new deterministic tests covering fixture harvest, canonical mapping accuracy, deduplication, network failure / graceful fallback, source health telemetry updates, and IngestionPipeline persistence with normalized pricing verification.
   - Quality verification: 252/252 Pytest tests 100% green, clean Vite production build (2493 modules, 0 errors, 25.25s).
+- **Phase 1: Real Data Integration Foundation + Data Quality & Validation**:
+  - `app/services/normalizer.py`: Hardened `CommodityNormalizer.resolve_commodity()` with single-token safety constraint (multi-token phrase containment only; single-token aliases restricted to exact match) preventing false taxonomy classification on processed/composite products (e.g., 'Paragon Chicken Mini Spring Roll -300gm' no longer matches Broiler Chicken).
+  - `scripts/init_db.py`: Seeded all canonical sources (`SHWAPNO_RETAIL`, `MEENA_BAZAR_RETAIL`, `PANDAMART_MODELED`) in `seed_sources()`, guaranteeing complete source provenance on fresh database initialization.
+  - `app/services/source_health.py`: Aligned initial source health states with real-world endpoint status (`CHALDAL_RETAIL` DEGRADED/is_fallback=True due to public catalog endpoint returning 404; `SHWAPNO_RETAIL` and `MEENA_BAZAR_RETAIL` initialized to UNKNOWN prior to live run).
+  - `app/api/v1/endpoints/commodities.py`: Fixed local variable scoping collision (`coll_status` vs `fastapi.status`), resolving HTTP 500 on store lookups.
+  - `tests/test_phase1_regression.py`: Added 33 deterministic regression tests covering taxonomy safety, cultural unit normalization (hali=4, powa=0.25kg, maund=40kg, dozen=12), isolated DB seeding, duplicate ingestion idempotency, and provenance boundaries.
+  - Test verification: **285/285 Pytest tests 100% green**, Vite production build clean.
 
 ## [2.5.0] - 2026-09-29
 

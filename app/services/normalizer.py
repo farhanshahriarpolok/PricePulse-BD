@@ -206,9 +206,16 @@ class CommodityNormalizer:
             if set(alias_key.split()) == cleaned_tokens:
                 return item
 
-        # 3. Tokenized / whole-phrase match across aliases (respecting word boundaries)
+        # 3. Whole-phrase containment match for multi-token aliases only.
+        # Safety rule: alias must have >= 2 tokens to prevent single-word aliases
+        # (e.g. 'chicken', 'rice', 'egg') from matching unrelated multi-word product
+        # descriptions. Single-token aliases are ONLY matched via exact lookup (step 1).
         cleaned_padded = f" {cleaned} "
         for alias_key, item in self._alias_index.items():
+            alias_tokens = alias_key.split()
+            if len(alias_tokens) < 2:
+                # Single-token alias: skip phrase containment — exact match only (step 1)
+                continue
             alias_padded = f" {alias_key} "
             if alias_padded in cleaned_padded or cleaned_padded in alias_padded:
                 return NormalizedCommodity(

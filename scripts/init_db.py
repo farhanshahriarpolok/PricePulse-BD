@@ -149,6 +149,9 @@ def seed_sources(session):
         {"code": "CHALDAL_RETAIL", "name": "Chaldal Live Catalog", "source_type": "retail_ecommerce", "reliability_score": 0.88},
         {"code": "field_report", "name": "Field Spot Report (Manual)", "source_type": "field_report", "reliability_score": 0.60},
         {"code": "PRESS_REPORT", "name": "National Daily Press Spot Roundups", "source_type": "press", "reliability_score": 0.70},
+        {"code": "SHWAPNO_RETAIL", "name": "Shwapno Superstore", "source_type": "retail_superstore", "reliability_score": 0.90},
+        {"code": "MEENA_BAZAR_RETAIL", "name": "Meena Bazar Online", "source_type": "retail_superstore", "reliability_score": 0.89},
+        {"code": "PANDAMART_MODELED", "name": "Pandamart Express Grocery", "source_type": "modeled_benchmark", "reliability_score": 0.75},
     ]
     src_count = 0
     for s_data in default_sources:
@@ -166,6 +169,7 @@ def seed_sources(session):
     session.commit()
     if src_count > 0:
         print(f"   Seeded sources: {src_count} data sources.")
+
 
 
 def main():
