@@ -26,25 +26,24 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
     } catch (e) {}
   };
 
-  const formattedItems = items.map((item, index) => {
-    let changePct = 0;
-    if (item.price_status === 'High') {
-      changePct = +(Math.abs((item.price_summary?.max_price - item.price_summary?.avg_price) / (item.price_summary?.avg_price || 1) * 10) + 4.5).toFixed(1);
-    } else if (item.price_status === 'Elevated') {
-      changePct = +(Math.abs((item.price_summary?.avg_price - item.price_summary?.min_price) / (item.price_summary?.avg_price || 1) * 6) + 1.8).toFixed(1);
-    } else if (index % 3 === 0) {
-      changePct = -(1.5 + (index % 4) * 0.8).toFixed(1);
-    } else {
-      changePct = 0.0;
-    }
+  const formattedItems = items.map((item) => {
+    const rawPct = item.percentage_change_7d !== undefined
+      ? item.percentage_change_7d
+      : item.price_change_pct !== undefined
+      ? item.price_change_pct
+      : item.change_pct !== undefined
+      ? item.change_pct
+      : null;
+
+    const changePct = rawPct !== null && !isNaN(rawPct) ? Number(Number(rawPct).toFixed(1)) : null;
 
     return {
       id: item.commodity_id,
       name: item.canonical_name,
       bangla: item.bangla_name,
-      price: item.price_summary?.avg_price || 0,
+      price: item.price_summary?.avg_price || item.retail_price || item.benchmark_price || 0,
       unit: item.unit,
-      changePct: Number(changePct),
+      changePct: changePct,
       rawItem: item,
     };
   });
@@ -53,13 +52,13 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
 
   return (
     <div 
-      className="w-full bg-slate-100/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800/80 py-1.5 px-3 text-xs select-none transition-colors duration-150 backdrop-blur-md"
+      className="w-full overflow-hidden bg-slate-100/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800/80 py-1.5 px-3 text-xs select-none transition-colors duration-150 backdrop-blur-md"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 min-w-0 overflow-hidden">
         {/* Live Indicator Pill */}
         <div className="flex items-center gap-1.5 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full shrink-0 z-10 mr-1 sm:mr-3 text-[11px] font-bold tracking-wider uppercase">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping mr-0.5" />
@@ -68,11 +67,11 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
         </div>
 
         {/* Marquee Container with Hover-Pause */}
-        <div className="overflow-hidden flex-1 relative whitespace-nowrap">
+        <div className="overflow-hidden flex-1 min-w-0 relative whitespace-nowrap">
           <div className={`animate-ticker flex items-center gap-4 sm:gap-6 ${isPaused ? 'paused' : ''}`}>
             {marqueeItems.map((item, idx) => {
-              const isUp = item.changePct > 0;
-              const isDown = item.changePct < 0;
+              const isUp = item.changePct !== null && item.changePct > 0;
+              const isDown = item.changePct !== null && item.changePct < 0;
 
               return (
                 <button
@@ -88,20 +87,22 @@ export default function MarketTicker({ items = [], onSelectItem, lang = 'bn' }) 
                     ৳{toBengaliNumeral(item.price.toFixed(1), lang)}/{item.unit || 'কেজি'}
                   </span>
 
-                  <span
-                    className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded ${
-                      isUp
-                        ? 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10'
-                        : isDown
-                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10'
-                        : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/30'
-                    }`}
-                  >
-                    {isUp && <TrendingUp className="w-3 h-3 mr-0.5" />}
-                    {isDown && <TrendingDown className="w-3 h-3 mr-0.5" />}
-                    {!isUp && !isDown && <Minus className="w-3 h-3 mr-0.5" />}
-                    {isUp ? `+${toBengaliNumeral(item.changePct, lang)}%` : isDown ? `${toBengaliNumeral(item.changePct, lang)}%` : '০%'}
-                  </span>
+                  {item.changePct !== null && (
+                    <span
+                      className={`inline-flex items-center text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                        isUp
+                          ? 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10'
+                          : isDown
+                          ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10'
+                          : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/30'
+                      }`}
+                    >
+                      {isUp && <TrendingUp className="w-3 h-3 mr-0.5" />}
+                      {isDown && <TrendingDown className="w-3 h-3 mr-0.5" />}
+                      {!isUp && !isDown && <Minus className="w-3 h-3 mr-0.5" />}
+                      {isUp ? `+${toBengaliNumeral(item.changePct, lang)}%` : isDown ? `${toBengaliNumeral(item.changePct, lang)}%` : '০%'}
+                    </span>
+                  )}
                 </button>
               );
             })}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MiniSparkline from './MiniSparkline';
 import CommodityIcon from './media/CommodityIcon';
-import { ShoppingBasket, Check, ArrowRight, Clock, Plus, Minus, MapPin } from 'lucide-react';
+import { ShoppingBasket, Check, ArrowRight, Clock, Plus, Minus, MapPin, Star } from 'lucide-react';
 import { getMarketById, getTopMarketsForDistrict, calculateMarketPrice } from '../utils/markets';
 
 /**
@@ -130,6 +130,8 @@ export default function CommodityCard({
   isHero = false,
   lang = 'bn',
   selectedMarketId = 'dhaka_mirpur1',
+  isWatched = false,
+  onToggleWatchlist,
 }) {
   const [justAdded, setJustAdded] = useState(false);
 
@@ -171,7 +173,8 @@ export default function CommodityCard({
 
   if (isEgg) {
     displayUnit = lang === 'bn' ? 'হালি' : 'Hali (4 pcs)';
-    if (rawAvg > 0 && rawAvg < 30) {
+    const isPerPiece = item.unit === 'pc' || item.unit === 'piece' || item.unit === 'পিস';
+    if (isPerPiece) {
       const perPiece = rawAvg;
       rawAvg = rawAvg * 4;
       rawWs = rawWs ? rawWs * 4 : Math.round(rawAvg * 0.85);
@@ -181,8 +184,8 @@ export default function CommodityCard({
       perPieceSubtext = lang === 'bn'
         ? `প্রতি পিস ৳ ${toBengaliNumeral(formatBazaarPrice(perPiece), lang)}`
         : `৳ ${formatBazaarPrice(perPiece)} / pc`;
-    } else if (rawAvg >= 30) {
-      const perPiece = rawAvg / 4;
+    } else {
+      const perPiece = rawAvg > 0 ? rawAvg / 4 : 0;
       perPieceSubtext = lang === 'bn'
         ? `প্রতি পিস ৳ ${toBengaliNumeral(formatBazaarPrice(perPiece), lang)}`
         : `৳ ${formatBazaarPrice(perPiece)} / pc`;
@@ -253,6 +256,23 @@ export default function CommodityCard({
                 <span className={`px-2.5 py-0.5 text-xs font-bold rounded-md ${trend.className}`}>
                   {trend.label}
                 </span>
+                {onToggleWatchlist && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleWatchlist(item.commodity_id || item.id);
+                    }}
+                    className={`p-1 rounded-md border transition-all ${
+                      isWatched
+                        ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-500 border-amber-300 dark:border-amber-700/60 shadow-2xs'
+                        : 'bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-500 border-slate-200 dark:border-slate-700'
+                    }`}
+                    title={isWatched ? (lang === 'bn' ? 'নিয়মিত তালিকা থেকে বাদ দিন' : 'Remove from Watchlist') : (lang === 'bn' ? 'নিয়মিত তালিকায় রাখুন' : 'Add to Watchlist')}
+                  >
+                    <Star className={`w-3.5 h-3.5 ${isWatched ? 'fill-amber-400 text-amber-500' : ''}`} />
+                  </button>
+                )}
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-outfit tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -273,7 +293,7 @@ export default function CommodityCard({
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <span>{lang === 'bn' ? '🟢 আজ সকাল ৭:০০ টায় যাচাইকৃত (১০০% ফ্রেশ রেট)' : '🟢 Verified Today 7:00 AM (100% Fresh Rate)'}</span>
+                  <span>{item.date ? (lang === 'bn' ? `তারিখ: ${item.date}` : `Date: ${item.date}`) : (lang === 'bn' ? 'আজকের যাচাইকৃত বাজারদর' : 'Today\'s Verified Rates')}</span>
                 </span>
               </div>
             </div>
@@ -315,28 +335,15 @@ export default function CommodityCard({
                 })}
               </div>
 
-              {/* Local Markets Spread Strip for Hero Card */}
+              {/* District / City Benchmark Tag */}
               <div className="mt-2 flex items-center gap-1.5 text-xs font-mono text-slate-700 dark:text-slate-300">
                 <span className="text-[10px] text-slate-500 font-sans flex items-center gap-1 shrink-0">
                   <MapPin className="w-2.5 h-2.5 text-emerald-600" />
-                  <span>{lang === 'bn' ? 'স্থানীয় দর:' : 'Local:'}</span>
+                  <span>{lang === 'bn' ? 'কভারেজ:' : 'Coverage:'}</span>
                 </span>
-                {localMarkets.map((m) => {
-                  const isSelected = m.id === selectedMarketId;
-                  const mPrice = calculateMarketPrice(retail, m.id);
-                  return (
-                    <span
-                      key={m.id}
-                      className={`px-2 py-0.5 rounded text-[11px] border transition-all ${
-                        isSelected
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold border-emerald-300 dark:border-emerald-700/60 shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700/60'
-                      }`}
-                    >
-                      {lang === 'bn' ? m.shortBn : m.shortEn}: ৳{toBengaliNumeral(Math.round(mPrice), lang)}
-                    </span>
-                  );
-                })}
+                <span className="px-2 py-0.5 rounded text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-medium">
+                  {lang === 'bn' ? `${activeMarket?.districtBn || 'ঢাকা'} সিটি বেঞ্চমার্ক` : `${activeMarket?.districtEn || 'Dhaka'} City Benchmark`}
+                </span>
               </div>
             </div>
 
@@ -437,10 +444,29 @@ export default function CommodityCard({
           </div>
         </div>
 
-        {/* Compact Trend Pill */}
-        <span className={`px-2 py-0.5 text-[11px] font-bold rounded-lg whitespace-nowrap flex-shrink-0 ${trend.className}`}>
-          {trend.label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* Compact Trend Pill */}
+          <span className={`px-2 py-0.5 text-[11px] font-bold rounded-lg whitespace-nowrap ${trend.className}`}>
+            {trend.label}
+          </span>
+          {onToggleWatchlist && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleWatchlist(item.commodity_id || item.id);
+              }}
+              className={`p-1 rounded-lg border transition-all ${
+                isWatched
+                  ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-500 border-amber-300 dark:border-amber-700/60 shadow-2xs'
+                  : 'bg-white/80 dark:bg-slate-800/80 text-slate-400 hover:text-amber-500 border-slate-200 dark:border-slate-700'
+              }`}
+              title={isWatched ? (lang === 'bn' ? 'নিয়মিত তালিকা থেকে বাদ দিন' : 'Remove from Watchlist') : (lang === 'bn' ? 'নিয়মিত তালিকায় রাখুন' : 'Add to Watchlist')}
+            >
+              <Star className={`w-3.5 h-3.5 ${isWatched ? 'fill-amber-400 text-amber-500' : ''}`} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 2. Hero Price & Sparkline Row */}
@@ -490,43 +516,18 @@ export default function CommodityCard({
         })}
       </div>
 
-      {/* 3.5. Local Markets Spread Strip */}
-      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/80 p-1.5 select-none">
-        <div className="flex items-center justify-between mb-1 px-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
-            <span>{lang === 'bn' ? 'স্থানীয় বাজারের দর' : 'Local Markets Spread'}</span>
-          </span>
-          <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-            {lang === 'bn' ? activeMarket?.districtBn : activeMarket?.districtEn}
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-1 text-[11px] font-mono text-center">
-          {localMarkets.map((m) => {
-            const isSelected = m.id === selectedMarketId;
-            const mPrice = calculateMarketPrice(retail, m.id);
-            return (
-              <div
-                key={m.id}
-                className={`py-1 px-1 rounded-lg flex flex-col justify-center transition-all ${
-                  isSelected
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-700/60 shadow-2xs'
-                    : 'bg-white/80 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800'
-                }`}
-              >
-                <span className="text-[9px] font-sans truncate block leading-tight">
-                  {lang === 'bn' ? m.shortBn : m.shortEn}
-                </span>
-                <span className="leading-tight mt-0.5">
-                  ৳{toBengaliNumeral(Math.round(mPrice), lang)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+      {/* 3.5. Location Coverage Tag */}
+      <div className="rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/80 p-1.5 select-none flex items-center justify-between text-[11px]">
+        <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+          <MapPin className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+          <span>{lang === 'bn' ? 'কভারেজ:' : 'Coverage:'}</span>
+        </span>
+        <span className="text-[10px] font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200/60 dark:border-slate-800">
+          {lang === 'bn' ? `${activeMarket?.districtBn || 'ঢাকা'} সিটি বেঞ্চমার্ক` : `${activeMarket?.districtEn || 'Dhaka'} City Benchmark`}
+        </span>
       </div>
 
-      {/* 4. Transparency & Verified Freshness Badges */}
+      {/* 4. Transparency & Freshness Badges */}
       <div className="flex flex-col gap-1 text-[10px] select-none pt-0.5">
         <div className="flex items-center justify-between gap-1 flex-wrap">
           <span 
@@ -541,12 +542,7 @@ export default function CommodityCard({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-[10px]">{lang === 'bn' ? '১০০% ফ্রেশ রেট' : '100% Fresh Rate'}</span>
-          </span>
-        </div>
-        <div className="flex items-center text-slate-500 dark:text-slate-400 gap-1 text-[10.5px]">
-          <span className="truncate">
-            {lang === 'bn' ? '🟢 আজ সকাল ৭:০০ টায় যাচাইকৃত (১০০% ফ্রেশ রেট)' : '🟢 Verified Today 7:00 AM (100% Fresh Rate)'}
+            <span className="text-[10px]">{item.date ? (lang === 'bn' ? `তারিখ: ${item.date}` : `Date: ${item.date}`) : (lang === 'bn' ? 'আজকের যাচাইকৃত দর' : 'Verified Today')}</span>
           </span>
         </div>
       </div>

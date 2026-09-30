@@ -108,11 +108,13 @@ def build_unified_application(serve_frontend: bool = True):
         @app.get("/{full_path:path}", include_in_schema=False)
         async def serve_spa(full_path: str):
             # Pass through API requests, docs, and health checks
-            if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("redoc") or full_path == "health":
-                return None
-            requested_file = dist_dir / full_path
-            if requested_file.is_file():
-                return FileResponse(requested_file)
+            try:
+                requested_file = (dist_dir / full_path).resolve()
+                dist_resolved = dist_dir.resolve()
+                if (dist_resolved in requested_file.parents or requested_file == dist_resolved) and requested_file.is_file():
+                    return FileResponse(requested_file)
+            except Exception:
+                pass
             return FileResponse(dist_dir / "index.html")
 
         print("Serving compiled React frontend directly from FastAPI root.")
@@ -168,9 +170,7 @@ def main():
         from scripts.generate_demo_history import seed_demo_history
         with SessionLocal() as session:
             seed_demo_history(session)
-
-    # Make sure calibrated 30-day market history is present
-    ensure_demo_history()
+        print("Calibrated 30-day demo history populated successfully.")
 
     import uvicorn
 

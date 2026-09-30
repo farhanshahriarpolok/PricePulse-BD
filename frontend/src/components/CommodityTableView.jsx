@@ -114,7 +114,8 @@ export default function CommodityTableView({
 
               if (isEgg) {
                 displayUnit = lang === 'bn' ? 'হালি' : 'Hali (4 pcs)';
-                if (rawAvg > 0 && rawAvg < 30) {
+                const isPerPiece = item.unit === 'pc' || item.unit === 'piece' || item.unit === 'পিস';
+                if (isPerPiece) {
                   const perPiece = rawAvg;
                   rawAvg = rawAvg * 4;
                   rawWs = rawWs ? rawWs * 4 : Math.round(rawAvg * 0.85);
@@ -123,8 +124,8 @@ export default function CommodityTableView({
                   perPieceSubtext = lang === 'bn'
                     ? `প্রতি পিস ৳ ${toBengaliNumeral(formatPrice(perPiece), lang)}`
                     : `৳ ${formatPrice(perPiece)} / pc`;
-                } else if (rawAvg >= 30) {
-                  const perPiece = rawAvg / 4;
+                } else {
+                  const perPiece = rawAvg > 0 ? rawAvg / 4 : 0;
                   perPieceSubtext = lang === 'bn'
                     ? `প্রতি পিস ৳ ${toBengaliNumeral(formatPrice(perPiece), lang)}`
                     : `৳ ${formatPrice(perPiece)} / pc`;
@@ -220,13 +221,13 @@ export default function CommodityTableView({
                     ৳ {toBengaliNumeral(Math.round(wholesale), lang)}
                   </td>
 
-                  {/* 5. Retail (Selected Market Rate & Tag) */}
+                  {/* 5. Retail (Benchmark Rate) */}
                   <td className="py-3 px-3">
                     <div className="font-mono text-slate-700 dark:text-slate-300 font-medium">
-                      ৳ {toBengaliNumeral(Math.round(calculateMarketPrice(retail, selectedMarketId)), lang)}
+                      ৳ {toBengaliNumeral(Math.round(retail), lang)}
                     </div>
                     <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-sans block truncate">
-                      ({lang === 'bn' ? activeMarket.shortBn : activeMarket.shortEn})
+                      ({lang === 'bn' ? `${activeMarket?.districtBn || 'ঢাকা'} বেঞ্চমার্ক` : `${activeMarket?.districtEn || 'Dhaka'} Benchmark`})
                     </span>
                   </td>
 

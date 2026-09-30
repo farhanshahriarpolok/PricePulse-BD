@@ -13,6 +13,7 @@ from app.schemas.spatial import (
     GeoSpatialPulseResponse,
     LocationHierarchyResponse,
     SpatialArbitrageResponse,
+    ConsumerOpportunityResponse,
 )
 
 router = APIRouter(prefix="/locations", tags=["Spatial Analytics"])
@@ -76,3 +77,37 @@ def get_spatial_arbitrage(
 )
 def get_location_hierarchy(db: Session = Depends(get_db)):
     return spatial_service.get_location_hierarchy(db=db)
+
+
+@router.get(
+    "/consumer-opportunity",
+    response_model=ConsumerOpportunityResponse,
+    summary="Consumer-Facing Spatial Market Opportunity",
+    description=(
+        "Returns the single best actionable spatial price opportunity for a commodity in a flat, "
+        "human-readable shape. Suitable for the consumer-first hybrid UI panel. "
+        "Always returns a result — has_opportunity=False when no viable arbitrage exists. "
+        "The freight_detail and top_routes fields comprise the expandable research layer."
+    ),
+)
+def get_consumer_opportunity(
+    commodity_id: str = Query(
+        ...,
+        description="Commodity ID or canonical alias (e.g., '1', 'onion_local', 'potato')",
+    ),
+    obs_date: Optional[date] = Query(
+        None,
+        alias="date",
+        description="Target date (YYYY-MM-DD). Defaults to latest available.",
+    ),
+    db: Session = Depends(get_db),
+):
+    result = spatial_service.get_consumer_opportunity(
+        db=db, commodity_identifier=commodity_id, target_date=obs_date
+    )
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Commodity '{commodity_id}' could not be resolved or has no spatial data.",
+        )
+    return result

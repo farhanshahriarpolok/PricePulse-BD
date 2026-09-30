@@ -78,13 +78,56 @@ class TestRealtimePriceService:
         assert count_first == count_second
 
     def test_channel_breakdown_and_status(self, db_session):
+        from app.models.source import Source
+        from app.models.location import Market
+
         service = RealtimePriceService(db=db_session)
         today = date.today()
+
+        # Seed an explicit wholesale observation to test channel breakdown between wholesale & retail
+        comm = service.resolve_commodity("onion")
+        mkt = db_session.scalars(select(Market).where(Market.name == "Karwan Bazar")).first()
+        src = db_session.scalars(select(Source).where(Source.code == "DAM_DAILY")).first()
+        if not src:
+            src = Source(code="DAM_DAILY", name="DAM", source_type="government", reliability_score=0.95)
+            db_session.add(src)
+            db_session.flush()
+
+        db_session.add(PriceObservation(
+            commodity_id=comm.id,
+            market_id=mkt.id,
+            source_id=src.id,
+            raw_name="দেশি পেঁয়াজ (পাইকারি)",
+            raw_price=55.0,
+            raw_unit="কেজি",
+            normalized_price=55.0,
+            normalized_unit="kg",
+            price_type="wholesale_avg",
+            observation_date=today,
+            confidence_score=0.95,
+        ))
+        db_session.add(PriceObservation(
+            commodity_id=comm.id,
+            market_id=mkt.id,
+            source_id=src.id,
+            raw_name="দেশি পেঁয়াজ (খুচরা)",
+            raw_price=65.0,
+            raw_unit="কেজি",
+            normalized_price=65.0,
+            normalized_unit="kg",
+            price_type="retail_avg",
+            observation_date=today,
+            confidence_score=0.95,
+        ))
+        db_session.commit()
 
         res = service.get_realtime_price(query="onion", target_date=today)
         assert res is not None
         assert res.channels.wholesale_avg is not None
+        assert res.channels.wholesale_avg == 55.0
         assert res.channels.retail_avg is not None or res.channels.online_avg is not None
+        assert res.channels.retail_avg == 65.0
+        assert res.channels.spread_bdt == 10.0
         assert res.price_status in ["Normal", "Elevated", "High"]
 
     def test_unknown_commodity_returns_none(self, db_session):

@@ -379,3 +379,193 @@ class TestDuplicateIngestionBehavior:
         assert report2.inserted == 0, (
             f"Second fixture run should insert 0 records (all fallback skipped), got {report2.inserted}"
         )
+
+
+# ── SECTION 5: System Hardening & Audit Gap Verification ─────────────────────
+
+class TestSystemHardeningAndGaps:
+    """Verify system hardening against synthetic prices, unknown market pollution, and order dependency."""
+
+    def test_empty_store_data_returns_unavailable_not_synthetic_price(self, isolated_db_session):
+        """When no DB observation exists for a store, it must return UNAVAILABLE and price=None, NEVER an invented price."""
+        from app.api.v1.endpoints.commodities import get_commodity_stores
+        from app.models.commodity import Commodity
+
+        # Get any canonical commodity that has no retail store observations in the isolated DB
+        comm = isolated_db_session.scalars(select(Commodity)).first()
+        assert comm is not None
+
+        response = get_commodity_stores(commodity_id=comm.id, db=isolated_db_session)
+        assert response.commodity_id == comm.id
+        assert len(response.stores) == 4
+
+        for store in response.stores:
+            # Must be honest: no price invented
+            assert store.collection_status == "UNAVAILABLE", (
+                f"Store {store.id} returned '{store.collection_status}' instead of 'UNAVAILABLE'"
+            )
+            assert store.price is None, (
+                f"Store {store.id} invented synthetic price {store.price} merely to avoid an empty screen"
+            )
+            assert store.status_label_bn == "তথ্য উপলব্ধ নেই"
+            assert store.error_message is not None
+
+    def test_unknown_market_returns_none_and_quarantined(self, isolated_db_session):
+        """Unknown raw market names must return None and NOT silently map to the first DB market."""
+        from app.services.ingestion import IngestionPipeline
+
+        pipeline = IngestionPipeline(db=isolated_db_session)
+        resolved = pipeline._resolve_market("Nonexistent Alien Remote Village Bazar 9999")
+        assert resolved is None, (
+            f"Security/Integrity flaw: unknown market mapped to '{resolved.name}' instead of returning None"
+        )
+
+    def test_order_independent_duplicate_resolution(self):
+        """
+        Duplicate ingestion of multiple SKUs for the same commodity in different orders
+        must yield identical deterministic normalized prices (no order-dependent averaging).
+        """
+        from datetime import date
+        from app.collectors.base import RawObservation
+        from app.services.ingestion import IngestionPipeline
+
+        def run_with_order(raw_items_list):
+            eng = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+            Base.metadata.create_all(eng)
+            S = sessionmaker(bind=eng)
+            with S() as sess:
+                seed_locations(sess)
+                seed_commodities(sess)
+                seed_sources(sess)
+
+                pipe = IngestionPipeline(db=sess)
+                mock_collector = type("MockCollector", (), {
+                    "source_code": "TEST_RETAIL",
+                    "source_name": "Test Retail",
+                    "source_type": "retail_superstore",
+                    "reliability_score": 0.90,
+                    "collect": lambda self: raw_items_list,
+                })()
+                pipe.run_collector(mock_collector)
+
+                obs = sess.scalars(select(PriceObservation)).all()
+                return [(o.normalized_price, o.raw_name) for o in obs]
+
+        item_a = RawObservation(
+            source_code="TEST_RETAIL",
+            market_name="Karwan Bazar",
+            raw_commodity_name="Miniket Rice 1kg Pack",
+            raw_unit="1 kg",
+            raw_price=70.0,
+            price_type="retail_avg",
+            observation_date=date(2026, 9, 30),
+        )
+        item_b = RawObservation(
+            source_code="TEST_RETAIL",
+            market_name="Karwan Bazar",
+            raw_commodity_name="Miniket Rice 5kg Sack",
+            raw_unit="5 kg",
+            raw_price=340.0,  # 68.0 BDT/kg
+            price_type="retail_avg",
+            observation_date=date(2026, 9, 30),
+        )
+
+        res_order_1 = run_with_order([item_a, item_b])
+        res_order_2 = run_with_order([item_b, item_a])
+
+        assert len(res_order_1) == 1
+        assert len(res_order_2) == 1
+        # Order 1 and Order 2 must produce the EXACT same normalized price
+        assert res_order_1[0][0] == res_order_2[0][0], (
+            f"Order-dependent duplicate resolution: order 1 gave {res_order_1[0][0]}, order 2 gave {res_order_2[0][0]}"
+        )
+
+    def test_historical_get_does_not_trigger_harvest(self, isolated_db_session):
+        """Historical GET requests with target_date < today must NEVER trigger on-demand live harvest."""
+        from datetime import date
+        from unittest.mock import patch
+        from app.services.realtime_service import RealtimePriceService
+
+        service = RealtimePriceService(db=isolated_db_session)
+        past_date = date(2022, 1, 1)
+
+        with patch.object(service, "_trigger_on_demand_harvest") as mock_harvest:
+            service.get_realtime_price(query="Miniket", target_date=past_date)
+            assert mock_harvest.call_count == 0, (
+                "Violation: Historical GET request triggered live on-demand harvest"
+            )
+
+    def test_modeled_pandamart_excluded_from_basket_channels(self, isolated_db_session):
+        """Modeled Pandamart observations must be excluded from real channel price averages in BasketService."""
+        from datetime import date
+        from app.services.basket_service import basket_service
+        from app.models.commodity import Commodity
+        from app.models.location import Market
+        from app.models.source import Source
+        from app.models.observation import PriceObservation
+
+        comm = isolated_db_session.scalars(select(Commodity).where(Commodity.canonical_name == "Rice (Miniket)")).first()
+        mkt = isolated_db_session.scalars(select(Market)).first()
+        panda_src = isolated_db_session.scalars(select(Source).where(Source.code == "PANDAMART_MODELED")).first()
+
+        # Add a modeled observation for Pandamart
+        modeled_obs = PriceObservation(
+            commodity_id=comm.id,
+            market_id=mkt.id,
+            source_id=panda_src.id,
+            raw_name="Rice (Miniket)",
+            raw_price=999.0,
+            raw_unit="kg",
+            normalized_price=999.0,
+            normalized_unit="kg",
+            price_type="retail_avg",
+            observation_date=date.today(),
+            confidence_score=0.75,
+        )
+        isolated_db_session.add(modeled_obs)
+        isolated_db_session.commit()
+
+        # Fetch channel prices via basket service
+        channel_prices = basket_service._fetch_channel_prices(isolated_db_session, comm.id, date.today())
+        # The modeled 999.0 must not enter retail or online averages
+        assert channel_prices.retail != 999.0, "Modeled Pandamart price leaked into real retail channel"
+        assert channel_prices.online != 999.0, "Modeled Pandamart price leaked into real online channel"
+
+    def test_stores_api_returns_none_when_unavailable(self, isolated_db_session):
+        """Store price API must return price=None and collection_status='UNAVAILABLE' when no DB record exists."""
+        from app.api.v1.endpoints.commodities import get_commodity_stores
+        from app.models.commodity import Commodity
+
+        comm = isolated_db_session.scalars(select(Commodity).where(Commodity.canonical_name == "Rice (Miniket)")).first()
+        res = get_commodity_stores(commodity_id=comm.id, db=isolated_db_session)
+        assert len(res.stores) > 0
+        for store in res.stores:
+            # If no real observation exists for that store, price must be None, not synthetic
+            if store.collection_status == "UNAVAILABLE":
+                assert store.price is None, f"Store {store.id} returned synthetic price {store.price} while UNAVAILABLE"
+                assert "অনুপলব্ধ" in store.status_label_bn or "অপ্রাপ্য" in store.status_label_bn or "উপলব্ধ নেই" in store.status_label_bn
+
+    def test_dam_ticker_range_not_split_wholesale_retail(self):
+        """DAM ticker range (e.g., 30 - 35 Tk) must be averaged for retail_avg, not split into wholesale_avg and retail_avg."""
+        from app.collectors.dam_live_collector import DAMLiveCollector
+        collector = DAMLiveCollector()
+        sample_html = """
+        <html>
+            <div class="stockbox">আলু: ৩০ - ৩৫</div>
+            <div class="stockbox">পেঁয়াজ (পাইকারি): ৬০ - ৭০</div>
+        </html>
+        """
+        obs = collector._parse_html(sample_html, is_fallback=False)
+        assert len(obs) == 2, f"Expected 2 observations, got {len(obs)}"
+
+        # Potato: Retail ticker range 30-35 -> average 32.5 retail_avg
+        potato_obs = next((o for o in obs if "আলু" in o.raw_commodity_name), None)
+        assert potato_obs is not None
+        assert potato_obs.price_type == "retail_avg"
+        assert potato_obs.raw_price == 32.5
+
+        # Onion: Wholesale ticker range 60-70 -> average 65.0 wholesale_avg
+        onion_obs = next((o for o in obs if "পেঁয়াজ" in o.raw_commodity_name), None)
+        assert onion_obs is not None
+        assert onion_obs.price_type == "wholesale_avg"
+        assert onion_obs.raw_price == 65.0

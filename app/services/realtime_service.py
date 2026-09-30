@@ -104,21 +104,22 @@ class RealtimePriceService:
         cache_age = 0
         latest_scraped: Optional[datetime] = None
 
-        # Check if observations need on-demand ingestion
+        # Check if observations need on-demand ingestion (strictly limited to today)
         needs_harvest = False
-        if not observations:
-            needs_harvest = True
-        elif eff_date == date.today():
-            latest_obs = max(observations, key=lambda o: o.scraped_at or datetime.min)
-            if latest_obs.scraped_at:
-                latest_scraped = latest_obs.scraped_at
-                now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
-                age_seconds = (now_utc - latest_obs.scraped_at).total_seconds()
-                cache_age = int(age_seconds)
-                # If cached observations are older than 12 hours, refresh
-                if age_seconds > (12 * 3600):
-                    needs_harvest = True
-                    is_stale = True
+        if eff_date == date.today():
+            if not observations:
+                needs_harvest = True
+            else:
+                latest_obs = max(observations, key=lambda o: o.scraped_at or datetime.min)
+                if latest_obs.scraped_at:
+                    latest_scraped = latest_obs.scraped_at
+                    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+                    age_seconds = (now_utc - latest_obs.scraped_at).total_seconds()
+                    cache_age = int(age_seconds)
+                    # If cached observations are older than 12 hours, refresh
+                    if age_seconds > (12 * 3600):
+                        needs_harvest = True
+                        is_stale = True
 
         if needs_harvest:
             self._trigger_on_demand_harvest(eff_date)

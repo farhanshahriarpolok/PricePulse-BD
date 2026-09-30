@@ -189,9 +189,9 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* 2. CENTER: Prominent Wide Search Bar with Bangla Voice Search */}
-        <div ref={searchContainerRef} className="flex-1 max-w-xl relative">
-          <div className="relative flex items-center">
+        {/* 2. CENTER: Prominent Wide Search Bar with Bangla Voice Search (Desktop & Tablet) */}
+        <div ref={searchContainerRef} className="hidden sm:block flex-1 min-w-0 max-w-xl relative">
+          <div className="relative flex items-center min-w-0">
             <input
               type="text"
               value={searchQuery}
@@ -199,10 +199,10 @@ export default function Navbar({
               onFocus={() => {
                 if (searchQuery.trim().length > 0) setIsDropdownOpen(true);
               }}
-              placeholder={lang === 'bn' ? 'পণ্য সার্চ করুন (যেমন: আলু, পেঁয়াজ, চাল)...' : 'Search commodities (e.g. potato, onion, rice)...'}
-              className="w-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 pl-9 sm:pl-10 pr-16 sm:pr-20 py-2 sm:py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs sm:text-sm font-medium transition shadow-inner"
+              placeholder={lang === 'bn' ? 'পণ্য সার্চ করুন...' : 'Search commodities...'}
+              className="w-full min-w-0 bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 pl-8 sm:pl-10 pr-14 sm:pr-20 py-1.5 sm:py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs sm:text-sm font-medium transition shadow-inner"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
 
             {/* Clear Button & Voice Search Button */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">

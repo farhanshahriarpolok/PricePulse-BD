@@ -30,8 +30,8 @@ class StorePriceOut(BaseModel):
     source_code: str
     name_bn: str
     name_en: str
-    price: float
-    unit: str
+    price: Optional[float] = None
+    unit: Optional[str] = None
     collection_status: str  # LIVE, FALLBACK, MODELED, STALE, UNAVAILABLE
     status_label_bn: str
     status_label_en: str
@@ -40,6 +40,7 @@ class StorePriceOut(BaseModel):
     url: str
     observation_date: Optional[str] = None
     raw_name: Optional[str] = None
+    error_message: Optional[str] = None
 
 
 class CommodityStoresResponse(BaseModel):

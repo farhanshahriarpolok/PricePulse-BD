@@ -126,10 +126,7 @@ class MeenaBazarCollector(BaseCollector):
         # Handle eggs pack of 12
         if "12pcs" in raw_name.lower() or "12 pcs" in raw_name.lower():
             package_unit = "12 pcs"
-        # Check name for embedded volume/weight (e.g. 5ltr, 2kg, 1.5kg, 500g)
-        elif re.search(r"\b(\d+(?:\.\d+)?\s*(?:ltr|liter|litre|kg|gm|g))\b", raw_name, re.IGNORECASE):
-            m = re.search(r"\b(\d+(?:\.\d+)?\s*(?:ltr|liter|litre|kg|gm|g))\b", raw_name, re.IGNORECASE)
-            package_unit = m.group(1).strip()
+        # Prioritize explicit sales unit if specified in API metadata
         elif unit_str in ("kg", "1 kg"):
             package_unit = "1 kg"
         elif unit_str in ("500g", "500 gm", "500 gram"):
@@ -142,6 +139,11 @@ class MeenaBazarCollector(BaseCollector):
             package_unit = "1 pc"
         elif unit_str in ("1.5kg", "1.5 kg"):
             package_unit = "1.5 kg"
+        # Check name for embedded volume/weight (e.g. 5ltr, 2kg, 1.5kg, 500g),
+        # but ignore fish grading specs with trailing '+' or '/pc' (e.g. 150gm+, 700 Gm+, Kg/Pc)
+        elif re.search(r"\b(\d+(?:\.\d+)?\s*(?:ltr|liter|litre|kg|gm|g))\b(?!\s*[\+\/])", raw_name, re.IGNORECASE):
+            m = re.search(r"\b(\d+(?:\.\d+)?\s*(?:ltr|liter|litre|kg|gm|g))\b(?!\s*[\+\/])", raw_name, re.IGNORECASE)
+            package_unit = m.group(1).strip()
         else:
             package_unit = "1 kg"
 

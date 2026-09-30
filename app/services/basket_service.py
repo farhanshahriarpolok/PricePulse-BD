@@ -420,9 +420,14 @@ class BasketOptimizationService:
         online_prices: list[float] = []
 
         for row in rows:
-            price = float(row.avg_price)
             source_code = (row.source_code or "").upper()
             source_type = (row.source_type or "").lower()
+
+            # Modeled, simulation, or isolated benchmarks must NEVER contaminate real market channel aggregates
+            if source_code == "PANDAMART_MODELED" or source_type == "modeled_benchmark":
+                continue
+
+            price = float(row.avg_price)
             market_type = (row.market_type or "").lower()
             price_type = (row.price_type or "").lower()
 

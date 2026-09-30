@@ -173,6 +173,27 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState(() => safeGetStorage('pricepulse_view_mode', 'grid'));
 
+  // Consumer Watchlist without mandatory login
+  const [watchlist, setWatchlist] = useState(() => {
+    try {
+      const s = safeGetStorage('pricepulse_watchlist', '[]');
+      const parsed = JSON.parse(s);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleToggleWatchlist = (commodityId) => {
+    setWatchlist((prev) => {
+      const next = prev.includes(commodityId)
+        ? prev.filter((id) => id !== commodityId)
+        : [...prev, commodityId];
+      safeSetStorage('pricepulse_watchlist', JSON.stringify(next));
+      return next;
+    });
+  };
+
   const handleToggleViewMode = (mode) => {
     setViewMode(mode);
     safeSetStorage('pricepulse_view_mode', mode);
@@ -429,105 +450,42 @@ export default function App() {
     loadData();
   }, []);
 
-  // When selectedCommodity changes, load its history and spatial spread
+  // When selectedCommodity changes, load its real history and spatial spread
   useEffect(() => {
     if (!selectedCommodity) return;
 
-    // Load 30-day history with fallback generation if empty
+    // Load genuine historical series without artificial sine waves
     getCommodityHistory(selectedCommodity.id)
       .then((res) => {
-        const series = res?.series || [];
-        if (series.length >= 3) {
-          setCommodityHistory(series);
-        } else {
-          // Generate realistic 30-day baseline series from pulse or benchmark price
-          const matchedPulse = allPulseItems.find(p => p.commodity_id === selectedCommodity.id);
-          const basePrice = matchedPulse?.benchmark_price || matchedPulse?.retail_price || 100;
-          const fallbackSeries = [];
-          const now = new Date();
-          for (let i = 29; i >= 0; i--) {
-            const d = new Date(now);
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            const noise = (Math.sin(i / 3) * 0.05 + (Math.random() * 0.04 - 0.02)) * basePrice;
-            const avg = Math.round((basePrice + noise) * 10) / 10;
-            fallbackSeries.push({
-              date: dateStr,
-              avg_price: avg,
-              min_price: Math.round((avg * 0.94) * 10) / 10,
-              max_price: Math.round((avg * 1.06) * 10) / 10,
-              sample_count: 5,
-            });
-          }
-          setCommodityHistory(fallbackSeries);
-        }
+        setCommodityHistory(res?.series || []);
       })
       .catch(() => {
-        // Fallback smooth series
-        const matchedPulse = allPulseItems.find(p => p.commodity_id === selectedCommodity.id);
-        const basePrice = matchedPulse?.benchmark_price || matchedPulse?.retail_price || 100;
-        const fallbackSeries = [];
-        const now = new Date();
-        for (let i = 29; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          const dateStr = d.toISOString().split('T')[0];
-          const noise = Math.sin(i / 3) * 0.05 * basePrice;
-          const avg = Math.round((basePrice + noise) * 10) / 10;
-          fallbackSeries.push({
-            date: dateStr,
-            avg_price: avg,
-            min_price: Math.round((avg * 0.94) * 10) / 10,
-            max_price: Math.round((avg * 1.06) * 10) / 10,
-            sample_count: 4,
-          });
-        }
-        setCommodityHistory(fallbackSeries);
+        setCommodityHistory([]);
       });
 
-    // Load spatial spread with fallback synthesis
+    // Load spatial spread without artificial percentage multipliers
     getLocationSpread(selectedCommodity.id)
       .then((res) => {
         if (res && res.spread_summary) {
           setSpatialData(res);
         } else {
-          const matchedPulse = allPulseItems.find(p => p.commodity_id === selectedCommodity.id);
-          const base = matchedPulse?.benchmark_price || 100;
-          setSpatialData({
-            spread_summary: {
-              wholesale_avg: matchedPulse?.wholesale_price || Math.round(base * 0.88),
-              retail_avg: matchedPulse?.retail_price || base,
-              online_avg: matchedPulse?.online_price || Math.round(base * 1.08),
-              spread_bdt: Math.round(base * 0.2),
-              markup_percentage: 20,
-            }
-          });
+          setSpatialData(null);
         }
       })
       .catch(() => {
-        const matchedPulse = allPulseItems.find(p => p.commodity_id === selectedCommodity.id);
-        const base = matchedPulse?.benchmark_price || 100;
-        setSpatialData({
-          spread_summary: {
-            wholesale_avg: matchedPulse?.wholesale_price || Math.round(base * 0.88),
-            retail_avg: matchedPulse?.retail_price || base,
-            online_avg: matchedPulse?.online_price || Math.round(base * 1.08),
-            spread_bdt: Math.round(base * 0.2),
-            markup_percentage: 20,
-          }
-        });
+        setSpatialData(null);
       });
-  }, [selectedCommodity, allPulseItems]);
+  }, [selectedCommodity]);
 
   const categoryCounts = CATEGORIES.reduce((acc, cat) => {
     acc[cat.id] = cat.id === 'all'
       ? allPulseItems.length
-      : allPulseItems.filter((item) => matchesCategory(item, cat.id)).length;
+      : allPulseItems.filter((item) => matchesCategory(item, cat.id, watchlist)).length;
     return acc;
   }, {});
 
   const displayedPulseItems = allPulseItems.filter((item) =>
-    matchesCategory(item, selectedCategory)
+    matchesCategory(item, selectedCategory, watchlist)
   );
 
   const topMover = useMemo(() => {
@@ -707,6 +665,8 @@ export default function App() {
                           lang={lang}
                           selectedMarketId={selectedMarketId}
                           basketQuantity={getBasketQuantity(topMover)}
+                          isWatched={watchlist.includes(topMover.commodity_id || topMover.id)}
+                          onToggleWatchlist={handleToggleWatchlist}
                           onAddToBasket={() => handleUpdateBasketQuantity(topMover, 1)}
                           onUpdateQuantity={(delta) => handleUpdateBasketQuantity(topMover, delta)}
                           onClick={() => {
@@ -725,6 +685,8 @@ export default function App() {
                           lang={lang}
                           selectedMarketId={selectedMarketId}
                           basketQuantity={getBasketQuantity(item)}
+                          isWatched={watchlist.includes(item.commodity_id || item.id)}
+                          onToggleWatchlist={handleToggleWatchlist}
                           onAddToBasket={() => handleUpdateBasketQuantity(item, 1)}
                           onUpdateQuantity={(delta) => handleUpdateBasketQuantity(item, delta)}
                           onClick={() => {
@@ -737,8 +699,12 @@ export default function App() {
                     </div>
                   )
                 ) : (
-                  <div className="p-8 text-center rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs shadow-sm">
-                    {t('no_commodities_found')}
+                  <div className="p-8 text-center rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs shadow-xs">
+                    {selectedCategory === 'watchlist'
+                      ? (lang === 'bn'
+                          ? '⭐ আপনার নিয়মিত তালিকায় এখনো কোনো পণ্য যুক্ত করেননি। পণ্যের কার্ডে থাকা স্টার (★) চিহ্নে চাপ দিয়ে আপনার নিত্যপ্রয়োজনীয় পণ্য যুক্ত করুন।'
+                          : '⭐ Your watchlist is empty. Click the star (★) on any staple card to track your daily essentials.')
+                      : t('no_commodities_found')}
                   </div>
                 )}
               </div>

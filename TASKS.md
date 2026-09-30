@@ -6,13 +6,13 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- None (All development milestones and tasks completed).
+- None (Post-integration verification, consumer UX, and system hardening verified).
 
 ---
 
 ## NEXT
 
-- None (Production v2.6.0 released & oral defense ready).
+- Public Beta deployment and academic evaluation rehearsal.
 
 ---
 
@@ -22,6 +22,48 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 3 — Forecasting, Direction Signals, Backtesting & Research Analytics** (2026-10-01):
+  - **Backend Forecasting Engine**:
+    - Built production `ForecastService` (`app/services/forecast_service.py`) supporting hybrid candidate models: Naive persistence, SMA-7, SMA-14, and formal non-seasonal ARIMA(1,1,0) with analytical OLS AR(1) fallback.
+    - Implemented rolling-origin walk-forward backtesting ($T_{\text{train}} = 14$ days, $H = 7$) strictly guaranteeing zero future data leakage (`train_end < val_start`), evaluating candidate models via out-of-sample MAE and RMSE.
+    - Added data eligibility engine strictly excluding `PANDAMART_MODELED` records and sparse commodities ($< 14$ continuous dates return `INSUFFICIENT_DATA` rather than fabricated predictions).
+    - Integrated channel-separated national series (Wholesale, Retail, Online, Combined) and verified populated market series.
+    - Implemented volatility-modulated direction signals (base deadband $\pm 3.0\%$ modulated by 14-day historical CV).
+    - Exposed endpoint `GET /api/v1/commodities/{id}/forecast` with full provenance, eligibility reasons, and backtest candidate metrics.
+  - **Consumer-First Hybrid UI**:
+    - Created `ForecastOutlookPanel.jsx` component featuring dual-tier layout:
+      1. *Consumer Tier*: Expected direction badge (সম্ভাব্য বৃদ্ধি/হ্রাস/স্থিতিশীল), projected 7-day price range (`৳X – ৳Y / unit`), point forecast delta, and clear analytical disclaimer.
+      2. *Expandable Research Tier*: Candidate models backtest table (NAIVE, SMA-7, SMA-14, ARIMA_1_1_0) with windows evaluated, out-of-sample MAE/RMSE, winning model status, volatility CV, and Day 1..7 daily schedule.
+    - Added channel toggle buttons (পাইকারি, খুচরা, অনলাইন) dynamically fetching channel-specific models.
+    - Integrated `ForecastOutlookPanel` into `CommodityDetailExplorer.jsx` below `SpatialOpportunityPanel`.
+  - **Comprehensive Verification & Zero Regression**:
+    - Added 17 unit and integration tests in `tests/test_phase3_forecast.py` covering data eligibility, channel separation, candidate models, leakage prevention, backtest selection, and API contracts.
+    - **Verification**: **331/331 Pytest tests 100% green** (up from 314), clean Vite production build (2495 modules transformed, 0 errors, built in 12.89s), all 6/6 production smoke checks passed, Playwright desktop (1440x900) & mobile (390x844) verified with zero horizontal overflow and zero console errors. Android directory 100% untouched.
+
+- **Phase 2 — Spatial Intelligence Implementation (Hybrid UI, Canonical Units & Consumer Opportunity)** (2026-10-01):
+  - **Backend Spatial Enhancement**:
+    - Added `calculation_unit` and `data_provenance` fields to `ArbitrageRoute` schema (`app/schemas/spatial.py`).
+    - Added `FreightBreakdownDetail` and `ConsumerOpportunityResponse` schemas to expose consumer-first spatial arbitrage summaries alongside granular corridor freight breakdowns.
+    - Implemented `get_consumer_opportunity()` in `SpatialService` (`app/services/spatial_service.py`), deterministically finding the highest net-opportunity corridor (net margin $\ge 2.0$ BDT/unit) or returning a structured market equilibrium / no-arbitrage response when spreads are unviable.
+    - Added `GET /api/v1/locations/consumer-opportunity` endpoint in `app/api/v1/endpoints/locations.py` with 404 handling and query routing.
+    - Added `getConsumerOpportunity()` API helper in `frontend/src/api/endpoints.js`.
+  - **Consumer-First Hybrid UI**:
+    - Created `SpatialOpportunityPanel.jsx` component featuring dual-tier layout:
+      1. *Consumer Tier*: Clear visual card showing cheapest origin district vs expensive destination district, transport cost, net savings callout (`+৳X.XX / unit`), and feasibility indicator (or market equilibrium notice when no net corridor exists).
+      2. *Expandable Research Tier*: Drill-down view with distance in km, transit hours, base freight breakdown (loading, fuel/distance, toll/ferry), Spatial Dispersion Index $D(t)$, and top corridor rankings table.
+    - Integrated `SpatialOpportunityPanel` directly into `CommodityDetailExplorer.jsx` below historical trend charts.
+    - Full bilingual Bengali/English localization (`lang` prop aware).
+  - **Comprehensive Test Suite & Zero-Regression Verification**:
+    - Added 21 unit and integration tests in `tests/test_phase2_spatial_consumer.py` covering schema compliance, canonical units matching `commodity.default_unit`, mathematical consistency of freight components, equilibrium handling, and HTTP endpoint contract.
+    - **Verification**: **314/314 Pytest tests 100% green**, clean Vite production build (2494 modules, 0 errors, built in 13.63s), Android directory untouched, zero unverified claims.
+
+- **Phase 1 Final Acceptance & Evidence Gate Passed** (2026-09-30):
+  - **DAM Ticker Range Inconsistency Fixed**: Corrected `DAMLiveCollector._parse_html` so intra-day ticker ranges (e.g. 30 - 35 Tk) within a single channel compute an arithmetic mean rather than falsely splitting into `wholesale_avg` and `retail_avg`. Added regression test `test_dam_ticker_range_not_split_wholesale_retail`.
+  - **Mobile 390x844 Layout Contained**: Fixed horizontal overflow on 390px mobile viewports by adding `min-w-0` to Navbar search and `overflow-x: hidden` to root HTML/body container.
+  - **Complete Evidence Gate**: All 25 acceptance gates verified with runtime evidence (293/293 pytest, fresh isolated SQLite DB, E2E collectors, Store API, scheduler, source health, cultural units, taxonomy safety, PWA, desktop/mobile browser testing).
+  - **Verification**: **293/293 Pytest tests 100% green**, clean Vite production build (2493 modules transformed, 0 errors), 6/6 production smoke tests passed.
+
 
 - **Phase 1 — Real Data Integration Foundation + Data Quality & Validation Hardening** (2026-09-30):
   - Hardened `CommodityNormalizer` with token-boundary constraint: multi-token phrase containment only, single-token aliases restricted to exact match to prevent taxonomy bleed on multi-word branded items.

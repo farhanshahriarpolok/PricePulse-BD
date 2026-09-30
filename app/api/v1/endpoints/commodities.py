@@ -23,6 +23,8 @@ from app.schemas.observation import (
     CommodityHistoryResponse,
     HistoricalPointOut,
 )
+from app.schemas.forecast import CommodityForecastResponse
+from app.services.forecast_service import forecast_service
 
 router = APIRouter(prefix="/commodities", tags=["Commodities"])
 
@@ -373,21 +375,12 @@ def get_commodity_stores(
             )
 
         else:
-            # No DB observation found — use modeled fallback spread
-            modeled_price = round(base_retail * (1.0 + cfg["default_spread"]), 2)
-            if cfg["id"] == "chaldal":
-                coll_status = "FALLBACK"
-                label_bn = "ফলব্যাক বেঞ্চমার্ক"
-                label_en = "Catalog Benchmark ✓"
-            elif cfg["id"] == "pandamart":
-                coll_status = "MODELED"
-                label_bn = "এক্সপ্রেস প্রাক্কলন (+৮%)"
-                label_en = "Express Est. (+8%)"
-            else:
-                pct = int(cfg["default_spread"] * 100)
-                coll_status = "MODELED"
-                label_bn = f"সুপারশপ প্রাক্কলন (+{pct}%)"
-                label_en = f"Superstore Est. (+{pct}%)"
+            # Honest representation: no observation found for this store and commodity.
+            # Never create synthetic numeric prices merely to avoid an empty card or screen.
+            coll_status = "UNAVAILABLE"
+            label_bn = "তথ্য উপলব্ধ নেই"
+            label_en = "Offer Unavailable"
+            err_msg = f"No verified price observation currently recorded for {commodity.canonical_name} at {cfg['name_en']}."
 
             stores_out.append(
                 StorePriceOut(
@@ -395,16 +388,17 @@ def get_commodity_stores(
                     source_code=cfg["source_code"],
                     name_bn=cfg["name_bn"],
                     name_en=cfg["name_en"],
-                    price=modeled_price,
+                    price=None,
                     unit=commodity.default_unit,
                     collection_status=coll_status,
                     status_label_bn=label_bn,
                     status_label_en=label_en,
                     is_live=False,
-                    is_fallback=(coll_status == "FALLBACK"),
+                    is_fallback=False,
                     url=cfg["url"],
                     observation_date=None,
                     raw_name=None,
+                    error_message=err_msg,
                 )
             )
 
@@ -415,4 +409,34 @@ def get_commodity_stores(
         default_unit=commodity.default_unit,
         stores=stores_out,
     )
+
+
+@router.get(
+    "/{commodity_id}/forecast",
+    response_model=CommodityForecastResponse,
+    summary="Get 7-Day Price Forecast with Model Selection and Direction Signal",
+    description=(
+        "Returns near-term 7-day price forecast, rolling backtest candidate evaluations, "
+        "volatility-aware directional outlook, and provenance telemetry. "
+        "Empirical observations only; modeled sources (PANDAMART_MODELED) are strictly excluded."
+    ),
+)
+def get_commodity_forecast(
+    commodity_id: str,
+    channel: str = Query("wholesale", description="Channel filter: 'wholesale', 'retail', 'online', or 'all'"),
+    market_id: Optional[int] = Query(None, description="Optional physical market ID filter"),
+    db: Session = Depends(get_db),
+):
+    res = forecast_service.generate_commodity_forecast(
+        db=db,
+        commodity_identifier=commodity_id,
+        channel=channel,
+        market_id=market_id,
+    )
+    if res.status == "UNAVAILABLE" and res.commodity_id == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Commodity '{commodity_id}' could not be resolved or has no price series.",
+        )
+    return res
 

@@ -13,11 +13,16 @@ import {
   ShoppingCart,
   ChevronDown,
   Layers,
-  Info
+  Info,
+  Share2,
+  Copy,
+  X
 } from 'lucide-react';
 import { toBengaliNumeral } from './CommodityCard';
 import CommodityIcon from './media/CommodityIcon';
 import HistoricalTrendChart from './HistoricalTrendChart';
+import SpatialOpportunityPanel from './SpatialOpportunityPanel';
+import ForecastOutlookPanel from './ForecastOutlookPanel';
 import { getCommodityStores } from '../api/endpoints';
 
 
@@ -146,28 +151,83 @@ export default function CommodityDetailExplorer({
   const avgBase = isNaN(rawAvg) || rawAvg <= 0 ? 65 : rawAvg;
   
   const rawWholesale = Number(matchedPulse?.wholesale_price) || Number(spatialData?.spread_summary?.wholesale_avg);
-  const wholesaleBase = !isNaN(rawWholesale) && rawWholesale > 0 ? rawWholesale : Math.round(avgBase * 0.82);
+  const wholesaleBase = !isNaN(rawWholesale) && rawWholesale > 0 ? rawWholesale : null;
 
   const rawRetail = Number(matchedPulse?.retail_price) || Number(spatialData?.spread_summary?.retail_avg);
   const retailBase = !isNaN(rawRetail) && rawRetail > 0 ? rawRetail : avgBase;
 
   const rawOnline = Number(matchedPulse?.online_price) || Number(spatialData?.spread_summary?.online_avg);
-  const onlineBase = !isNaN(rawOnline) && rawOnline > 0 ? rawOnline : Math.round(avgBase * 1.08);
+  const onlineBase = !isNaN(rawOnline) && rawOnline > 0 ? rawOnline : null;
 
   const rawBenchmark = Number(matchedPulse?.benchmark_price);
-  const benchmarkRate = !isNaN(rawBenchmark) && rawBenchmark > 0 ? rawBenchmark : Math.round(avgBase * 0.95);
+  const benchmarkRate = !isNaN(rawBenchmark) && rawBenchmark > 0 ? rawBenchmark : retailBase;
 
-  // Adjusted prices for selected physical market
-  const marketRetailPrice = retailBase + (currentMarket?.offset || 0);
+  // Selected physical market rate matches retail benchmark without artificial local offsets
+  const marketRetailPrice = retailBase;
   const marketWholesalePrice = wholesaleBase;
-  const wholesaleDiff = Math.max(0, marketRetailPrice - marketWholesalePrice);
+  const wholesaleDiff = (marketRetailPrice && marketWholesalePrice && marketRetailPrice > marketWholesalePrice)
+    ? (marketRetailPrice - marketWholesalePrice)
+    : null;
 
-  // Best Buying Decision Savings calculations
-  const wholesaleSavings = Math.max(8, marketRetailPrice - marketWholesalePrice);
-  const retailVsOnlineSavings = Math.max(5, onlineBase - marketRetailPrice);
+  // Best Buying Decision Savings calculations (only calculated when both are genuinely observed)
+  const wholesaleSavings = (marketRetailPrice && marketWholesalePrice && marketRetailPrice > marketWholesalePrice)
+    ? (marketRetailPrice - marketWholesalePrice)
+    : null;
+  const retailVsOnlineSavings = (onlineBase && marketRetailPrice && onlineBase > marketRetailPrice)
+    ? (onlineBase - marketRetailPrice)
+    : null;
 
   // Variety Tag
   const varietyTag = getVarietyTag(commodity?.canonical_name, commodity?.bangla_name, lang);
+
+  // Share Card State & Handlers
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
+
+  const generateShareText = () => {
+    const name = lang === 'bn' ? (commodity?.bangla_name || commodity?.canonical_name) : commodity?.canonical_name;
+    const dateStr = matchedPulse?.date || new Date().toISOString().split('T')[0];
+    const lines = [
+      `🇧🇩 PricePulse BD — আজকের বাজারদর (${dateStr})`,
+      `📦 পণ্য: ${name} (${varietyTag})`,
+      `💵 বর্তমান খুচরা দর: ৳ ${toBengaliNumeral(retailBase, lang)} / ${unit}`,
+    ];
+    if (wholesaleBase) {
+      lines.push(`🚛 পাইকারি আড়ত দর: ৳ ${toBengaliNumeral(wholesaleBase, lang)} / ${unit}`);
+    }
+    if (onlineBase) {
+      lines.push(`🛒 অনলাইন/সুপারশপ গড় দর: ৳ ${toBengaliNumeral(onlineBase, lang)} / ${unit}`);
+    }
+    lines.push(`🏛️ উৎস: কৃষি বিপণন অধিদপ্তর (DAM), টিসিবি ও সুপারশপ পর্যবেক্ষণ`);
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/#pulse?commodity=${commodity?.id}` : '';
+    if (shareUrl) lines.push(`🔗 সরাসরি যাচাই করুন: ${shareUrl}`);
+    return lines.join('\n');
+  };
+
+  const handleCopyShare = () => {
+    const text = generateShareText();
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedShare(true);
+    setTimeout(() => setCopiedShare(false), 2500);
+  };
+
+  const handleNativeShare = async () => {
+    const text = generateShareText();
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `PricePulse BD - ${commodity?.bangla_name || commodity?.canonical_name}`,
+          text: text,
+        });
+      } catch (err) {
+        handleCopyShare();
+      }
+    } else {
+      handleCopyShare();
+    }
+  };
 
   // Live and modeled store data fetched from backend
   const [storeData, setStoreData] = useState(null);
@@ -239,10 +299,10 @@ export default function CommodityDetailExplorer({
 
       const resolvedList = storeDefs.map((def) => {
         const live = storesById[def.id];
-        const status = live?.collection_status || 'MODELED';
-        const price = live?.price && live.price > 0 ? live.price : def.defaultPrice;
-        const tagBn = live?.status_label_bn || (status === 'LIVE' ? 'লাইভ দাম ✓' : status === 'FALLBACK' ? 'ফলব্যাক বেঞ্চমার্ক' : 'সুপারশপ প্রাক্কলন');
-        const tagEn = live?.status_label_en || (status === 'LIVE' ? 'Live Observed ✓' : status === 'FALLBACK' ? 'Catalog Benchmark' : 'Superstore Est.');
+        const status = live?.collection_status || (live ? 'UNAVAILABLE' : 'MODELED');
+        const price = live ? (live.price !== null && live.price !== undefined && live.price > 0 ? live.price : null) : def.defaultPrice;
+        const tagBn = live?.status_label_bn || (status === 'LIVE' ? 'লাইভ দাম ✓' : status === 'FALLBACK' ? 'ফলব্যাক বেঞ্চমার্ক' : status === 'UNAVAILABLE' ? 'তথ্য অনুপলব্ধ' : 'সুপারশপ প্রাক্কলন');
+        const tagEn = live?.status_label_en || (status === 'LIVE' ? 'Live Observed ✓' : status === 'FALLBACK' ? 'Catalog Benchmark' : status === 'UNAVAILABLE' ? 'Unavailable' : 'Superstore Est.');
 
         return {
           id: def.id,
@@ -259,10 +319,11 @@ export default function CommodityDetailExplorer({
         };
       });
 
-      const minPrice = Math.min(...resolvedList.map((s) => s.price));
+      const validPrices = resolvedList.filter((s) => s.price !== null && s.price > 0 && s.status !== 'UNAVAILABLE').map((s) => s.price);
+      const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
       return resolvedList.map((s) => ({
         ...s,
-        isBestDeal: s.price === minPrice,
+        isBestDeal: minPrice !== null && s.price === minPrice && s.status !== 'MODELED',
       }));
     }
 
@@ -271,11 +332,11 @@ export default function CommodityDetailExplorer({
         id: 'chaldal',
         nameBn: 'চালডাল',
         nameEn: 'Chaldal',
-        tagBn: 'ফলব্যাক বেঞ্চমার্ক ✓',
-        tagEn: 'Catalog Benchmark ✓',
-        status: 'FALLBACK',
-        isBestDeal: true,
-        price: Math.round(onlineBase * 0.98),
+        tagBn: 'তথ্য অনুপলব্ধ',
+        tagEn: 'Unavailable',
+        status: 'UNAVAILABLE',
+        isBestDeal: false,
+        price: null,
         url: 'https://chaldal.com',
         buttonBn: 'চালডালে দেখুন ↗',
         buttonEn: 'View on Chaldal ↗',
@@ -284,11 +345,11 @@ export default function CommodityDetailExplorer({
         id: 'shwapno',
         nameBn: 'স্বপ্ন অনলাইন',
         nameEn: 'Shwapno Online',
-        tagBn: 'সুপারশপ প্রাক্কলন (+২%)',
-        tagEn: 'Superstore Est. (+2%)',
-        status: 'MODELED',
+        tagBn: 'তথ্য অনুপলব্ধ',
+        tagEn: 'Unavailable',
+        status: 'UNAVAILABLE',
         isBestDeal: false,
-        price: Math.round(onlineBase * 1.02),
+        price: null,
         url: 'https://shwapno.com',
         buttonBn: 'স্বপ্ন-তে দেখুন ↗',
         buttonEn: 'View on Shwapno ↗',
@@ -297,11 +358,11 @@ export default function CommodityDetailExplorer({
         id: 'meenabazar',
         nameBn: 'মীনা বাজার',
         nameEn: 'Meena Bazar',
-        tagBn: 'সুপারশপ প্রাক্কলন (+৫%)',
-        tagEn: 'Superstore Est. (+5%)',
-        status: 'MODELED',
+        tagBn: 'তথ্য অনুপলব্ধ',
+        tagEn: 'Unavailable',
+        status: 'UNAVAILABLE',
         isBestDeal: false,
-        price: Math.round(onlineBase * 1.05),
+        price: null,
         url: 'https://meenabazaronline.com',
         buttonBn: 'মীনা বাজারে দেখুন ↗',
         buttonEn: 'View on Meena Bazar ↗',
@@ -310,11 +371,11 @@ export default function CommodityDetailExplorer({
         id: 'pandamart',
         nameBn: 'পান্ডামার্ট',
         nameEn: 'Pandamart',
-        tagBn: 'এক্সপ্রেস প্রাক্কলন (+৮%)',
-        tagEn: 'Express Est. (+8%)',
-        status: 'MODELED',
+        tagBn: 'তথ্য অনুপলব্ধ',
+        tagEn: 'Unavailable',
+        status: 'UNAVAILABLE',
         isBestDeal: false,
-        price: Math.round(onlineBase * 1.08),
+        price: null,
         url: 'https://foodpanda.com.bd/pandamart',
         buttonBn: 'পান্ডামার্টে দেখুন ↗',
         buttonEn: 'View on Pandamart ↗',
@@ -398,43 +459,66 @@ export default function CommodityDetailExplorer({
             </div>
           </div>
 
-          {/* Quick Add to Basket CTA */}
-          {onAddToBasket && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Share Price Button */}
             <button
               type="button"
-              onClick={() => onAddToBasket(matchedPulse || commodity)}
-              className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-950/20 transition-all active:scale-95 w-fit"
+              onClick={() => setIsShareModalOpen(true)}
+              className="flex items-center justify-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+              title={lang === 'bn' ? 'দর ও প্রমাণের লিঙ্ক শেয়ার করুন' : 'Share verified rate & evidence'}
             >
-              <ShoppingCart className="w-4 h-4" />
-              <span>{lang === 'bn' ? '+ এই পণ্যটি ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
+              <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{lang === 'bn' ? 'দর শেয়ার করুন' : 'Share Price'}</span>
             </button>
-          )}
-        </div>
 
-        {/* Best Buying Decision Alert Card (Prominent Emerald Container) */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/80 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-emerald-950/30 border-2 border-emerald-500/40 shadow-sm mb-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xl bg-emerald-600 text-white flex-shrink-0 shadow-xs">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
-              <span className="font-extrabold text-emerald-900 dark:text-emerald-300 block sm:inline mr-1 text-sm sm:text-base">
-                {lang === 'bn' ? '💡 আজকের সাশ্রয়ী কেনার সিদ্ধান্ত:' : '💡 Smart Buying Decision:'}
-              </span>
-              {lang === 'bn' ? (
-                <span>
-                  আপনি যদি <strong className="text-emerald-950 dark:text-emerald-200 font-bold">{districtData.wholesaleHubBn}</strong> থেকে কেনেন তবে কেজিতে সাশ্রয় <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(wholesaleSavings, lang)}</strong>। সাধারণ কাঁচাবাজারে কিনলে অনলাইন থেকে বাঁচবে <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(retailVsOnlineSavings, lang)}/{unit}</strong>।
-                </span>
-              ) : (
-                <span>
-                  Buying from <strong>{districtData.wholesaleHubEn}</strong> saves approximately{' '}
-                  <strong className="font-mono text-emerald-400">BDT {wholesaleSavings}</strong> per {unit}. 
-                  Local wet markets also save <strong className="font-mono text-emerald-400">BDT {retailVsOnlineSavings}/{unit}</strong> compared to online delivery.
-                </span>
-              )}
-            </div>
+            {/* Quick Add to Basket CTA */}
+            {onAddToBasket && (
+              <button
+                type="button"
+                onClick={() => onAddToBasket(matchedPulse || commodity)}
+                className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-950/20 transition-all active:scale-95 w-fit"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>{lang === 'bn' ? '+ এই পণ্যটি ফর্দে যোগ করুন' : '+ Add to Basket'}</span>
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Best Buying Decision Alert Card (Only render if genuine savings exist) */}
+        {(wholesaleSavings || retailVsOnlineSavings) && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/80 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/20 dark:to-emerald-950/30 border-2 border-emerald-500/40 shadow-sm mb-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-xl bg-emerald-600 text-white flex-shrink-0 shadow-xs">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed">
+                <span className="font-extrabold text-emerald-900 dark:text-emerald-300 block sm:inline mr-1 text-sm sm:text-base">
+                  {lang === 'bn' ? '💡 আজকের সাশ্রয়ী কেনার সিদ্ধান্ত:' : '💡 Smart Buying Decision:'}
+                </span>
+                {lang === 'bn' ? (
+                  <span>
+                    {wholesaleSavings ? (
+                      <>আপনি যদি <strong className="text-emerald-950 dark:text-emerald-200 font-bold">{districtData.wholesaleHubBn}</strong> থেকে পাইকারিতে কেনেন তবে কেজিতে সাশ্রয় <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(wholesaleSavings, lang)}</strong>। </>
+                    ) : null}
+                    {retailVsOnlineSavings ? (
+                      <>সাধারণ কাঁচাবাজারে কিনলে অনলাইন থেকে সাশ্রয় <strong className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-sm">৳ {toBengaliNumeral(retailVsOnlineSavings, lang)}/{unit}</strong>।</>
+                    ) : null}
+                  </span>
+                ) : (
+                  <span>
+                    {wholesaleSavings ? (
+                      <>Buying wholesale from <strong>{districtData.wholesaleHubEn}</strong> saves approximately <strong className="font-mono text-emerald-400">BDT {wholesaleSavings}</strong> per {unit}. </>
+                    ) : null}
+                    {retailVsOnlineSavings ? (
+                      <>Local wet markets also save <strong className="font-mono text-emerald-400">BDT {retailVsOnlineSavings}/{unit}</strong> compared to online delivery.</>
+                    ) : null}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Official Benchmark & Transparency Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-xs font-mono text-slate-700 dark:text-slate-300">
@@ -450,13 +534,13 @@ export default function CommodityDetailExplorer({
 
           <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
             <Clock className="w-3.5 h-3.5" />
-            <span>{lang === 'bn' ? '🕒 যাচাই সময়: আজ সকাল ৮:৩০ টা' : 'Verified: Today 8:30 AM'}</span>
+            <span>{matchedPulse?.date ? (lang === 'bn' ? `তারিখ: ${matchedPulse.date}` : `Date: ${matchedPulse.date}`) : (lang === 'bn' ? 'আজকের যাচাইকৃত দর' : 'Verified Today')}</span>
           </div>
 
           <div>
             <span className="text-slate-500 dark:text-slate-400">{lang === 'bn' ? 'অনলাইন গড়:' : 'Online Avg:'} </span>
             <strong className="text-amber-600 dark:text-amber-400 font-bold">
-              ৳ {toBengaliNumeral(onlineBase, lang)}
+              {onlineBase ? `৳ ${toBengaliNumeral(onlineBase, lang)}` : (lang === 'bn' ? 'তথ্য নেই' : 'N/A')}
             </strong>
           </div>
         </div>
@@ -571,16 +655,21 @@ export default function CommodityDetailExplorer({
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2 pt-2">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono">
-                ৳ {toBengaliNumeral(marketWholesalePrice, lang)}
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/{unit}</span>
-              
-              <span className="ml-auto text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
-                {lang === 'bn' ? 'সর্বনিম্ন দর ✓' : 'Lowest Rate ✓'}
-              </span>
-            </div>
+            {marketWholesalePrice ? (
+              <div className="flex items-baseline gap-2 pt-2">
+                <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono">
+                  ৳ {toBengaliNumeral(marketWholesalePrice, lang)}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">/{unit}</span>
+                <span className="ml-auto text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
+                  {lang === 'bn' ? 'আড়ত দর ✓' : 'Wholesale Rate ✓'}
+                </span>
+              </div>
+            ) : (
+              <div className="py-2.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {lang === 'bn' ? 'এই পণ্যের সরকারি পাইকারি আড়ত দর এই মুহূর্তে পাওয়া যায়নি।' : 'Government wholesale rate is currently unavailable for this item.'}
+              </div>
+            )}
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
               {lang === 'bn' ? 'পাইকারিতে সর্বনিম্ন কেনা যাবে ৫ কেজি/বস্তা।' : 'Minimum wholesale lot: 5 kg/sack lot.'}
             </p>
@@ -635,12 +724,18 @@ export default function CommodityDetailExplorer({
                   </span>
                 </div>
 
-                <div className="flex items-baseline gap-1 my-3">
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white font-mono">
-                    ৳ {toBengaliNumeral(store.price, lang)}
-                  </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">/{unit}</span>
-                </div>
+                {store.price !== null && store.price !== undefined ? (
+                  <div className="flex items-baseline gap-1 my-3">
+                    <span className="text-2xl font-extrabold text-slate-900 dark:text-white font-mono">
+                      ৳ {toBengaliNumeral(store.price, lang)}
+                    </span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">/{unit}</span>
+                  </div>
+                ) : (
+                  <div className="my-3 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    {lang === 'bn' ? 'স্টোরে এই মুহূর্তে পণ্যটি অপ্রাপ্য' : 'Currently unavailable in this store'}
+                  </div>
+                )}
               </div>
 
               <a
@@ -683,6 +778,126 @@ export default function CommodityDetailExplorer({
         unit={unit}
         lang={lang}
       />
+
+      {/* ── SECTION 3.5: SPATIAL MARKET INTELLIGENCE (Phase 2) ─────────────────── */}
+      {commodity?.id && (
+        <SpatialOpportunityPanel
+          commodityId={commodity.id}
+          commodityName={commodity.canonical_name}
+          lang={lang}
+        />
+      )}
+
+      {/* ── SECTION 3.6: 7-DAY PRICE FORECAST & DIRECTION (Phase 3) ─────────────── */}
+      {commodity?.id && (
+        <ForecastOutlookPanel
+          commodityId={commodity.id}
+          commodityName={commodity.canonical_name}
+          lang={lang}
+        />
+      )}
+
+      {/* ── SHARE CARD MODAL ───────────────────────────────────────────────── */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => setIsShareModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-xl">🇧🇩</span>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white font-outfit">
+                  {lang === 'bn' ? 'বাজারদর শেয়ার কার্ড' : 'Market Rate Share Card'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {lang === 'bn' ? 'যাচাইকৃত মূল্য ও প্রমাণের তথ্য' : 'Verified rate & evidence preview'}
+                </p>
+              </div>
+            </div>
+
+            {/* Visual Card Preview */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-slate-900 border border-emerald-500/30 shadow-xs mb-4 select-none">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block">
+                    PricePulse BD • {matchedPulse?.date || 'আজকের দর'}
+                  </span>
+                  <h4 className="text-xl font-extrabold text-slate-900 dark:text-white font-outfit mt-0.5">
+                    {lang === 'bn' ? (commodity?.bangla_name || commodity?.canonical_name) : commodity?.canonical_name}
+                  </h4>
+                  <span className="text-xs text-slate-600 dark:text-slate-400">{varietyTag}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 p-2 flex items-center justify-center flex-shrink-0">
+                  <CommodityIcon category={commodity?.category} name={commodity?.canonical_name} className="w-full h-full object-contain" />
+                </div>
+              </div>
+
+              <div className="my-3 py-2 px-3 rounded-xl bg-white/90 dark:bg-slate-800/90 border border-emerald-200 dark:border-emerald-800/50 flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans">
+                    {lang === 'bn' ? 'খুচরা বাজার দর' : 'Retail Price'}
+                  </span>
+                  <div className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 font-mono">
+                    ৳ {toBengaliNumeral(retailBase, lang)}
+                    <span className="text-xs font-normal text-slate-500 dark:text-slate-400">/{unit}</span>
+                  </div>
+                </div>
+                {wholesaleBase && (
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans">
+                      {lang === 'bn' ? 'পাইকারি আড়ত' : 'Wholesale'}
+                    </span>
+                    <div className="text-sm font-bold text-slate-700 dark:text-slate-300 font-mono">
+                      ৳ {toBengaliNumeral(wholesaleBase, lang)}/{unit}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-800">
+                <span>🏛️ DAM / TCB যাচাইকৃত</span>
+                <span className="font-mono">pricepulse.bd</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCopyShare}
+                className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span className="text-emerald-600 font-bold">{lang === 'bn' ? 'কপি হয়েছে!' : 'Copied!'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-slate-500" />
+                    <span>{lang === 'bn' ? 'টেক্সট কপি করুন' : 'Copy Text'}</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNativeShare}
+                className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>{lang === 'bn' ? 'বন্ধুদের পাঠান' : 'Share Rate'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

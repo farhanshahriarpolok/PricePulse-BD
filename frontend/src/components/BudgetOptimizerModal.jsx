@@ -35,17 +35,16 @@ export default function BudgetOptimizerModal({
   const [applied, setApplied] = useState(false);
 
   // Map commodities rates dynamically if available in DB
-  const optimizedItems = useMemo(() => {
-    // Determine target scale based on budget
-    // Calculate unscaled cost
+  const { optimizedItems, totalCalculated, isInfeasible, minRequiredCost } = useMemo(() => {
+    // Determine minimum and baseline requirements
     const unscaledList = ESSENTIAL_STAPLES.map((staple) => {
-      // Find live rate if exists
       const match = commodities.find(
         (c) => c.canonical_name?.toLowerCase().includes(staple.name.toLowerCase()) ||
                c.bangla_name?.includes(staple.bnName)
       );
-      const rate = match?.price_summary?.avg_price || staple.baseRate;
+      const rate = match?.price_summary?.avg_price || match?.retail_avg || staple.baseRate;
       const baseQty = familySize === 'small' ? staple.defaultSmallQty : staple.defaultMedQty;
+      const minQty = staple.unit === 'হালি' ? 1 : staple.unit === 'g' ? 100 : staple.unit === 'liter' ? 1 : 1;
       return {
         commodity_id: match?.id || null,
         name: staple.name,
@@ -53,42 +52,65 @@ export default function BudgetOptimizerModal({
         unit: staple.unit,
         rate,
         baseQty,
+        minQty,
+        minCost: rate * minQty,
         cost: rate * baseQty,
       };
     });
 
-    const totalUnscaled = unscaledList.reduce((sum, item) => sum + item.cost, 0);
-    const scalingFactor = Math.max(0.5, Math.min(2.5, budget / totalUnscaled));
+    const minRequired = unscaledList.reduce((sum, item) => sum + item.minCost, 0);
+    if (budget < minRequired) {
+      return {
+        optimizedItems: [],
+        totalCalculated: 0,
+        isInfeasible: true,
+        minRequiredCost: Math.round(minRequired),
+      };
+    }
 
-    return unscaledList.map((item, idx) => {
+    const totalUnscaled = unscaledList.reduce((sum, item) => sum + item.cost, 0);
+    let scalingFactor = budget / totalUnscaled;
+
+    // Iteratively ensure we NEVER exceed budget
+    let items = unscaledList.map((item, idx) => {
       let qty = item.baseQty * scalingFactor;
-      // Round gracefully
       if (item.unit === 'kg' || item.unit === 'liter') {
-        qty = Math.round(qty * 2) / 2; // to nearest 0.5
-        if (qty < 0.5) qty = 0.5;
+        qty = Math.max(item.minQty, Math.floor(qty * 2) / 2); // round down to nearest 0.5 to avoid budget overrun
       } else if (item.unit === 'হালি') {
-        qty = Math.max(1, Math.round(qty));
+        qty = Math.max(item.minQty, Math.floor(qty));
       } else if (item.unit === 'g') {
-        qty = Math.max(100, Math.round(qty / 50) * 50);
+        qty = Math.max(item.minQty, Math.floor(qty / 50) * 50);
       }
-      const itemCost = Math.round(qty * item.rate);
       return {
         ...item,
         id: `opt-${idx}`,
         quantity: qty,
-        totalCost: itemCost,
+        totalCost: Math.round(qty * item.rate),
       };
     });
+
+    let currentTotal = items.reduce((acc, it) => acc + it.totalCost, 0);
+    // If rounding slightly exceeded budget, decrement highest cost item safely
+    while (currentTotal > budget) {
+      const candidates = items.filter((it) => it.quantity > it.minQty);
+      if (candidates.length === 0) break;
+      const highest = candidates.reduce((prev, curr) => (curr.totalCost > prev.totalCost ? curr : prev));
+      if (highest.unit === 'kg' || highest.unit === 'liter') highest.quantity -= 0.5;
+      else if (highest.unit === 'হালি') highest.quantity -= 1;
+      else if (highest.unit === 'g') highest.quantity -= 50;
+      highest.totalCost = Math.round(highest.quantity * highest.rate);
+      currentTotal = items.reduce((acc, it) => acc + it.totalCost, 0);
+    }
+
+    return {
+      optimizedItems: items,
+      totalCalculated: currentTotal,
+      isInfeasible: false,
+      minRequiredCost: Math.round(minRequired),
+    };
   }, [familySize, budget, commodities]);
 
-  const totalCalculated = useMemo(() => {
-    return optimizedItems.reduce((acc, item) => acc + item.totalCost, 0);
-  }, [optimizedItems]);
-
-  const estimatedSavings = useMemo(() => {
-    // Estimated wholesale/best-channel buying savings (~8-12%)
-    return Math.round(totalCalculated * 0.09);
-  }, [totalCalculated]);
+  const budgetRemaining = Math.max(0, budget - totalCalculated);
 
   if (!isOpen) return null;
 
@@ -218,54 +240,67 @@ export default function BudgetOptimizerModal({
           </div>
 
           {/* 3. Generated Balanced Basket Preview */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-800/30">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                {lang === 'bn' ? 'সুপারিশকৃত অপ্টিমাইজড ফর্দ:' : 'Optimized Essential Breakdown:'}
+          {isInfeasible ? (
+            <div className="border border-amber-300 dark:border-amber-800/60 rounded-xl p-4 bg-amber-50/60 dark:bg-amber-950/20 text-center space-y-2">
+              <span className="text-amber-700 dark:text-amber-400 font-bold text-sm block">
+                {lang === 'bn' ? '⚠️ বাজেট অপর্যাপ্ত' : '⚠️ Insufficient Budget'}
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                {optimizedItems.length} {lang === 'bn' ? 'টি মূল পণ্য' : 'Staples'}
-              </span>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                {lang === 'bn'
+                  ? `ন্যূনতম ১ কেজি/প্যাক হিসেবে ৭টি মৌলিক পণ্য কেনার জন্য কমপক্ষে ৳ ${toBengaliNumeral(minRequiredCost, lang)} প্রয়োজন। অনুগ্রহ করে বাজেট বাড়িয়ে চেষ্টা করুন।`
+                  : `Minimum ৳ ${minRequiredCost} is required to cover baseline minimum pack units across all essential staples. Please increase your budget.`}
+              </p>
             </div>
+          ) : (
+            <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-800/30">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  {lang === 'bn' ? 'সুপারিশকৃত অপ্টিমাইজড ফর্দ:' : 'Optimized Essential Breakdown:'}
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  {optimizedItems.length} {lang === 'bn' ? 'টি মূল পণ্য' : 'Staples'}
+                </span>
+              </div>
 
-            <div className="divide-y divide-slate-200 dark:divide-slate-800/80 text-xs">
-              {optimizedItems.map((item) => (
-                <div key={item.id} className="py-2 flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
-                      {lang === 'bn' ? item.bnName : item.name}
-                    </span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                      ({toBengaliNumeral(item.quantity, lang)} {item.unit})
+              <div className="divide-y divide-slate-200 dark:divide-slate-800/80 text-xs">
+                {optimizedItems.map((item) => (
+                  <div key={item.id} className="py-2 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      <span className="font-medium text-slate-800 dark:text-slate-200">
+                        {lang === 'bn' ? item.bnName : item.name}
+                      </span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        ({toBengaliNumeral(item.quantity, lang)} {item.unit})
+                      </span>
+                    </div>
+                    <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+                      ৳ {toBengaliNumeral(item.totalCost, lang)}
                     </span>
                   </div>
-                  <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
-                    ৳ {toBengaliNumeral(item.totalCost, lang)}
+                ))}
+              </div>
+
+              {/* Total and Remaining Budget Bar */}
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 block">{lang === 'bn' ? 'মোট বরাদ্দকৃত খরচ:' : 'Total Allocated:'}</span>
+                  <span className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
+                    ৳ {toBengaliNumeral(totalCalculated, lang)}
                   </span>
                 </div>
-              ))}
-            </div>
-
-            {/* Total and Savings Bar */}
-            <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-between">
-              <div>
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">{lang === 'bn' ? 'মোট আনুমানিক খরচ:' : 'Total Estimated Cost:'}</span>
-                <span className="text-base font-extrabold text-slate-900 dark:text-white font-mono">
-                  ৳ {toBengaliNumeral(totalCalculated, lang)}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-end gap-1">
-                  <TrendingDown className="w-3.5 h-3.5" />
-                  {lang === 'bn' ? 'সাশ্রয় হতে পারে:' : 'Est. Savings:'}
-                </span>
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                  ~ ৳ {toBengaliNumeral(estimatedSavings, lang)}
-                </span>
+                <div className="text-right">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-end gap-1">
+                    <Wallet className="w-3.5 h-3.5 text-emerald-500" />
+                    {lang === 'bn' ? 'বাজেট অবশিষ্ট:' : 'Budget Surplus:'}
+                  </span>
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                    ৳ {toBengaliNumeral(budgetRemaining, lang)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Modal Footer Actions */}
@@ -281,8 +316,12 @@ export default function BudgetOptimizerModal({
           <button
             type="button"
             onClick={handleApply}
-            disabled={applied}
-            className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            disabled={applied || isInfeasible}
+            className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              isInfeasible
+                ? 'bg-slate-300 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/20 hover:scale-[1.02] active:scale-[0.98]'
+            }`}
           >
             {applied ? (
               <>

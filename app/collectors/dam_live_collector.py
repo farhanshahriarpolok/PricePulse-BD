@@ -267,6 +267,10 @@ class DAMLiveCollector(BaseCollector):
     def collect(self) -> List[RawObservation]:
         """Harvest observations from live bulletin or fallback fixture with adaptive DOM parsing."""
         html_content, is_fallback, _, _ = self._fetch_html()
+        return self._parse_html(html_content, is_fallback)
+
+    def _parse_html(self, html_content: str, is_fallback: bool = False) -> List[RawObservation]:
+        """Parse HTML string into RawObservation objects."""
         soup = BeautifulSoup(html_content, "html.parser")
 
         if self.target_date:
@@ -301,29 +305,30 @@ class DAMLiveCollector(BaseCollector):
                         unit = "কেজি"
 
                     market_name = "Dhaka Central Market"
-                    if p_min is not None and p_min > 0:
+                    is_wholesale = any(w in comm_name.lower() or w in stext.lower() for w in ["পাইকারি", "wholesale"])
+                    price_type = "wholesale_avg" if is_wholesale else "retail_avg"
+                    comm_name_clean = re.sub(r"\s*\((খুচরা|পাইকারি|retail|wholesale)\)", "", comm_name, flags=re.IGNORECASE).strip()
+
+                    # An intra-day ticker range (e.g. 30 - 35 Tk) represents min-max prices within that tier,
+                    # NOT wholesale vs retail. Compute the arithmetic mean for the channel average observation.
+                    if p_min is not None and p_max is not None and p_min > 0 and p_max > 0:
+                        avg_price = round((p_min + p_max) / 2.0, 2)
+                    elif p_min is not None and p_min > 0:
+                        avg_price = p_min
+                    elif p_max is not None and p_max > 0:
+                        avg_price = p_max
+                    else:
+                        avg_price = None
+
+                    if avg_price is not None and avg_price > 0:
                         observations.append(
                             RawObservation(
                                 source_code=self.source_code,
                                 market_name=market_name,
-                                raw_commodity_name=comm_name,
+                                raw_commodity_name=comm_name_clean,
                                 raw_unit=unit,
-                                raw_price=p_min,
-                                price_type="wholesale_avg",
-                                observation_date=obs_date,
-                                completeness_score=1.0 if not is_fallback else 0.90,
-                                is_fallback=is_fallback,
-                            )
-                        )
-                    if p_max is not None and p_max > 0:
-                        observations.append(
-                            RawObservation(
-                                source_code=self.source_code,
-                                market_name=market_name,
-                                raw_commodity_name=comm_name,
-                                raw_unit=unit,
-                                raw_price=p_max,
-                                price_type="retail_avg",
+                                raw_price=avg_price,
+                                price_type=price_type,
                                 observation_date=obs_date,
                                 completeness_score=1.0 if not is_fallback else 0.90,
                                 is_fallback=is_fallback,

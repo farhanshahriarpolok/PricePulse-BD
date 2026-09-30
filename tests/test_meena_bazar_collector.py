@@ -180,6 +180,42 @@ class TestMeenaBazarCollectorUnit:
             rice_obs = [o for o in observations if o.raw_commodity_name == "Rice (Nazirshail)"]
             assert len(rice_obs) == 1
 
+    def test_fish_grading_spec_does_not_override_sales_unit(self):
+        """
+        Critical verification: When Meena Bazar returns 'Rupchanda Fish 150gm+'
+        with Unit='KG', the '150gm+' is the fish individual grading size, NOT the sale unit.
+        The sale price basis must remain 1 kg (never scaled by ~6.67x).
+        """
+        collector = MeenaBazarCollector(enable_network=True)
+        payload = {
+            "code": 200,
+            "status": "success",
+            "data": {
+                "homeProductSection": [
+                    {
+                        "ItemId": "mb-fish-1",
+                        "ItemDisplayName": "Rupchanda Fish 150gm+",
+                        "UnitSalesPrice": 1250.0,
+                        "DiscountSalesPrice": 1250.0,
+                        "Unit": "KG",
+                        "StockQuantity": 20,
+                    }
+                ]
+            },
+        }
+        with patch("httpx.Client.get") as mock_get:
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.json.return_value = payload
+            mock_get.return_value = mock_resp
+
+            observations = collector.collect()
+            assert len(observations) == 1
+            fish_obs = observations[0]
+            assert fish_obs.raw_commodity_name == "Pomfret (Rupchanda)"
+            assert fish_obs.raw_unit == "1 kg"
+            assert fish_obs.raw_price == 1250.0
+
     def test_live_network_failure_falls_back_cleanly(self):
         collector = MeenaBazarCollector(enable_network=True, max_retries=1)
 

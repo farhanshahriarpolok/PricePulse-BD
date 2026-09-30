@@ -76,6 +76,31 @@ Integrated under Milestone 013 (`app/services/basket_service.py`):
 
 ---
 
+## 4.5. Phase 3 Forecasting, Rolling Backtesting & Direction Signals
+
+Integrated under Phase 3 (`app/services/forecast_service.py`):
+- **Hybrid Candidate Set**:
+  - Naive persistence: $P(t+h) = P(t)$.
+  - SMA-7: Mean of the trailing 7 observations.
+  - SMA-14: Mean of the trailing 14 observations.
+  - Formal non-seasonal ARIMA(1,1,0) with exact analytical OLS AR(1) fallback for edge cases.
+- **Strict Data Eligibility**:
+  - `PANDAMART_MODELED` records are strictly excluded from empirical series extraction.
+  - Minimum 14 distinct dates and $\ge 7$ continuous daily streak required. Commodities with sparse history (e.g., imported onion) return explicit `INSUFFICIENT_DATA` rather than fabricated forecasts.
+- **Rolling Walk-Forward Backtesting**:
+  - $T_{\text{train}} = 14$ days, $H = 7$ days forecast horizon.
+  - Strictly chronological walk-forward splits with absolute zero future data leakage ($\max(\text{train\_indices}) < \min(\text{val\_indices})$).
+  - Out-of-sample MAE and RMSE evaluated for all candidate models; the lowest-MAE model is dynamically selected.
+- **Parametric Uncertainty Interval & Direction Signal**:
+  - 95% confidence interval derived from walk-forward backtest empirical RMSE:
+    $$\text{Interval}_h = \hat{P}_h \pm 1.96 \cdot \text{RMSE} \cdot \sqrt{\frac{h}{7}}$$
+  - Direction classified as `UP`, `DOWN`, `STABLE`, or `UNAVAILABLE`.
+  - Base deadband threshold is $\pm 3.0\%$, modulated upwards by historical volatility ($\text{Effective Threshold} = \max(3.0\%, 1.5 \cdot CV_{14})$).
+- **Documented Limitations**:
+  - The historical dataset contains approximately 33 calendar days. This sample size supports short-term 7-day projections and rolling backtesting across ~13 windows, but does NOT statistically establish long-term or weekly seasonal (SARIMA) dynamics.
+
+---
+
 ## 5. Architectural Invariants & Data Integrity
 
 - **Database**: Single SQLite file with WAL mode (`pricepulse.db`). Foreign keys enabled.
@@ -97,8 +122,8 @@ Integrated under Milestone 013 (`app/services/basket_service.py`):
 
 ## 7. Current Project State & Verification Summary
 
-- **Total Test Suite**: 285 passed (100% green — 33 regression tests added in Phase 1).
-- **FastAPI Endpoints**: Realtime pulse, commodities (catalog + history + compare + **multi-store prices**), locations, anomalies, spatial arbitrage, simulation sandbox, bazaar basket optimizer, saved baskets.
-- **Retail Collectors**: DAM (government), TCB (statutory), Chaldal (e-commerce), **Shwapno** (superstore live API), **Meena Bazar** (superstore live API), **Pandamart** (transparent modeled).
-- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2493 modules).
-- **Android State**: SDK 34 client with Room database offline cache, Custom Canvas sparklines, and Jetpack Compose screens.
+- **Total Test Suite**: 331 passed (100% green — 17 Phase 3 forecasting tests + 21 Phase 2 spatial consumer tests + 41 Phase 1 regression tests across audit fixes).
+- **FastAPI Endpoints**: Realtime pulse, commodities (catalog + history + compare + multi-store prices + **7-day price forecast**), locations (districts, markets, spatial-arbitrage, consumer-opportunity), anomalies, simulation sandbox, bazaar basket optimizer, saved baskets.
+- **Retail Collectors**: DAM (government), TCB (statutory), Chaldal (e-commerce), Shwapno (superstore live API), Meena Bazar (superstore live API), Pandamart (transparent modeled).
+- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer with **Hybrid Spatial Opportunity Panel & 7-Day Forecast Outlook Panel**, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2495 modules).
+- **Android State**: SDK 34 client with Room database offline cache, Custom Canvas sparklines, and Jetpack Compose screens. Android code is completely frozen and untouched.

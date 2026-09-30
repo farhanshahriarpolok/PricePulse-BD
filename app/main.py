@@ -27,11 +27,13 @@ async def lifespan(app: FastAPI):
         seed_locations(session)
         seed_commodities(session)
         seed_sources(session)
-        from app.models.observation import PriceObservation
-        obs_count = session.query(PriceObservation).count()
-        if obs_count < 50:
-            from scripts.generate_demo_history import seed_demo_history
-            seed_demo_history(session)
+        import os
+        if os.getenv("PRICEPULSE_SEED_DEMO", "").lower() in ("1", "true", "yes"):
+            from app.models.observation import PriceObservation
+            obs_count = session.query(PriceObservation).count()
+            if obs_count < 50:
+                from scripts.generate_demo_history import seed_demo_history
+                seed_demo_history(session)
     # Start in-process background sync scheduler
     sync_scheduler.start()
     yield
@@ -134,9 +136,13 @@ def create_application() -> FastAPI:
                 or full_path == "health"
             ):
                 return None
-            requested_file = dist_dir / full_path
-            if requested_file.is_file():
-                return FileResponse(requested_file)
+            try:
+                requested_file = (dist_dir / full_path).resolve()
+                dist_resolved = dist_dir.resolve()
+                if (dist_resolved in requested_file.parents or requested_file == dist_resolved) and requested_file.is_file():
+                    return FileResponse(requested_file)
+            except Exception:
+                pass
             return FileResponse(dist_dir / "index.html")
 
     return app

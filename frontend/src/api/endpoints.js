@@ -64,6 +64,9 @@ export const injectShock = (payload) => apiClient.post('/simulation/inject-shock
 export const getSpatialArbitrage = (commodityId) =>
   apiClient.get('/locations/arbitrage', { params: { commodity_id: commodityId } });
 
+export const getConsumerOpportunity = (commodityId) =>
+  apiClient.get('/locations/consumer-opportunity', { params: { commodity_id: commodityId } });
+
 // ── Bazaar Basket endpoints ───────────────────────────────────────────────────
 
 /**
@@ -109,6 +112,12 @@ export const deleteSavedBasket = (basketId) => apiClient.delete(`/basket/saved/$
  */
 export const getSavedBasketTrend = (basketId, days = 30) =>
   apiClient.get(`/basket/saved/${basketId}/trend`, { params: { days } });
+
+export const getCommodityForecast = (commodityId, channel = 'wholesale', marketId = null) => {
+  const params = { channel };
+  if (marketId) params.market_id = marketId;
+  return apiClient.get(`/commodities/${commodityId}/forecast`, { params });
+};
 
 
 

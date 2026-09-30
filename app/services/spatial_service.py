@@ -25,6 +25,8 @@ from app.schemas.spatial import (
     LocationHierarchyResponse,
     ArbitrageRoute,
     SpatialArbitrageResponse,
+    ConsumerOpportunityResponse,
+    FreightBreakdownDetail,
 )
 
 
@@ -680,6 +682,13 @@ class SpatialService:
                         toll_and_buffer_cost_bdt=toll_buffer,
                         freight_breakdown=freight_breakdown,
                         corridor_name=meta["name"],
+                        # Phase 2: unit provenance
+                        calculation_unit=commodity.default_unit,
+                        data_provenance=(
+                            "LIVE"
+                            if (src["district"] in district_nodes and dest["district"] in district_nodes)
+                            else "FALLBACK"
+                        ),
                     )
                 )
 
@@ -711,5 +720,116 @@ class SpatialService:
             recommendation=rec,
         )
 
+    def get_consumer_opportunity(
+        self,
+        db: Session,
+        commodity_identifier: str,
+        target_date=None,
+    ) -> Optional[ConsumerOpportunityResponse]:
+        """
+        Consumer-facing spatial opportunity shape.
+        Re-uses existing arbitrage logic and projects it into a flat,
+        human-readable response suitable for the hybrid Q1 UI panel.
+        Always returns a result (never None) — sets has_opportunity=False
+        when no freight-viable arbitrage exists.
+        """
+        full = self.get_spatial_arbitrage(db, commodity_identifier, target_date)
+        if not full:
+            return None
+
+        calc_unit = full.unit
+
+        # All routes already sorted descending by net_arbitrage_margin_bdt
+        all_routes = list(full.routes)
+        positive_routes = [r for r in all_routes if r.net_arbitrage_margin_bdt >= 2.0]
+        top = all_routes[0] if all_routes else None
+        has_opportunity = bool(positive_routes)
+
+        if has_opportunity and top:
+            net = top.net_arbitrage_margin_bdt
+            gross = top.gross_spread_bdt
+            freight = top.estimated_freight_cost_bdt
+            opportunity_summary = (
+                f"{top.source_district} \u2192 {top.destination_district}: "
+                f"{top.source_market} (\u09f3{top.source_price:.0f}/{calc_unit}) \u2192 "
+                f"{top.destination_market} (\u09f3{top.destination_price:.0f}/{calc_unit}). "
+                f"Gross spread \u09f3{gross:.2f}, freight \u09f3{freight:.2f} \u2014 "
+                f"net opportunity \u09f3{net:.2f}/{calc_unit} ({top.economic_feasibility})."
+            )
+            fb = top.freight_breakdown
+            base_loading = fb.get("base_freight", 1.50)
+            dist_cost = round(top.distance_km * 0.018, 2)
+            toll = fb.get("toll_buffer", 0.35)
+            freight_detail = FreightBreakdownDetail(
+                base_loading_bdt=max(round(base_loading - dist_cost, 2), 1.50),
+                distance_cost_bdt=dist_cost,
+                toll_and_bridge_bdt=toll,
+                total_freight_bdt=fb.get("total_freight", freight),
+                distance_km=top.distance_km,
+                transit_hours=top.transit_hours_estimated,
+                corridor_name=top.corridor_name,
+            )
+            return ConsumerOpportunityResponse(
+                commodity_id=full.commodity_id,
+                canonical_name=full.canonical_name,
+                bangla_name=full.bangla_name,
+                calculation_unit=calc_unit,
+                observation_date=full.observation_date,
+                has_opportunity=True,
+                opportunity_summary=opportunity_summary,
+                cheapest_district=top.source_district,
+                cheapest_market=top.source_market,
+                cheapest_price_bdt=top.source_price,
+                expensive_district=top.destination_district,
+                expensive_market=top.destination_market,
+                expensive_price_bdt=top.destination_price,
+                gross_difference_bdt=gross,
+                transport_cost_bdt=freight,
+                net_opportunity_bdt=net,
+                roi_percentage=top.roi_percentage,
+                economic_feasibility=top.economic_feasibility,
+                data_provenance=top.data_provenance,
+                freight_detail=freight_detail,
+                waypoints=top.waypoints,
+                spatial_dispersion_index=full.spatial_dispersion_index,
+                all_routes_count=len(full.routes),
+                top_routes=positive_routes[:5],
+            )
+        else:
+            # Equilibrium / transport-barrier scenario
+            summary = (
+                "Spatial price dispersion is within transport-cost equilibrium. "
+                "No freight-viable arbitrage opportunity identified today."
+            )
+            if top:
+                summary = (
+                    f"Best route ({top.source_district} \u2192 {top.destination_district}) yields "
+                    f"\u09f3{top.net_arbitrage_margin_bdt:.2f}/{calc_unit} net \u2014 "
+                    f"below the \u09f3{2.00:.2f} minimum viable threshold."
+                )
+            return ConsumerOpportunityResponse(
+                commodity_id=full.commodity_id,
+                canonical_name=full.canonical_name,
+                bangla_name=full.bangla_name,
+                calculation_unit=calc_unit,
+                observation_date=full.observation_date,
+                has_opportunity=False,
+                opportunity_summary=summary,
+                cheapest_district=top.source_district if top else None,
+                cheapest_market=top.source_market if top else None,
+                cheapest_price_bdt=top.source_price if top else None,
+                expensive_district=top.destination_district if top else None,
+                expensive_market=top.destination_market if top else None,
+                expensive_price_bdt=top.destination_price if top else None,
+                gross_difference_bdt=top.gross_spread_bdt if top else None,
+                transport_cost_bdt=top.estimated_freight_cost_bdt if top else None,
+                net_opportunity_bdt=top.net_arbitrage_margin_bdt if top else None,
+                roi_percentage=top.roi_percentage if top else None,
+                economic_feasibility=top.economic_feasibility if top else None,
+                data_provenance=top.data_provenance if top else "FALLBACK",
+                spatial_dispersion_index=full.spatial_dispersion_index,
+                all_routes_count=len(full.routes),
+                top_routes=all_routes[:5],
+            )
 
 spatial_service = SpatialService()
