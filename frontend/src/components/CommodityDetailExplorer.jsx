@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   ArrowLeft, 
   Store, 
@@ -18,6 +18,8 @@ import {
 import { toBengaliNumeral } from './CommodityCard';
 import CommodityIcon from './media/CommodityIcon';
 import HistoricalTrendChart from './HistoricalTrendChart';
+import { getCommodityStores } from '../api/endpoints';
+
 
 // ── Canonical Variety Descriptions for Bangladesh Staples ───────────────────────
 const VARIETY_TAGS = {
@@ -167,15 +169,111 @@ export default function CommodityDetailExplorer({
   // Variety Tag
   const varietyTag = getVarietyTag(commodity?.canonical_name, commodity?.bangla_name, lang);
 
+  // Live and modeled store data fetched from backend
+  const [storeData, setStoreData] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (commodity?.id) {
+      getCommodityStores(commodity.id)
+        .then((res) => {
+          if (isMounted && res?.stores) {
+            setStoreData(res.stores);
+          }
+        })
+        .catch(() => {
+          // Graceful fallback to client calculations
+        });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [commodity?.id]);
+
   // Quick Commerce Platforms
   const quickCommerceStores = useMemo(() => {
+    if (storeData && storeData.length > 0) {
+      const storesById = {};
+      storeData.forEach((s) => {
+        storesById[s.id] = s;
+      });
+
+      const storeDefs = [
+        {
+          id: 'chaldal',
+          nameBn: 'চালডাল',
+          nameEn: 'Chaldal',
+          url: 'https://chaldal.com',
+          buttonBn: 'চালডালে দেখুন ↗',
+          buttonEn: 'View on Chaldal ↗',
+          defaultPrice: Math.round(onlineBase * 0.98),
+        },
+        {
+          id: 'shwapno',
+          nameBn: 'স্বপ্ন অনলাইন',
+          nameEn: 'Shwapno Online',
+          url: 'https://shwapno.com',
+          buttonBn: 'স্বপ্ন-তে দেখুন ↗',
+          buttonEn: 'View on Shwapno ↗',
+          defaultPrice: Math.round(onlineBase * 1.02),
+        },
+        {
+          id: 'meenabazar',
+          nameBn: 'মীনা বাজার',
+          nameEn: 'Meena Bazar',
+          url: 'https://meenabazaronline.com',
+          buttonBn: 'মীনা বাজারে দেখুন ↗',
+          buttonEn: 'View on Meena Bazar ↗',
+          defaultPrice: Math.round(onlineBase * 1.05),
+        },
+        {
+          id: 'pandamart',
+          nameBn: 'পান্ডামার্ট',
+          nameEn: 'Pandamart',
+          url: 'https://foodpanda.com.bd/pandamart',
+          buttonBn: 'পান্ডামার্টে দেখুন ↗',
+          buttonEn: 'View on Pandamart ↗',
+          defaultPrice: Math.round(onlineBase * 1.08),
+        },
+      ];
+
+      const resolvedList = storeDefs.map((def) => {
+        const live = storesById[def.id];
+        const status = live?.collection_status || 'MODELED';
+        const price = live?.price && live.price > 0 ? live.price : def.defaultPrice;
+        const tagBn = live?.status_label_bn || (status === 'LIVE' ? 'লাইভ দাম ✓' : status === 'FALLBACK' ? 'ফলব্যাক বেঞ্চমার্ক' : 'সুপারশপ প্রাক্কলন');
+        const tagEn = live?.status_label_en || (status === 'LIVE' ? 'Live Observed ✓' : status === 'FALLBACK' ? 'Catalog Benchmark' : 'Superstore Est.');
+
+        return {
+          id: def.id,
+          nameBn: def.nameBn,
+          nameEn: def.nameEn,
+          tagBn,
+          tagEn,
+          status,
+          isLive: status === 'LIVE',
+          price,
+          url: def.url,
+          buttonBn: def.buttonBn,
+          buttonEn: def.buttonEn,
+        };
+      });
+
+      const minPrice = Math.min(...resolvedList.map((s) => s.price));
+      return resolvedList.map((s) => ({
+        ...s,
+        isBestDeal: s.price === minPrice,
+      }));
+    }
+
     return [
       {
         id: 'chaldal',
         nameBn: 'চালডাল',
         nameEn: 'Chaldal',
-        tagBn: 'সেরা অনলাইন ডিল ✓',
-        tagEn: 'Best Online Deal ✓',
+        tagBn: 'ফলব্যাক বেঞ্চমার্ক ✓',
+        tagEn: 'Catalog Benchmark ✓',
+        status: 'FALLBACK',
         isBestDeal: true,
         price: Math.round(onlineBase * 0.98),
         url: 'https://chaldal.com',
@@ -186,8 +284,9 @@ export default function CommodityDetailExplorer({
         id: 'shwapno',
         nameBn: 'স্বপ্ন অনলাইন',
         nameEn: 'Shwapno Online',
-        tagBn: 'সুপারশপ অফার',
-        tagEn: 'Superstore Pack',
+        tagBn: 'সুপারশপ প্রাক্কলন (+২%)',
+        tagEn: 'Superstore Est. (+2%)',
+        status: 'MODELED',
         isBestDeal: false,
         price: Math.round(onlineBase * 1.02),
         url: 'https://shwapno.com',
@@ -198,8 +297,9 @@ export default function CommodityDetailExplorer({
         id: 'meenabazar',
         nameBn: 'মীনা বাজার',
         nameEn: 'Meena Bazar',
-        tagBn: 'প্রিমিয়াম কোয়ালিটি',
-        tagEn: 'Premium Quality',
+        tagBn: 'সুপারশপ প্রাক্কলন (+৫%)',
+        tagEn: 'Superstore Est. (+5%)',
+        status: 'MODELED',
         isBestDeal: false,
         price: Math.round(onlineBase * 1.05),
         url: 'https://meenabazaronline.com',
@@ -210,8 +310,9 @@ export default function CommodityDetailExplorer({
         id: 'pandamart',
         nameBn: 'পান্ডামার্ট',
         nameEn: 'Pandamart',
-        tagBn: '৩০ মিনিটে ডেলিভারি',
-        tagEn: '30 Min Express',
+        tagBn: 'এক্সপ্রেস প্রাক্কলন (+৮%)',
+        tagEn: 'Express Est. (+8%)',
+        status: 'MODELED',
         isBestDeal: false,
         price: Math.round(onlineBase * 1.08),
         url: 'https://foodpanda.com.bd/pandamart',
@@ -219,7 +320,8 @@ export default function CommodityDetailExplorer({
         buttonEn: 'View on Pandamart ↗',
       },
     ];
-  }, [onlineBase]);
+  }, [onlineBase, storeData]);
+
 
   const handleDistrictChange = (e) => {
     const newDist = e.target.value;
@@ -496,11 +598,11 @@ export default function CommodityDetailExplorer({
               <span>{lang === 'bn' ? '🛒 অনলাইন প্ল্যাটফর্মগুলোর আজকের দর' : '🛒 Online Quick-Commerce Rates'}</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {lang === 'bn' ? 'হোম ডেলিভারি সুবিধা সহ শীর্ষ ৪টি অনলাইন সুপারশপের লাইভ দাম' : 'Direct home delivery prices across top 4 online grocers'}
+              {lang === 'bn' ? 'হোম ডেলিভারি সুবিধা সহ শীর্ষ ৪টি অনলাইন প্ল্যাটফর্মের বেঞ্চমার্ক ও প্রাক্কলিত দর' : 'Home delivery benchmarks and modeled retail spreads across top 4 online grocers'}
             </p>
           </div>
           <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 w-fit">
-            {lang === 'bn' ? 'লাইভ ট্র্যাকড' : 'Live Tracked'}
+            {lang === 'bn' ? 'রিটেল ও সুপারশপ পর্যবেক্ষণ' : 'Retail & Superstore Tracking'}
           </span>
         </div>
 
@@ -510,8 +612,10 @@ export default function CommodityDetailExplorer({
             <div
               key={store.id}
               className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
-                store.isBestDeal
-                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500/50 shadow-sm'
+                store.status === 'LIVE'
+                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-500/70 shadow-sm'
+                  : store.isBestDeal
+                  ? 'bg-emerald-50/30 dark:bg-emerald-950/10 border-emerald-400/40 shadow-xs'
                   : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/80 hover:border-slate-300'
               }`}
             >
@@ -521,9 +625,11 @@ export default function CommodityDetailExplorer({
                     {lang === 'bn' ? store.nameBn : store.nameEn}
                   </h4>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    store.isBestDeal
-                      ? 'bg-emerald-500 text-white shadow-xs'
-                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    store.status === 'LIVE'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : store.status === 'FALLBACK'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                   }`}>
                     {lang === 'bn' ? store.tagBn : store.tagEn}
                   </span>
@@ -553,6 +659,20 @@ export default function CommodityDetailExplorer({
             </div>
           ))}
         </div>
+
+        {/* Supermarket Model Transparency Disclosure */}
+        <div className="mt-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300">
+          <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div className="leading-relaxed">
+            <span className="font-bold text-slate-900 dark:text-white mr-1">
+              {lang === 'bn' ? 'স্বচ্ছতা নোট:' : 'Transparency Note:'}
+            </span>
+            {lang === 'bn'
+              ? 'স্বপ্ন ও মীনা বাজার থেকে সরাসরি লাইভ অনলাইন রিটেল দর সংগ্রহ করা হয়। চালডাল পাবলিক ক্যাটালগ বেঞ্চমার্ক দ্বারা মূল্যায়িত এবং পান্ডামার্টের দরসমূহ এক্সপ্রেস ডেলিভারি মার্জিনের (+৮%) প্রাক্কলন।'
+              : 'Shwapno and Meena Bazar prices are harvested live from public retail catalogs. Chaldal is evaluated from public catalog benchmarks, and Pandamart figures represent transparent express delivery estimates (+8%).'}
+          </div>
+        </div>
+
       </div>
 
       {/* ── SECTION 4: SIMPLIFIED PRICE HISTORY CHART (AT BOTTOM) ───────────── */}

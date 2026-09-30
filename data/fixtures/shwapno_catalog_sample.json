@@ -1,0 +1,168 @@
+{
+  "store": "Shwapno Superstore",
+  "market_name": "Shwapno Retail Hub",
+  "catalog_date": "2026-09-30",
+  "currency": "BDT",
+  "products": [
+    {
+      "id": "shw-101",
+      "name": "Fulcopy (Cauliflower)",
+      "sku": "2902791",
+      "price": {"priceValue": 75.0, "unitPriceValue": 75.0},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-102",
+      "name": "Kacha Morich (Chilli Green)",
+      "sku": "2900281",
+      "price": {"priceValue": 160.0, "unitPriceValue": 160.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-103",
+      "name": "Badhakopi (Cabbage)",
+      "sku": "2900282",
+      "price": {"priceValue": 75.0, "unitPriceValue": 75.0},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-104",
+      "name": "Shosha (Cucumber)",
+      "sku": "2900283",
+      "price": {"priceValue": 70.0, "unitPriceValue": 70.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-105",
+      "name": "Kacha Pepe (Green Papaya)",
+      "sku": "2900284",
+      "price": {"priceValue": 30.0, "unitPriceValue": 30.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-106",
+      "name": "Red Spinach",
+      "sku": "2900285",
+      "price": {"priceValue": 20.0, "unitPriceValue": 20.0},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-107",
+      "name": "Lau (Bottle Gourd)",
+      "sku": "2900286",
+      "price": {"priceValue": 70.0, "unitPriceValue": 70.0},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-108",
+      "name": "Lomba Lebu (Lemon Long)",
+      "sku": "2900287",
+      "price": {"priceValue": 12.0, "unitPriceValue": 12.0},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-109",
+      "name": "Begun Gol-Beguni (Brinjal Round)",
+      "sku": "2900288",
+      "price": {"priceValue": 180.0, "unitPriceValue": 180.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-110",
+      "name": "Potol (Pointed Gourd)",
+      "sku": "2900289",
+      "price": {"priceValue": 60.0, "unitPriceValue": 60.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-111",
+      "name": "Kacha Kola (Green Banana)",
+      "sku": "2900290",
+      "price": {"priceValue": 12.5, "unitPriceValue": 12.5},
+      "unit": "Piece",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-112",
+      "name": "Dherosh (Lady Finger)",
+      "sku": "2900291",
+      "price": {"priceValue": 80.0, "unitPriceValue": 80.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-113",
+      "name": "Carrot China (China Gajor) Kg",
+      "sku": "2900292",
+      "price": {"priceValue": 170.0, "unitPriceValue": 170.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-114",
+      "name": "ACI Pure Fortified Nazirshail Rice 5kg",
+      "sku": "2900293",
+      "price": {"priceValue": 495.0, "unitPriceValue": 99.0},
+      "unit": "5 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-115",
+      "name": "ACI Pure Fortified Miniket Rice 5kg",
+      "sku": "2900294",
+      "price": {"priceValue": 460.0, "unitPriceValue": 92.0},
+      "unit": "5 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-116",
+      "name": "ACI Pure Chinigura Rice 1kg",
+      "sku": "2900295",
+      "price": {"priceValue": 230.0, "unitPriceValue": 230.0},
+      "unit": "1 kg",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-117",
+      "name": "King's Sunflower Oil 5Ltr.",
+      "sku": "2900296",
+      "price": {"priceValue": 1980.0, "unitPriceValue": 396.0},
+      "unit": "5 liter",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-118",
+      "name": "ACI Pure Mustard Oil 1Ltr.",
+      "sku": "2900297",
+      "price": {"priceValue": 330.0, "unitPriceValue": 330.0},
+      "unit": "1 liter",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-119",
+      "name": "Rupchanda Soyabean Oil 5Ltr.",
+      "sku": "2900298",
+      "price": {"priceValue": 1000.0, "unitPriceValue": 200.0},
+      "unit": "5 liter",
+      "stock": "InStock"
+    },
+    {
+      "id": "shw-120",
+      "name": "Egg Loose",
+      "sku": "2900299",
+      "price": {"priceValue": 12.75, "unitPriceValue": 12.75},
+      "unit": "Piece",
+      "stock": "InStock"
+    }
+  ]
+}

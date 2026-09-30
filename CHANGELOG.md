@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-09-30
+
+### Added
+- **Multi-Store Retail Collector Trio, `/commodities/{id}/stores` API & Detail Page Store Panel (Milestone 025)**:
+  - `app/collectors/shwapno_collector.py`:
+    - `ShwapnoCollector` (`SHWAPNO_RETAIL`, reliability 0.90) harvests live product listings from 4 Shwapno public category endpoints (fresh-vegetables, rice, oil, eggs) with explicit canonical taxonomy mappings, package-size extraction from product names, stock-status filtering, and graceful fixture fallback.
+  - `app/collectors/meena_bazar_collector.py`:
+    - `MeenaBazarCollector` (`MEENA_BAZAR_RETAIL`, reliability 0.89) harvests live listings from the Meena Bazar home section API with explicit commodity mapping, `DiscountSalesPrice` / `UnitSalesPrice` priority, out-of-stock / zero-price filtering, duplicate deduplication, and fixture fallback.
+  - `app/collectors/pandamart_collector.py`:
+    - `PandamartCollector` (`PANDAMART_MODELED`, reliability 0.75) transparently documents the Cloudflare Bot Management HTTP 403 / mobile-app-only access restriction and serves fixture-backed modeled benchmarks clearly labelled `MODELED`.
+  - `app/collectors/__init__.py`: Registered `ShwapnoCollector`, `MeenaBazarCollector`, `PandamartCollector`, and `CollectionStatus` in package public API.
+  - `app/collectors/base.py`:
+    - Added `CollectionStatus` enum (`LIVE`, `FALLBACK`, `MODELED`, `STALE`, `UNAVAILABLE`).
+    - Extended `RawObservation` dataclass with `collection_status`, `source_url`, `raw_package_size`, and `error_message` fields.
+  - `app/api/v1/endpoints/commodities.py`:
+    - New `GET /api/v1/commodities/{id}/stores` endpoint returning `CommodityStoresResponse` with per-store `StorePriceOut` records for Chaldal, Shwapno, Meena Bazar, and Pandamart.
+    - Each store entry includes `collection_status`, bilingual status labels (`status_label_bn` / `status_label_en`), `is_live`, `is_fallback`, direct storefront URL, observation date, and raw product name.
+    - Modeled fallback spread applied transparently when no live/cached observation is available.
+  - `app/schemas/commodity.py`: Added `StorePriceOut` and `CommodityStoresResponse` Pydantic v2 response models.
+  - `frontend/src/api/endpoints.js`: Added `getCommodityStores(commodityId)` endpoint wrapper.
+  - `frontend/src/components/CommodityDetailExplorer.jsx`:
+    - New store price comparison panel fetching and rendering per-store prices on commodity detail open.
+    - `LIVE` / `FALLBACK` / `MODELED` badges with distinct visual styling, BDT price per normalized unit, Bengali-first store names, and direct outbound links per store.
+  - `data/fixtures/meena_bazar_catalog_sample.json`, `pandamart_modeled_sample.json`, `shwapno_catalog_sample.json`: Verified local fixture snapshots for offline deterministic testing.
+  - `tests/test_meena_bazar_collector.py`, `tests/test_pandamart_collector.py`, `tests/test_shwapno_collector.py`: 16 new deterministic tests covering fixture harvest, canonical mapping accuracy, deduplication, network failure / graceful fallback, source health telemetry updates, and IngestionPipeline persistence with normalized pricing verification.
+  - Quality verification: 252/252 Pytest tests 100% green, clean Vite production build (2493 modules, 0 errors, 25.25s).
+
 ## [2.5.0] - 2026-09-29
 
 ### Added

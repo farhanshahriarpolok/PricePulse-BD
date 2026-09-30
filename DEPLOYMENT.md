@@ -56,7 +56,7 @@ The container automatically:
 - Builds the Vite React 18 production bundle inside Node 20.
 - Boots FastAPI with 2 Uvicorn workers on port `8000`.
 - Initializes the SQLite database at `/app/data/pricepulse.db` with WAL mode.
-- Seeds all 35 canonical commodities, 64 districts, and 30-day baseline observations.
+- Seeds all 65 canonical commodities, 64 districts, and 30-day baseline observations.
 
 ---
 
@@ -169,7 +169,7 @@ python scripts/production_smoke_test.py
 Expected Output:
 ```
 [1/6] [PASS] API Health & Liveness
-[2/6] [PASS] Taxonomy Completeness (35/35 staples)
+[2/6] [PASS] Taxonomy Completeness (65/65 staples)
 [3/6] [PASS] Highway Transit Corridors & Spatial Arbitrage
 [4/6] [PASS] 3-Channel Bazaar Basket Optimization
 [5/6] [PASS] Saved Baskets Storage & CRUD

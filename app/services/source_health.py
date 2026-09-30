@@ -76,7 +76,41 @@ class SourceHealthService:
                 is_fallback=False,
                 success_count=1,
             ),
+            "SHWAPNO_RETAIL": SourceTelemetry(
+                source_code="SHWAPNO_RETAIL",
+                source_name="Shwapno Superstore",
+                source_type="retail_superstore",
+                status="HEALTHY",
+                latency_ms=45.0,
+                last_sync=datetime.now(timezone.utc),
+                is_fallback=False,
+                success_count=1,
+            ),
+            "MEENA_BAZAR_RETAIL": SourceTelemetry(
+                source_code="MEENA_BAZAR_RETAIL",
+                source_name="Meena Bazar Online",
+                source_type="retail_superstore",
+                status="HEALTHY",
+                latency_ms=52.0,
+                last_sync=datetime.now(timezone.utc),
+                is_fallback=False,
+                success_count=1,
+            ),
+            "PANDAMART_MODELED": SourceTelemetry(
+                source_code="PANDAMART_MODELED",
+                source_name="Pandamart Express Grocery",
+                source_type="modeled_benchmark",
+                status="DEGRADED",
+                latency_ms=1.5,
+                last_sync=datetime.now(timezone.utc),
+                is_fallback=True,
+                success_count=1,
+                last_error="Cloudflare 403 / mobile app restricted. Retaining transparent modeled benchmark.",
+            ),
         }
+
+
+
 
     def record_attempt(
         self,

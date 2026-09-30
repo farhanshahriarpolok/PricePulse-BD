@@ -17,6 +17,9 @@ export const getCommodities = (category = null) => {
 
 export const getCommodityDetail = (id) => apiClient.get(`/commodities/${id}`);
 
+export const getCommodityStores = (id) => apiClient.get(`/commodities/${id}/stores`);
+
+
 export const getCommodityHistory = (id, startDate = null, endDate = null, marketId = null) => {
   const params = {};
   if (startDate) params.start_date = startDate;

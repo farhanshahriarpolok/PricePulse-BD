@@ -12,7 +12,7 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NEXT
 
-- None (Production v2.0.0 released & oral defense ready).
+- None (Production v2.6.0 released & oral defense ready).
 
 ---
 
@@ -22,6 +22,19 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Milestone 025 — Multi-Store Retail Collector Trio, `/commodities/{id}/stores` API & Detail Page Store Panel** (2026-09-30):
+  - Added three new retail harvest connectors registered in `app/collectors/__init__.py`:
+    - `ShwapnoCollector` (`SHWAPNO_RETAIL`, reliability 0.90): Live network harvest across 4 category APIs (fresh-vegetables, rice, oil, eggs) with explicit taxonomy mapping and fixture fallback.
+    - `MeenaBazarCollector` (`MEENA_BAZAR_RETAIL`, reliability 0.89): Live home-section API harvest with explicit commodity mapping, stock/zero-price filtering, and deduplication.
+    - `PandamartCollector` (`PANDAMART_MODELED`, reliability 0.75): Transparent modeled benchmark collector documenting the Cloudflare 403 / mobile-app-only access limitation; fixture-backed.
+  - Extended `app/collectors/base.py` with `CollectionStatus` enum (`LIVE`, `FALLBACK`, `MODELED`, `STALE`, `UNAVAILABLE`) and `RawObservation` fields (`collection_status`, `source_url`, `raw_package_size`, `error_message`).
+  - Added new `GET /api/v1/commodities/{id}/stores` endpoint in `app/api/v1/endpoints/commodities.py` returning live/fallback/modeled prices from Chaldal, Shwapno, Meena Bazar, and Pandamart with transparent status labels (Bengali + English).
+  - Added `StorePriceOut` and `CommodityStoresResponse` Pydantic v2 schemas in `app/schemas/commodity.py`.
+  - Overhauled `CommodityDetailExplorer.jsx` with a full store price comparison panel: live vs fallback vs modeled badges, BDT price per unit display, direct store links, and Bengali-first status labels.
+  - Wired `getCommodityStores()` in `frontend/src/api/endpoints.js`.
+  - Added 16 new deterministic tests across `test_meena_bazar_collector.py`, `test_pandamart_collector.py`, and `test_shwapno_collector.py` covering fixture harvest, canonical mapping accuracy, deduplication, network failure fallback, source health telemetry, and IngestionPipeline persistence.
+  - Verification: **252/252 Pytest tests 100% green**, clean Vite production build (2493 modules, 0 errors).
 
 - **Milestone 024 — Android SDK Packaging, WhatsApp Bazaar Fard Export & Background Ingestion Hardening** (2026-09-29):
   - Added WhatsApp Bazar Fard export & sharing directly in the active basket section of `BazaarBasketView.jsx`, generating structured, colloquial Bengali shopping lists with line-item totals, total estimated cost, wholesale savings, and local verification link.

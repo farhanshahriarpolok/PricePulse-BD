@@ -38,6 +38,17 @@ export default function CommodityTableView({
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+      {/* Mobile Horizontal Scroll Affordance Bar */}
+      <div className="md:hidden flex items-center justify-between px-3.5 py-2 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400">
+        <span className="flex items-center gap-1.5 font-medium">
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold">⇄</span>
+          <span>{lang === 'bn' ? 'সব কলাম দেখতে ডানে স্ক্রোল করুন' : 'Swipe horizontally to view all price columns'}</span>
+        </span>
+        <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-mono text-[10px] font-bold">
+          {toBengaliNumeral(items.length, lang)} {lang === 'bn' ? 'পণ্য' : 'items'}
+        </span>
+      </div>
+
       <div className="overflow-x-auto scrollbar-thin">
         <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[760px]">
           {/* Table Header */}

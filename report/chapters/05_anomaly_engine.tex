@@ -76,9 +76,9 @@ When condition \eqref{eq:compound_rule} evaluates to true, the anomaly is catego
 
 \begin{equation}
 \text{Severity}(t) = \begin{cases}
-\textbf{Critical}, & \text{if } |Z(t)| \ge 2.5 \;\lor\; |\Delta\%(t)| \ge 25.0\% \\
-\textbf{Severe}, & \text{if } 2.0 \le |Z(t)| < 2.5 \;\lor\; 18.0\% \le |\Delta\%(t)| < 25.0\% \\
-\textbf{Moderate}, & \text{if } 1.5 \le |Z(t)| < 2.0 \;\lor\; 10.0\% \le |\Delta\%(t)| < 18.0\%
+\textbf{Critical}, & \text{if } |Z(t)| \ge 2.5 \;\land\; |\Delta\%(t)| \ge 30.0\% \\
+\textbf{Severe}, & \text{if } 2.0 \le |Z(t)| < 2.5 \;\land\; 20.0\% \le |\Delta\%(t)| < 30.0\% \\
+\textbf{Moderate}, & \text{if } 1.5 \le |Z(t)| < 2.0 \;\land\; 10.0\% \le |\Delta\%(t)| < 20.0\%
 \end{cases}
 \end{equation}
 

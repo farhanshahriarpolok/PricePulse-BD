@@ -129,6 +129,9 @@ class BackgroundSyncScheduler:
             from app.collectors.chaldal_live_collector import ChaldalLiveCollector
             from app.collectors.tcb_collector import TCBCollector
             from app.collectors.news_collector import NewsCollector
+            from app.collectors.shwapno_collector import ShwapnoCollector
+            from app.collectors.meena_bazar_collector import MeenaBazarCollector
+            from app.collectors.pandamart_collector import PandamartCollector
             from app.services.source_health import source_health_service
 
             with SessionLocal() as db:
@@ -138,7 +141,11 @@ class BackgroundSyncScheduler:
                     ChaldalLiveCollector(),
                     TCBCollector(),
                     NewsCollector(),
+                    ShwapnoCollector(),
+                    MeenaBazarCollector(),
+                    PandamartCollector(),
                 ]
+
                 total_harvested = 0
                 total_inserted = 0
                 total_updated = 0

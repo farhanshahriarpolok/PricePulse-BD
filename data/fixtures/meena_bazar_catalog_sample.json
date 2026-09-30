@@ -1,0 +1,152 @@
+{
+  "store": "Meena Bazar Online",
+  "market_name": "Meena Bazar Hub",
+  "catalog_date": "2026-09-30",
+  "currency": "BDT",
+  "products": [
+    {
+      "ItemId": "mb-101",
+      "ItemDisplayName": "Beef Bone-In Premium",
+      "ItemDescription": "Beef Bone-In Premium",
+      "UnitSalesPrice": 412.5,
+      "DiscountSalesPrice": 412.5,
+      "Unit": "500g",
+      "StockQuantity": 100
+    },
+    {
+      "ItemId": "mb-102",
+      "ItemDisplayName": "Najir Rice (Premium)",
+      "ItemDescription": "Najir Rice (Premium)",
+      "UnitSalesPrice": 82.0,
+      "DiscountSalesPrice": 82.0,
+      "Unit": "KG",
+      "StockQuantity": 39
+    },
+    {
+      "ItemId": "mb-103",
+      "ItemDisplayName": "Minicate Rice (Premium)",
+      "ItemDescription": "Minicate Rice (Premium)",
+      "UnitSalesPrice": 72.0,
+      "DiscountSalesPrice": 72.0,
+      "Unit": "KG",
+      "StockQuantity": 236
+    },
+    {
+      "ItemId": "mb-104",
+      "ItemDisplayName": "Broiler Chicken Without Skin",
+      "ItemDescription": "Broiler Chicken Without Skin",
+      "UnitSalesPrice": 339.0,
+      "DiscountSalesPrice": 339.0,
+      "Unit": "KG",
+      "StockQuantity": 100
+    },
+    {
+      "ItemId": "mb-105",
+      "ItemDisplayName": "Farm Fresh Paragon Omega3+ Egg 12pcs",
+      "ItemDescription": "Farm Fresh Paragon Omega3+ Egg 12pcs",
+      "UnitSalesPrice": 265.0,
+      "DiscountSalesPrice": 265.0,
+      "Unit": "12 pcs",
+      "StockQuantity": 24
+    },
+    {
+      "ItemId": "mb-106",
+      "ItemDisplayName": "Onion Local Bulk Regular",
+      "ItemDescription": "Onion Local Bulk Regular",
+      "UnitSalesPrice": 27.0,
+      "DiscountSalesPrice": 27.0,
+      "Unit": "500g",
+      "StockQuantity": 704
+    },
+    {
+      "ItemId": "mb-107",
+      "ItemDisplayName": "Potato Bulk White Regular",
+      "ItemDescription": "Potato Bulk White Regular",
+      "UnitSalesPrice": 15.0,
+      "DiscountSalesPrice": 15.0,
+      "Unit": "500g",
+      "StockQuantity": 500
+    },
+    {
+      "ItemId": "mb-108",
+      "ItemDisplayName": "Green Chili Local",
+      "ItemDescription": "Green Chili Local",
+      "UnitSalesPrice": 17.0,
+      "DiscountSalesPrice": 17.0,
+      "Unit": "100g",
+      "StockQuantity": 300
+    },
+    {
+      "ItemId": "mb-109",
+      "ItemDisplayName": "Shosha [cucumber]",
+      "ItemDescription": "Shosha [cucumber]",
+      "UnitSalesPrice": 17.5,
+      "DiscountSalesPrice": 17.5,
+      "Unit": "250g",
+      "StockQuantity": 150
+    },
+    {
+      "ItemId": "mb-110",
+      "ItemDisplayName": "Cauliflower (ফুলকপি) Pcs",
+      "ItemDescription": "Cauliflower (ফুলকপি) Pcs",
+      "UnitSalesPrice": 80.0,
+      "DiscountSalesPrice": 80.0,
+      "Unit": "Each",
+      "StockQuantity": 80
+    },
+    {
+      "ItemId": "mb-111",
+      "ItemDisplayName": "Rupchanda Soyabean Oil Pet 5ltr",
+      "ItemDescription": "Rupchanda Soyabean Oil Pet 5ltr",
+      "UnitSalesPrice": 1000.0,
+      "DiscountSalesPrice": 1000.0,
+      "Unit": "5 liter",
+      "StockQuantity": 50
+    },
+    {
+      "ItemId": "mb-112",
+      "ItemDisplayName": "Farmland Atta 2kg",
+      "ItemDescription": "Farmland Atta 2kg",
+      "UnitSalesPrice": 118.0,
+      "DiscountSalesPrice": 118.0,
+      "Unit": "2 kg",
+      "StockQuantity": 100
+    },
+    {
+      "ItemId": "mb-113",
+      "ItemDisplayName": "White Sugar",
+      "ItemDescription": "White Sugar",
+      "UnitSalesPrice": 59.0,
+      "DiscountSalesPrice": 59.0,
+      "Unit": "500g",
+      "StockQuantity": 200
+    },
+    {
+      "ItemId": "mb-114",
+      "ItemDisplayName": "Lemon Local Pcs",
+      "ItemDescription": "Lemon Local Pcs",
+      "UnitSalesPrice": 12.0,
+      "DiscountSalesPrice": 12.0,
+      "Unit": "Each",
+      "StockQuantity": 150
+    },
+    {
+      "ItemId": "mb-115",
+      "ItemDisplayName": "Cabbage [badacopi] Local Pcs",
+      "ItemDescription": "Cabbage [badacopi] Local Pcs",
+      "UnitSalesPrice": 90.0,
+      "DiscountSalesPrice": 90.0,
+      "Unit": "Each",
+      "StockQuantity": 70
+    },
+    {
+      "ItemId": "mb-116",
+      "ItemDisplayName": "Khesari (Grass Pea) Local Bulk",
+      "ItemDescription": "Khesari (Grass Pea) Local Bulk",
+      "UnitSalesPrice": 110.0,
+      "DiscountSalesPrice": 110.0,
+      "Unit": "KG",
+      "StockQuantity": 40
+    }
+  ]
+}

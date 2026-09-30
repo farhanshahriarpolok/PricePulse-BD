@@ -2,6 +2,7 @@
 FastAPI application factory, middleware configuration, and lifecycle event handlers.
 """
 
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request, status
@@ -53,12 +54,17 @@ def create_application() -> FastAPI:
         redoc_url="/redoc",
     )
 
-    # Enable CORS for Web dashboards and Android mobile clients
+    # Hardened CORS configuration for Web dashboards and Android clients
+    cors_origins = list(settings.cors_origins)
+    env_origins = os.getenv("ALLOWED_ORIGINS")
+    if env_origins:
+        cors_origins.extend([o.strip() for o in env_origins.split(",") if o.strip()])
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=cors_origins,
         allow_credentials=True,
-        allow_methods=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
         allow_headers=["*"],
     )
 

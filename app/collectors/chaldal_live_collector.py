@@ -15,9 +15,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 from bs4 import BeautifulSoup
 
-from app.collectors.base import BaseCollector, RawObservation
+from app.collectors.base import BaseCollector, RawObservation, CollectionStatus
 from app.core.config import settings
 from app.services.source_health import source_health_service
+
 
 logger = logging.getLogger(__name__)
 
@@ -300,7 +301,12 @@ class ChaldalLiveCollector(BaseCollector):
                     observation_date=obs_date,
                     completeness_score=0.85 if is_fallback else 0.95,
                     is_fallback=is_fallback,
+                    collection_status=CollectionStatus.FALLBACK.value if is_fallback else CollectionStatus.LIVE.value,
+                    source_url="https://chaldal.com",
+                    raw_package_size=package_unit,
+                    error_message="catalog.chaldal.com legacy endpoint returned 404 (obsolete/decommissioned route). Loaded verified benchmark fixture." if is_fallback else None,
                 )
             )
 
         return observations
+

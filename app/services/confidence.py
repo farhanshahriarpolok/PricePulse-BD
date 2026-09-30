@@ -31,6 +31,10 @@ class ConfidenceScorer:
         "chaldal_retail": 0.85,
         "field_report": 0.60,
         "manual_field": 0.60,
+        "DAM_DAILY": 0.95,
+        "TCB_DAILY": 0.90,
+        "CHALDAL_RETAIL": 0.88,
+        "PRESS_REPORT": 0.70,
     }
 
     def __init__(self, weights: Optional[dict[str, float]] = None):

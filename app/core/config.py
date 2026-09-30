@@ -13,6 +13,16 @@ class Settings(BaseModel):
     app_name: str = "PricePulse BD"
     app_version: str = "0.1.0"
     debug: bool = Field(default=False)
+    cors_origins: list[str] = Field(
+        default=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+        ]
+    )
     
     # Project paths
     project_root: Path = Field(

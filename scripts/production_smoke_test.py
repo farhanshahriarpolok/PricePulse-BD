@@ -3,7 +3,7 @@
 PricePulse BD — Comprehensive Production Smoke Test & Verification Suite
 Performs an automated end-to-end validation of all 6 mission-critical system pillars:
   1. API Health & Liveness (/health -> 200 OK)
-  2. Taxonomy Completeness (All 35 canonical staples registered)
+  2. Taxonomy Completeness (All 65 canonical staples registered)
   3. 64-District Highway Transit Corridors & Spatial Arbitrage Engine
   4. 3-Channel Bazaar Basket Optimization & Savings Engine
   5. Saved Baskets Persistence & CRUD Subsystem
@@ -74,9 +74,9 @@ def run_smoke_tests():
         data = res.json()
         items = data.get("items", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
         count = len(items)
-        passed = res.status_code == 200 and count >= 35
+        passed = res.status_code == 200 and count >= 65
         results.append(passed)
-        log_check(2, "Taxonomy Completeness", passed, f"Registered Commodities: {count}/35 canonical staples verified")
+        log_check(2, "Taxonomy Completeness", passed, f"Registered Commodities: {count}/65 canonical staples verified")
     except Exception as e:
         results.append(False)
         log_check(2, "Taxonomy Completeness", False, f"Exception: {e}")

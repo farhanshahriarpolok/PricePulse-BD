@@ -5,7 +5,17 @@ Abstract base collector and raw observation data contracts.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
-from typing import List
+from enum import Enum
+from typing import List, Optional
+
+
+class CollectionStatus(str, Enum):
+    """Explicit lifecycle and provenance states for harvested market data."""
+    LIVE = "LIVE"
+    FALLBACK = "FALLBACK"
+    MODELED = "MODELED"
+    STALE = "STALE"
+    UNAVAILABLE = "UNAVAILABLE"
 
 
 @dataclass
@@ -20,6 +30,10 @@ class RawObservation:
     observation_date: date
     completeness_score: float = 1.0
     is_fallback: bool = False
+    collection_status: str = "LIVE"  # LIVE, FALLBACK, MODELED, STALE, UNAVAILABLE
+    source_url: Optional[str] = None
+    raw_package_size: Optional[str] = None
+    error_message: Optional[str] = None
 
 
 class BaseCollector(ABC):
@@ -29,8 +43,10 @@ class BaseCollector(ABC):
     source_name: str
     source_type: str
     reliability_score: float
+    default_collection_status: str = "LIVE"
 
     @abstractmethod
     def collect(self) -> List[RawObservation]:
         """Harvest raw observations from the configured source."""
         pass
+

@@ -1,0 +1,46 @@
+{
+  "store": "Pandamart Express Grocery",
+  "market_name": "Pandamart Darkstore Network",
+  "catalog_date": "2026-09-30",
+  "currency": "BDT",
+  "model_type": "MODELED_RETAIL_SPREAD",
+  "spread_percentage": 8.0,
+  "items": [
+    {
+      "name": "Onion (Local)",
+      "price": 58.0,
+      "unit": "1 kg",
+      "model_basis": "Retail average + 8% express premium"
+    },
+    {
+      "name": "Potato (Diamond)",
+      "price": 32.0,
+      "unit": "1 kg",
+      "model_basis": "Retail average + 8% express premium"
+    },
+    {
+      "name": "Farm Egg",
+      "price": 13.5,
+      "unit": "1 pc",
+      "model_basis": "Retail average + 8% express premium"
+    },
+    {
+      "name": "Rice (Miniket)",
+      "price": 78.0,
+      "unit": "1 kg",
+      "model_basis": "Retail average + 8% express premium"
+    },
+    {
+      "name": "Soybean Oil (Bottled)",
+      "price": 210.0,
+      "unit": "1 liter",
+      "model_basis": "Retail average + 8% express premium"
+    },
+    {
+      "name": "Green Chilli",
+      "price": 180.0,
+      "unit": "1 kg",
+      "model_basis": "Retail average + 8% express premium"
+    }
+  ]
+}
