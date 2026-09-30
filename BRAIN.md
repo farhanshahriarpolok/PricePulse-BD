@@ -97,7 +97,7 @@ Integrated under Milestone 013 (`app/services/basket_service.py`):
 
 ## 7. Current Project State & Verification Summary
 
-- **Total Test Suite**: 252 passed (100% green — 16 new collector tests added in Milestone 025).
+- **Total Test Suite**: 285 passed (100% green — 33 regression tests added in Phase 1).
 - **FastAPI Endpoints**: Realtime pulse, commodities (catalog + history + compare + **multi-store prices**), locations, anomalies, spatial arbitrage, simulation sandbox, bazaar basket optimizer, saved baskets.
 - **Retail Collectors**: DAM (government), TCB (statutory), Chaldal (e-commerce), **Shwapno** (superstore live API), **Meena Bazar** (superstore live API), **Pandamart** (transparent modeled).
 - **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2493 modules).
