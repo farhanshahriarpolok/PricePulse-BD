@@ -1,0 +1,185 @@
+{
+  "version": "1.0.0",
+  "description": "PricePulse BD Canonical Smart Cheaper Alternatives Registry (Strictly Intra-Category)",
+  "alternatives": [
+    {
+      "source_commodity_id": 4,
+      "source_canonical_name": "Rice (Miniket)",
+      "alternative_commodity_id": 6,
+      "alternative_canonical_name": "Rice (Coarse)",
+      "category": "Grains",
+      "reason_bn": "দৈনন্দিন রান্নার জন্য সাশ্রয়ী চালের বিকল্প",
+      "reason_en": "Economical staple rice alternative for daily consumption"
+    },
+    {
+      "source_commodity_id": 5,
+      "source_canonical_name": "Rice (Nazirshail)",
+      "alternative_commodity_id": 6,
+      "alternative_canonical_name": "Rice (Coarse)",
+      "category": "Grains",
+      "reason_bn": "দৈনন্দিন রান্নার জন্য সাশ্রয়ী চালের বিকল্প",
+      "reason_en": "Economical staple rice alternative for daily consumption"
+    },
+    {
+      "source_commodity_id": 4,
+      "source_canonical_name": "Rice (Miniket)",
+      "alternative_commodity_id": 48,
+      "alternative_canonical_name": "Paijam Rice",
+      "category": "Grains",
+      "reason_bn": "মাঝারি দানার সাশ্রয়ী চালের বিকল্প",
+      "reason_en": "Medium-grain budget-friendly rice alternative"
+    },
+    {
+      "source_commodity_id": 5,
+      "source_canonical_name": "Rice (Nazirshail)",
+      "alternative_commodity_id": 48,
+      "alternative_canonical_name": "Paijam Rice",
+      "category": "Grains",
+      "reason_bn": "মাঝারি দানার সাশ্রয়ী চালের বিকল্প",
+      "reason_en": "Medium-grain budget-friendly rice alternative"
+    },
+    {
+      "source_commodity_id": 1,
+      "source_canonical_name": "Onion (Local)",
+      "alternative_commodity_id": 2,
+      "alternative_canonical_name": "Onion (Imported)",
+      "category": "Vegetables",
+      "reason_bn": "আমদানি পেঁয়াজের সাশ্রয়ী বিকল্প",
+      "reason_en": "Imported onion alternative during domestic price surges"
+    },
+    {
+      "source_commodity_id": 2,
+      "source_canonical_name": "Onion (Imported)",
+      "alternative_commodity_id": 1,
+      "alternative_canonical_name": "Onion (Local)",
+      "category": "Vegetables",
+      "reason_bn": "দেশি পেঁয়াজের সাশ্রয়ী বিকল্প",
+      "reason_en": "Domestic onion alternative when seasonal supply peaks"
+    },
+    {
+      "source_commodity_id": 7,
+      "source_canonical_name": "Soybean Oil (Bottled)",
+      "alternative_commodity_id": 33,
+      "alternative_canonical_name": "Soybean Oil (Loose)",
+      "category": "Edible Oils",
+      "reason_bn": "একই রান্নার তেলের খোলা সাশ্রয়ী বিকল্প",
+      "reason_en": "Unbottled loose format of the same edible cooking oil"
+    },
+    {
+      "source_commodity_id": 65,
+      "source_canonical_name": "Sunflower Oil",
+      "alternative_commodity_id": 7,
+      "alternative_canonical_name": "Soybean Oil (Bottled)",
+      "category": "Edible Oils",
+      "reason_bn": "নিত্যদিনের রান্নার জন্য সাশ্রয়ী ভোজ্যতেলের বিকল্প",
+      "reason_en": "Economical staple edible oil alternative"
+    },
+    {
+      "source_commodity_id": 21,
+      "source_canonical_name": "Mustard Oil",
+      "alternative_commodity_id": 7,
+      "alternative_canonical_name": "Soybean Oil (Bottled)",
+      "category": "Edible Oils",
+      "reason_bn": "নিত্যদিনের রান্নার জন্য সাশ্রয়ী ভোজ্যতেলের বিকল্প",
+      "reason_en": "Economical staple cooking oil alternative"
+    },
+    {
+      "source_commodity_id": 31,
+      "source_canonical_name": "Deshi Chicken",
+      "alternative_commodity_id": 8,
+      "alternative_canonical_name": "Broiler Chicken",
+      "category": "Meat & Poultry",
+      "reason_bn": "পোল্ট্রি মাংসের উল্লেখযোগ্য সাশ্রয়ী বিকল্প",
+      "reason_en": "Economical poultry meat alternative"
+    },
+    {
+      "source_commodity_id": 30,
+      "source_canonical_name": "Masur Dal (Fine)",
+      "alternative_commodity_id": 10,
+      "alternative_canonical_name": "Masur Dal (Medium)",
+      "category": "Pulses",
+      "reason_bn": "একই মসুর ডালের মাঝারি দানার সাশ্রয়ী বিকল্প",
+      "reason_en": "Medium-grain format of the same red lentil pulse"
+    },
+    {
+      "source_commodity_id": 10,
+      "source_canonical_name": "Masur Dal (Medium)",
+      "alternative_commodity_id": 49,
+      "alternative_canonical_name": "Khesari Dal",
+      "category": "Pulses",
+      "reason_bn": "দৈনন্দিন রান্নার জন্য সাশ্রয়ী ডালের বিকল্প",
+      "reason_en": "Budget-friendly staple pulse alternative"
+    },
+    {
+      "source_commodity_id": 50,
+      "source_canonical_name": "Moong Dal",
+      "alternative_commodity_id": 10,
+      "alternative_canonical_name": "Masur Dal (Medium)",
+      "category": "Pulses",
+      "reason_bn": "দৈনন্দিন ডালের জন্য সাশ্রয়ী বিকল্প",
+      "reason_en": "Economical daily staple pulse alternative"
+    },
+    {
+      "source_commodity_id": 14,
+      "source_canonical_name": "Rui Fish (Fresh)",
+      "alternative_commodity_id": 15,
+      "alternative_canonical_name": "Pangas Fish (Farm)",
+      "category": "Fish & Seafood",
+      "reason_bn": "দৈনন্দিন খাবারের জন্য সাশ্রয়ী মাছের বিকল্প",
+      "reason_en": "Budget-friendly commercial table fish alternative"
+    },
+    {
+      "source_commodity_id": 14,
+      "source_canonical_name": "Rui Fish (Fresh)",
+      "alternative_commodity_id": 32,
+      "alternative_canonical_name": "Tilapia Fish",
+      "category": "Fish & Seafood",
+      "reason_bn": "দৈনন্দিন খাবারের জন্য সাশ্রয়ী মাছের বিকল্প",
+      "reason_en": "Economical commercial freshwater table fish alternative"
+    },
+    {
+      "source_commodity_id": 56,
+      "source_canonical_name": "Catla Fish",
+      "alternative_commodity_id": 32,
+      "alternative_canonical_name": "Tilapia Fish",
+      "category": "Fish & Seafood",
+      "reason_bn": "দৈনন্দিন খাবারের জন্য সাশ্রয়ী মাছের বিকল্প",
+      "reason_en": "Economical commercial freshwater table fish alternative"
+    },
+    {
+      "source_commodity_id": 58,
+      "source_canonical_name": "Duck Egg",
+      "alternative_commodity_id": 9,
+      "alternative_canonical_name": "Farm Egg",
+      "category": "Eggs & Dairy",
+      "reason_bn": "দৈনন্দিন ডিমের জন্য সাশ্রয়ী পোল্ট্রি ফার্ম ডিমের বিকল্প",
+      "reason_en": "Budget-friendly poultry farm egg alternative"
+    }
+  ],
+  "inactive_alternatives_documented": [
+    {
+      "source_commodity_id": 16,
+      "source_canonical_name": "Hilsa Fish (Medium)",
+      "alternative_commodity_id": 14,
+      "alternative_canonical_name": "Rui Fish (Fresh)",
+      "category": "Fish & Seafood",
+      "reason_inactive": "Unit incompatibility in upstream collection: Hilsa is scraped per piece (1 pc) while Rui is scraped per kg. Deactivated until an authoritative weight-per-piece conversion is formally canonized."
+    },
+    {
+      "source_commodity_id": 37,
+      "source_canonical_name": "Spinach",
+      "alternative_commodity_id": 36,
+      "alternative_canonical_name": "Red Spinach",
+      "category": "Vegetables",
+      "reason_inactive": "Unit incompatibility in upstream collection: Spinach is scraped per bundle while Red Spinach is scraped per piece in modern retail feeds. Deactivated until bundle-to-piece standard is canonized."
+    },
+    {
+      "source_commodity_id": 38,
+      "source_canonical_name": "Malabar Spinach",
+      "alternative_commodity_id": 36,
+      "alternative_canonical_name": "Red Spinach",
+      "category": "Vegetables",
+      "reason_inactive": "Unit incompatibility in upstream collection: Malabar Spinach is scraped per bundle while Red Spinach is scraped per piece in modern retail feeds. Deactivated until bundle-to-piece standard is canonized."
+    }
+  ]
+}

@@ -283,6 +283,56 @@ export default function BazaarBasketView({ onBasketCountChange, onOpenBudgetModa
     setResult(null);
   };
 
+  // ── Replace item with smart cheaper alternative ───────────────────────────
+  const handleReplaceWithAlternative = async (sourceId, altItem) => {
+    // 1. Find existing matching item in current basket
+    const existingIndex = basket.findIndex((i) => i.commodity_id === sourceId);
+    if (existingIndex === -1) return;
+
+    const currentItem = basket[existingIndex];
+
+    // 2. Lookup full commodity details for alternative if available in commodities list
+    const altCommodity = commodities.find((c) => c.id === altItem.alternative_commodity_id);
+
+    // 3. Create updated basket array replacing only this specific line item
+    const updatedBasket = [...basket];
+    updatedBasket[existingIndex] = {
+      ...currentItem,
+      id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      commodity_id: altItem.alternative_commodity_id,
+      commodity_name: altCommodity?.canonical_name || altItem.alternative_commodity_name,
+      bangla_name: altCommodity?.bangla_name || altItem.alternative_bangla_name || altItem.alternative_commodity_name,
+      // preserve current quantity and unit
+      quantity: currentItem.quantity,
+      unit: currentItem.unit,
+      matched: true,
+    };
+
+    setBasket(updatedBasket);
+
+    // 4. Automatically re-calculate with the new basket selection to keep state in sync
+    const validItems = updatedBasket.filter((item) => item.commodity_id != null && item.matched);
+    if (validItems.length === 0) return;
+
+    setIsCalculating(true);
+    setError(null);
+    try {
+      const payload = {
+        items: validItems.map((item) => ({
+          commodity_id: item.commodity_id,
+          quantity: item.quantity,
+          raw_unit: item.unit,
+        })),
+      };
+      const res = await calculateBasket(payload);
+      setResult(res);
+    } catch (err) {
+      setError('বাস্কেট পুনঃগণনা করতে সমস্যা হয়েছে।');
+    } finally {
+      setIsCalculating(false);
+    }
+  };
+
   // ── Calculate basket ──────────────────────────────────────────────────────
   const calculate = async () => {
     const validItems = basket.filter((item) => item.commodity_id != null && item.matched);
@@ -983,6 +1033,121 @@ export default function BazaarBasketView({ onBasketCountChange, onOpenBudgetModa
                   </p>
                 </div>
               </div>
+
+              {/* ── Smart Cheaper Alternatives (Phase 5B) ────────────────── */}
+              {result.price_alternatives?.length > 0 && (
+                <div className="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-4 shadow-lg backdrop-blur-sm">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                          <span>{isEn ? 'Smart Cheaper Alternatives' : 'স্মার্ট সাশ্রয়ী বিকল্প পণ্য'}</span>
+                          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            {isEn ? 'Optional' : 'ঐচ্ছিক'}
+                          </span>
+                        </h4>
+                        <p className="text-xs text-slate-400">
+                          {isEn
+                            ? 'Substitute with lower-priced items in the same category without sacrificing quality'
+                            : 'একই ক্যাটাগরির মানসম্মত সাশ্রয়ী পণ্য বেছে নিয়ে খরচ কমান'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {result.price_alternatives.map((alt, idx) => {
+                      const sourceName = isEn ? alt.source_commodity_name : (alt.source_bangla_name || alt.source_commodity_name);
+                      const altName = isEn ? alt.alternative_commodity_name : (alt.alternative_bangla_name || alt.alternative_commodity_name);
+                      const reasonText = isEn ? (alt.reason_en || alt.reason_bn) : (alt.reason_bn || alt.reason_en);
+                      const freshnessLabel =
+                        alt.freshness_tier === 'FRESH_TODAY'
+                          ? (isEn ? 'Fresh Price' : 'তাজা দর')
+                          : alt.freshness_tier === 'YESTERDAY'
+                          ? (isEn ? 'Recent Price' : 'সাম্প্রতিক দর')
+                          : (isEn ? 'Older Price' : 'পূর্বের দর');
+
+                      const freshnessColor =
+                        alt.freshness_tier === 'FRESH_TODAY'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                          : alt.freshness_tier === 'YESTERDAY'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                          : 'bg-slate-700/50 text-slate-400 border-slate-600/30';
+
+                      const unitLabel = alt.standard_unit || 'kg';
+                      const lineSavings = alt.estimated_line_savings != null ? alt.estimated_line_savings : alt.savings_per_unit;
+
+                      return (
+                        <div
+                          key={`alt-${alt.source_commodity_id}-${alt.alternative_commodity_id}-${idx}`}
+                          className="bg-slate-800/70 border border-slate-700/80 hover:border-emerald-500/40 rounded-xl p-3.5 flex flex-col justify-between transition-all"
+                        >
+                          <div>
+                            {/* Header row with dual freshness badges */}
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <span className="text-xs text-slate-400 font-medium">
+                                {isEn ? 'Instead of: ' : 'পরিবর্তে: '}
+                                <span className="line-through text-slate-500">{sourceName}</span>
+                                <span className="ml-1 text-slate-400">({BDT(alt.source_price)}/{unitLabel})</span>
+                              </span>
+                              <div className="flex flex-col items-end gap-1">
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${freshnessColor}`}>
+                                  {isEn ? `Alternative: ${alt.alternative_freshness_tier === 'FRESH_TODAY' ? "Today" : "Yesterday"}` : `বিকল্প: ${alt.alternative_freshness_tier === 'FRESH_TODAY' ? 'আজকের' : 'গতকালের'}`}
+                                </span>
+                                {!alt.is_symmetric_freshness && (
+                                  <span className="text-[9px] font-medium text-amber-400 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/20">
+                                    {isEn ? `Source: ${alt.source_freshness_tier === 'FRESH_TODAY' ? "Today" : "Yesterday"}` : `মূল পণ্য: ${alt.source_freshness_tier === 'FRESH_TODAY' ? 'আজকের' : 'গতকালের'}`}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Alternative title & price */}
+                            <div className="flex items-baseline justify-between mb-2">
+                              <h5 className="text-sm font-bold text-white flex items-center gap-1.5">
+                                <span className="text-emerald-400">💡</span>
+                                <span>{altName}</span>
+                              </h5>
+                              <span className="text-sm font-bold text-emerald-400">
+                                {BDT(alt.alternative_price)}/{unitLabel}
+                              </span>
+                            </div>
+
+                            {/* Savings callout */}
+                            <div className="bg-emerald-950/40 border border-emerald-500/20 rounded-lg px-2.5 py-1.5 mb-3 flex items-center justify-between text-xs">
+                              <span className="text-emerald-300 font-medium">
+                                {isEn ? 'Est. Savings:' : 'সম্ভাব্য সাশ্রয়:'}
+                              </span>
+                              <span className="font-bold text-emerald-400">
+                                {BDT(lineSavings)} ({alt.savings_percent.toFixed(1)}%)
+                              </span>
+                            </div>
+
+                            {/* Reason text */}
+                            <p className="text-[11px] text-slate-400 mb-3 italic">
+                              "{reasonText}"
+                            </p>
+                          </div>
+
+                          {/* Action Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleReplaceWithAlternative(alt.source_commodity_id, alt)}
+                            className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                            id={`replace-alt-${alt.source_commodity_id}`}
+                          >
+                            <span>{isEn ? 'Use this instead' : 'এই বিকল্পটি ব্যবহার করুন'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* ── Smart Saving Tips ────────────────────────────────────── */}
               {result.smart_saving_tips?.length > 0 && (

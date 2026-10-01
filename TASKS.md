@@ -6,14 +6,14 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- Phase 5A complete. Ready for final review.
+- Phase 5B complete. Ready for final review.
 
 ---
 
 ## NEXT
 
-- Phase 5B — Nutrition-Aware Basket Substitution Architecture (Requires explicit nutritional dataset and methodology; price-only substitution is safer than unverified nutritional equivalence).
 - Phase 5C — Supply-Chain Margin & Arath Commission Deconstruction (Must not invent commission or retail markup; components must be explicitly modeled assumptions with provenance).
+- Phase 6 — Production Packaging, Deployment & Linux Host Hardening.
 
 ---
 
@@ -23,6 +23,24 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 5B — Smart Cheaper Alternative Recommendations (Hardened & Audited)** (2026-10-02):
+  - **Empirical Intra-Category Substitution Registry**:
+    - Created `data/taxonomy/alternative_registry.json` establishing 17 active verified pairwise substitution relationships strictly within the same food categories (Grains, Edible Oils, Vegetables, Pulses, Meat & Poultry, Fish & Seafood, Eggs & Dairy).
+    - Fully deactivated and documented 3 unit-incompatible upstream pairs (`Hilsa pc -> Rui kg`, `Spinach bundle -> Red Spinach pc`, `Malabar Spinach bundle -> Red Spinach pc`) until authoritative unit-to-weight standards are canonized.
+  - **Strict Temporal Alignment & Provenance Rules**:
+    - Enforced mandatory qualification criteria: absolute savings $\ge ৳2.00/\text{unit}$ **AND** percentage savings $\ge 5.0\%$.
+    - Implemented strict backend observation divergence gate: comparisons with temporal divergence $> 1$ calendar day are strictly rejected.
+    - Excluded modeled, imputed, or synthetic benchmarks (`PANDAMART_MODELED`, `modeled_benchmark`), relying strictly on empirical channel price observations.
+    - Enriched `PriceAlternativeOut` with dual-sided observation metadata (`source_observation_date`, `source_freshness_tier`, `alternative_observation_date`, `alternative_freshness_tier`, `is_symmetric_freshness`).
+  - **Frontend UI & Interactive Replacement**:
+    - Enhanced `BazaarBasketView.jsx` with an optional, non-intrusive alternative card rendering dual-sided freshness badges, unit savings, line savings, and neutral explanation.
+    - Added user-driven `[Use this instead]` / `[এই বিকল্পটি ব্যবহার করুন]` button that updates the specific basket line item and recalculates totals without mutating unrelated items or silently auto-substituting.
+    - Added bilingual translations in `translations.js`.
+  - **Verification**:
+    - **374/374 Pytest tests passing 100% green** across all 29 test suites.
+    - Production Vite build passing in 16.28s (0 errors, 0 warnings).
+    - Zero DB schema migrations; zero Android modifications.
 
 - **Phase 5A — Observation Freshness & Stale Data Safeguards** (2026-10-02):
   - **Freshness vs Provenance Decoupling**:

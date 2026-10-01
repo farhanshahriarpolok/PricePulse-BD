@@ -84,6 +84,17 @@ export const translations = {
     provenance_title: 'তথ্যসূত্র ও ডাটা নিরাপত্তা',
     provenance_subtitle: 'স্বচ্ছ ও নির্ভরযোগ্য ১০০% লোকাল-ফার্স্ট অডিট সিস্টেম',
     footer_text: 'প্রাইসপালস বিডি • নিত্যপণ্যের সঠিক বাজারদর ও সাশ্রয়ী বাজারের প্ল্যাটফর্ম',
+    // Smart Cheaper Alternatives
+    alt_title: 'স্মার্ট সাশ্রয়ী বিকল্প পণ্য',
+    alt_subtitle: 'একই ক্যাটাগরির কম দামি বিকল্প বেছে নিয়ে খরচ কমান (ঐচ্ছিক)',
+    alt_save_unit: 'প্রতি ইউনিটে সম্ভাব্য সাশ্রয়',
+    alt_save_line: 'মোট সাশ্রয়',
+    alt_replace_btn: 'এই বিকল্পটি ব্যবহার করুন',
+    alt_badge: 'সাশ্রয়ী বিকল্প',
+    alt_current_selection: 'বর্তমান নির্বাচন',
+    alt_fresh_badge: 'তাজা দর',
+    alt_recent_badge: 'সাম্প্রতিক দর',
+    alt_stale_badge: 'পূর্বের দর',
   },
   en: {
     // Brand & Header
@@ -165,6 +176,17 @@ export const translations = {
     provenance_title: 'Auditable Data Provenance & Architecture',
     provenance_subtitle: 'National Commodity Price Intelligence • Transparent Local-First Pipeline',
     footer_text: 'PricePulse BD • National Commodity Market Intelligence & Cost of Living Platform',
+    // Smart Cheaper Alternatives
+    alt_title: 'Smart Cheaper Alternatives',
+    alt_subtitle: 'Save money by choosing lower-priced staples in the same category (optional)',
+    alt_save_unit: 'Est. savings per unit',
+    alt_save_line: 'Total savings',
+    alt_replace_btn: 'Use this instead',
+    alt_badge: 'Cheaper Alternative',
+    alt_current_selection: 'Current Selection',
+    alt_fresh_badge: 'Fresh Price',
+    alt_recent_badge: 'Recent Price',
+    alt_stale_badge: 'Older Price',
   },
 };
 

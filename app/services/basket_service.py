@@ -85,23 +85,23 @@ class _ItemCalc:
 _SUBSTITUTE_TIPS: dict[str, tuple[str, str]] = {
     "Onion (Local)": (
         "Onion (Imported)",
-        "দেশি পেঁয়াজের বদলে আমদানি পেঁয়াজ নিলে খরচ কমতে পারে।",
+        "দেশি পেঁয়াজের বিকল্প হিসেবে আমদানি পেঁয়াজ বিবেচনা করা যেতে পারে।",
     ),
     "Rice (Miniket)": (
         "Rice (Coarse)",
         "মিনিকেটের বদলে মোটা চাল নিলে উল্লেখযোগ্য সাশ্রয় সম্ভব।",
     ),
     "Soybean Oil (Bottled)": (
-        "Mustard Oil",
-        "বোতলজাত সয়াবিনের বদলে সরিষার তেল নিলে স্বাস্থ্যকর এবং সাশ্রয়ী।",
+        "Soybean Oil (Loose)",
+        "বোতলজাত সয়াবিনের বদলে খোলা সয়াবিন তেল নিলে সাশ্রয় হতে পারে।",
     ),
-    "Beef (Local with Bone)": (
-        "Mutton (Goat Meat)",
-        "গরুর মাংসের বদলে খাসির মাংস অনেক ক্ষেত্রে সাশ্রয়ী হতে পারে।",
+    "Deshi Chicken": (
+        "Broiler Chicken",
+        "দেশি মুরগির বদলে ব্রয়লার মুরগি নিলে উল্লেখযোগ্য সাশ্রয় সম্ভব।",
     ),
     "Rui Fish (Fresh)": (
         "Pangas Fish (Farm)",
-        "রুই মাছের বদলে পাঙ্গাশ মাছ বেছে নিলে খরচ অনেকটা কমে।",
+        "রুই মাছের বদলে পাঙ্গাশ বা তেলাপিয়া মাছ বেছে নিলে খরচ অনেকটা কমে।",
     ),
 }
 
@@ -322,10 +322,22 @@ class BasketOptimizationService:
         )
 
         # ---------------------------------------------------------------------------
-        # Smart saving tips
+        # Smart saving tips & Empirical Cheaper Alternatives (Phase 5B)
         # ---------------------------------------------------------------------------
 
         smart_tips = self._generate_smart_tips(item_calcs, item_details)
+
+        from app.services.alternative_service import alternative_service
+        basket_tuples = [
+            (calc.commodity_id, calc.quantity_normalized, calc.standard_unit)
+            for calc in item_calcs
+        ]
+        alternatives = alternative_service.find_alternatives_for_basket(
+            db=db,
+            basket_items=basket_tuples,
+            target_date=today,
+            channel="retail",
+        )
 
         return BasketCalculationResponse(
             benchmark_total=benchmark_total,
@@ -339,6 +351,7 @@ class BasketOptimizationService:
             cost_shift_7d_bdt=cost_shift_bdt,
             item_details=item_details,
             smart_saving_tips=smart_tips,
+            price_alternatives=alternatives,
         )
 
     # ---------------------------------------------------------------------------
@@ -568,6 +581,7 @@ class BasketOptimizationService:
             cost_shift_7d_bdt=0.0,
             item_details=[],
             smart_saving_tips=[],
+            price_alternatives=[],
         )
 
     # -----------------------------------------------------------------------

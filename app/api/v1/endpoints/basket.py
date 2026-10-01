@@ -17,6 +17,7 @@ from app.core.database import get_db
 from app.schemas.basket import (
     BasketCalculationRequest,
     BasketCalculationResponse,
+    PriceAlternativeOut,
     SavedBasketCreate,
     SavedBasketDetailOut,
     SavedBasketSummaryOut,
@@ -130,6 +131,32 @@ def get_basket_presets() -> dict:
         "total": len(BASKET_PRESETS),
         "presets": BASKET_PRESETS,
     }
+
+
+@router.get(
+    "/alternatives/{commodity_id}",
+    response_model=list[PriceAlternativeOut],
+    summary="Get Cheaper Alternatives for Commodity",
+    description=(
+        "Returns empirical, verified cheaper substitute commodities strictly within "
+        "the same category (Rule A) from the explicit registry (Rule B). "
+        "Requires savings >= ৳2.00/unit and >= 5.0%."
+    ),
+)
+def get_commodity_alternatives(
+    commodity_id: int,
+    channel: str = "retail",
+    quantity: float = 1.0,
+    db: Session = Depends(get_db),
+) -> list[PriceAlternativeOut]:
+    """Retrieve qualifying cheaper alternatives for a specific commodity."""
+    from app.services.alternative_service import alternative_service
+    return alternative_service.find_alternatives_for_commodity(
+        db=db,
+        commodity_id=commodity_id,
+        channel=channel,
+        basket_quantity=quantity,
+    )
 
 
 # ---------------------------------------------------------------------------

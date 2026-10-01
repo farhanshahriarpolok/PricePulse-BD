@@ -55,6 +55,42 @@ class BasketItemCostDetail(BaseModel):
     )
 
 
+class PriceAlternativeOut(BaseModel):
+    """Empirical cheaper alternative recommendation for a commodity."""
+
+    source_commodity_id: int = Field(..., description="ID of the original basket commodity")
+    source_commodity_name: str = Field(..., description="Canonical name of original commodity")
+    source_bangla_name: str = Field(..., description="Bangla name of original commodity")
+    source_price: float = Field(..., description="Observed price per standard unit of original commodity")
+
+    alternative_commodity_id: int = Field(..., description="ID of the suggested substitute commodity")
+    alternative_commodity_name: str = Field(..., description="Canonical name of alternative commodity")
+    alternative_bangla_name: str = Field(..., description="Bangla name of alternative commodity")
+    alternative_price: float = Field(..., description="Observed price per standard unit of alternative commodity")
+
+    standard_unit: str = Field(..., description="Common standardized unit for comparison")
+    savings_per_unit: float = Field(..., description="Absolute savings per unit in BDT")
+    savings_percent: float = Field(..., description="Percentage savings relative to original price")
+
+    basket_quantity: Optional[float] = Field(None, description="Normalized quantity in user basket")
+    estimated_line_savings: Optional[float] = Field(None, description="Projected savings for user basket line in BDT")
+
+    # Dual-sided freshness tracking (Phase 5B Hardened)
+    source_observation_date: str = Field(..., description="ISO observation date of the source commodity price")
+    source_freshness_tier: str = Field("FRESH_TODAY", description="Freshness tier of source price: FRESH_TODAY, YESTERDAY, or STALE")
+    alternative_observation_date: str = Field(..., description="ISO observation date of the alternative commodity price")
+    alternative_freshness_tier: str = Field("FRESH_TODAY", description="Freshness tier of alternative price: FRESH_TODAY, YESTERDAY, or STALE")
+    is_symmetric_freshness: bool = Field(True, description="True if both source and alternative prices originate from the exact same observation date")
+
+    # Backward compatibility fields (synced with alternative observation)
+    observation_date: str = Field(..., description="ISO observation date of the alternative price")
+    freshness_tier: str = Field("FRESH_TODAY", description="Freshness tier: FRESH_TODAY, YESTERDAY, or STALE")
+    provenance_status: str = Field("LIVE", description="Collection provenance: LIVE or FALLBACK")
+    channel: str = Field("retail", description="Comparison channel (retail or wholesale)")
+    reason_bn: str = Field(..., description="Bangla context/reason for alternative")
+    reason_en: str = Field(..., description="English context/reason for alternative")
+
+
 class BasketCalculationResponse(BaseModel):
     """Full optimized basket cost analysis with channel savings and smart tips."""
 
@@ -86,6 +122,10 @@ class BasketCalculationResponse(BaseModel):
     smart_saving_tips: list[str] = Field(
         ...,
         description="Actionable Bengali-language procurement suggestions",
+    )
+    price_alternatives: list[PriceAlternativeOut] = Field(
+        default_factory=list,
+        description="Empirical, verified cheaper substitute opportunities for items in this basket",
     )
 
 
