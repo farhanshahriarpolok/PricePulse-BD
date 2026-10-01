@@ -6,13 +6,14 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- None (Post-integration verification, consumer UX, and system hardening verified).
+- Phase 5A complete. Ready for final review.
 
 ---
 
 ## NEXT
 
-- Public Beta deployment and academic evaluation rehearsal.
+- Phase 5B — Nutrition-Aware Basket Substitution Architecture (Requires explicit nutritional dataset and methodology; price-only substitution is safer than unverified nutritional equivalence).
+- Phase 5C — Supply-Chain Margin & Arath Commission Deconstruction (Must not invent commission or retail markup; components must be explicitly modeled assumptions with provenance).
 
 ---
 
@@ -22,6 +23,29 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 5A — Observation Freshness & Stale Data Safeguards** (2026-10-02):
+  - **Freshness vs Provenance Decoupling**:
+    - Disentangled temporal age (`freshness_tier`: `FRESH_TODAY`, `YESTERDAY`, `STALE`, `freshness_age_hours`) from source provenance (`LIVE`, `FALLBACK`, `MODELED`, `UNAVAILABLE`).
+    - Standardized Bangladesh Standard Time (BST UTC+6) calendar boundaries across observation lifecycles without requiring schema mutations.
+  - **Ingestion & Fallback Safeguards**:
+    - Ensured older fallback data and fixtures cannot overwrite newer live observations (`raw.is_fallback` records never overwrite existing observations).
+    - Fixed fixture date handling in `DAMLiveCollector`: fallback fixture parser extracts the authentic date from bulletin metadata (`data-date="2026-09-27"`) instead of falsely synthesizing target dates.
+  - **API Contract & Realtime Enrichment**:
+    - Enriched `FreshnessMetadata` with `freshness_tier` (`FRESH_TODAY`, `YESTERDAY`, `STALE`) and `freshness_age_hours`.
+    - Added `observation_date` to `DailyPulseItem` and `freshness_tier`/`freshness_age_hours` to `StorePriceOut`.
+    - In `RealtimePriceService.get_today_pulse()`, commodities lacking today's observations discover the latest available observation date and accurately reflect their tier (`YESTERDAY` or `STALE`), preventing data disappearance.
+  - **Frontend UI & Localization**:
+    - Updated `CommodityCard.jsx` to render deterministic, non-alarmist freshness indicators:
+      - `FRESH_TODAY`: Emerald dot with subtle pulse + `আজকের দর` / `Today's Price`.
+      - `YESTERDAY`: Sky blue steady dot + `গতকালের দর` / `Yesterday's Price`.
+      - `STALE`: Amber steady dot + `পুরনো বাজারদর` / `Older Price` (or formatted date).
+    - Preserved distinct source provenance badges (`DAM / TCB ভেরিফাইড`).
+    - Added bilingual keys (`freshness_today`, `freshness_yesterday`, `freshness_stale`) to `translations.js`.
+  - **Verification**:
+    - **355/355 Pytest tests 100% green** (343 baseline + 12 new Phase 5A freshness tests).
+    - Production Vite build passing (394.28 kB JS / 117.75 kB gzip, 0 errors).
+    - Playwright QA verified on desktop (1440px) and mobile (390px) viewports with zero horizontal overflow and zero console errors.
 
 - **Phase 4B — Data Freshness & Cache Correctness Audit** (2026-10-01):
   - **Freshness Audit & Bug Discovery**:

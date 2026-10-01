@@ -280,6 +280,7 @@ To operate robustly across real-world internet instability without crashing or p
 - [x] **Phase 2**: Spatial intelligence hybrid UI, canonical default units, and consumer opportunity API.
 - [x] **Phase 3**: Rolling walk-forward backtesting, hybrid candidate model selection (Naive, SMA, ARIMA), and 7-day forecast outlook panel.
 - [x] **Phase 4 & 4B**: Controlled hardening, performance in-memory caching (3600s TTL), event-driven cache invalidation, and frontend code splitting.
+- [x] **Phase 5A**: Upstream harvester resilience, temporal freshness tiers (FRESH_TODAY, YESTERDAY, STALE), and stale data safeguards.
 
 ---
 

@@ -47,6 +47,9 @@ export const translations = {
     pulse_title: 'আজকের নিত্যপণ্যের বাজারদর',
     pulse_subtitle: 'প্রধান বাণিজ্যিক হাব ও খুচরা বাজারের নির্ভরযোগ্য যাচাইকৃত বাজারদর',
     pulse_live_badge: 'আজকের লাইভ রেট',
+    freshness_today: 'আজকের দর',
+    freshness_yesterday: 'গতকালের দর',
+    freshness_stale: 'পুরনো বাজারদর',
     top_mover_badge: 'আজ সবচেয়ে বেশি ওঠানামা',
     no_commodities_found: 'এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি। সব পণ্য দেখতে "সব পণ্য" সিলেক্ট করুন।',
 
@@ -125,6 +128,9 @@ export const translations = {
     pulse_title: "Today's Essential Staples Pulse",
     pulse_subtitle: 'Canonical benchmark prices across commercial wholesale and retail hubs.',
     pulse_live_badge: 'Live Today',
+    freshness_today: "Today's Price",
+    freshness_yesterday: "Yesterday's Price",
+    freshness_stale: "Older Price",
     top_mover_badge: 'Top Market Mover',
     no_commodities_found: 'No commodities found in this category. Select "All Items" to view the full basket.',
 

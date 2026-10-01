@@ -273,11 +273,11 @@ class DAMLiveCollector(BaseCollector):
         """Parse HTML string into RawObservation objects."""
         soup = BeautifulSoup(html_content, "html.parser")
 
-        if self.target_date:
+        if self.target_date and not is_fallback:
             obs_date = self.target_date
         else:
             date_elem = soup.find(class_="bulletin-date")
-            obs_date = date.today()
+            obs_date = self.target_date or date.today()
             if date_elem and date_elem.get("data-date"):
                 try:
                     obs_date = datetime.strptime(date_elem["data-date"], "%Y-%m-%d").date()

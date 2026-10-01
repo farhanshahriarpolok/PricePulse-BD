@@ -355,6 +355,12 @@ def get_commodity_stores(
                 label_bn = "ক্যাশড ডেটা"
                 label_en = "Cached Observation"
 
+            from app.services.freshness import evaluate_freshness
+            obs_freshness = evaluate_freshness(
+                obs_date=obs.observation_date,
+                scraped_at=obs.scraped_at,
+            )
+
             stores_out.append(
                 StorePriceOut(
                     id=cfg["id"],
@@ -371,6 +377,8 @@ def get_commodity_stores(
                     url=cfg["url"],
                     observation_date=obs.observation_date.isoformat() if obs.observation_date else None,
                     raw_name=obs.raw_name,
+                    freshness_tier=obs_freshness.freshness_tier,
+                    freshness_age_hours=obs_freshness.freshness_age_hours,
                 )
             )
 

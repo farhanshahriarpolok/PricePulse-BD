@@ -16,6 +16,7 @@ from app.collectors.chaldal_collector import ChaldalCollector
 from app.services.normalizer import CommodityNormalizer, commodity_normalizer
 from app.services.analytics import AnalyticsService, analytics_service
 from app.services.ingestion import IngestionPipeline
+from app.services.freshness import evaluate_freshness, get_bangladesh_today
 from app.schemas.common import FreshnessMetadata
 from app.schemas.observation import (
     PriceObservationOut,
@@ -176,11 +177,12 @@ class RealtimePriceService:
             markup_percentage=analytics_result.channels.markup_percentage,
         )
 
-        freshness_out = FreshnessMetadata(
-            status=freshness_status,
-            last_scraped_at=latest_scraped,
-            is_stale=is_stale,
-            cache_age_seconds=cache_age,
+        freshness_out = evaluate_freshness(
+            obs_date=eff_date,
+            scraped_at=latest_scraped,
+            ref_date=get_bangladesh_today(),
+            status_override=freshness_status,
+            is_stale_override=is_stale,
         )
 
         return RealtimePriceResponse(
@@ -199,7 +201,7 @@ class RealtimePriceService:
 
     def get_today_pulse(self) -> DailyPulseResponse:
         """Generate overall market intelligence pulse for essential commodities with 7d sparklines and channel metrics."""
-        today = date.today()
+        today = get_bangladesh_today()
         # Ensure latest data is loaded
         commodities = list(self.db.scalars(select(Commodity).order_by(Commodity.id)).all())
         
@@ -233,11 +235,30 @@ class RealtimePriceService:
         items: List[DailyPulseItem] = []
         for comm in commodities:
             observations = self._query_observations(comm.id, today)
+            latest_obs_date = today
+
+            # If no observations exist for today, discover the most recent available observation date
+            if not observations:
+                latest_date_stmt = (
+                    select(func.max(PriceObservation.observation_date))
+                    .where(PriceObservation.commodity_id == comm.id)
+                )
+                recent_date = self.db.scalar(latest_date_stmt)
+                if recent_date:
+                    latest_obs_date = recent_date
+                    observations = self._query_observations(comm.id, latest_obs_date)
+
             if not observations:
                 continue
 
             analytics_result = self.analytics.compute_analytics(observations)
             latest_scraped = max((o.scraped_at for o in observations if o.scraped_at), default=None)
+
+            freshness_meta = evaluate_freshness(
+                obs_date=latest_obs_date,
+                scraped_at=latest_scraped,
+                ref_date=today,
+            )
 
             # Sparkline and delta calculation
             hist_series = daily_history_by_comm[comm.id]
@@ -297,12 +318,8 @@ class RealtimePriceService:
                         markup_percentage=analytics_result.channels.markup_percentage,
                     ),
                     price_status=analytics_result.price_status,
-                    freshness=FreshnessMetadata(
-                        status="fresh",
-                        last_scraped_at=latest_scraped,
-                        is_stale=False,
-                        cache_age_seconds=0,
-                    ),
+                    freshness=freshness_meta,
+                    observation_date=latest_obs_date,
                     sparkline_7d=sparkline_7d,
                     percentage_change_7d=pct_change_7d,
                     min_price=analytics_result.summary.min_price,

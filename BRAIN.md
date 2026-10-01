@@ -129,10 +129,32 @@ Integrated under Phase 3 (`app/services/forecast_service.py`):
 
 ---
 
-## 7. Current Project State & Verification Summary
+## 7. Phase 5 Architecture: Freshness, Provenance & Guardrails
 
-- **Total Test Suite**: 343 passed (100% green — 4 Phase 4B lifecycle freshness tests + 8 Phase 4 caching tests + 17 Phase 3 forecasting tests + 21 Phase 2 spatial consumer tests + 41 Phase 1 regression tests).
+### 5A — Freshness Semantics vs Source Provenance
+- **Decoupled Concepts**:
+  - `Freshness`: Represents the **temporal age** of an observation relative to the Bangladesh local calendar (`FRESH_TODAY`, `YESTERDAY`, `STALE`, and `freshness_age_hours`).
+  - `Provenance`: Represents **where and how** the observation was gathered (`LIVE`, `FALLBACK`, `MODELED`, `UNAVAILABLE`).
+  - These two concepts are orthogonal and must remain distinguishable: `LIVE + STALE` means directly collected from an upstream source but on an older date; `FALLBACK + FRESH_TODAY` means an offline catalog used today; `MODELED` (e.g. Pandamart) remains modeled regardless of age.
+- **Canonical Evaluation Engine (`app/services/freshness.py`)**:
+  - Timezone: Bangladesh Standard Time (BST = UTC+6) consistently marks calendar day transitions.
+  - Tiers:
+    - `FRESH_TODAY`: Observed on current Bangladesh calendar date (`obs_date == today_bst`).
+    - `YESTERDAY`: Observed 1 calendar day prior (`obs_date == today_bst - 1d`). A valid recent observation; not marked "wrong" or alarmist.
+    - `STALE`: Observed $\ge 2$ calendar days prior (`obs_date < today_bst - 1d`).
+  - Stale Safe Fallback: In `get_today_pulse()`, commodities lacking today's observations query the most recent available observation and reflect `YESTERDAY` or `STALE` without disappearing from the pulse.
+  - Ingestion Protection: `raw.is_fallback` observations never overwrite existing database records, and fallback fixture parsers preserve authentic bulletin dates (`2026-09-27`) instead of synthesizing target dates.
+
+### 5B & 5C Architectural Guardrails
+- **Phase 5B Guardrail**: Do **NOT** implement nutritional substitution recommendations unless there is a defensible, verified nutritional dataset and explicit methodology. Price-only commodity substitution is safer than claiming unverified nutritional equivalence.
+- **Phase 5C Guardrail**: Do **NOT** fabricate or invent arath commission or retail markup percentages. If these components are not directly observed through field surveys, they must be explicitly modeled assumptions with documented provenance, never presented as empirical supply-chain facts.
+
+---
+
+## 8. Current Project State & Verification Summary
+
+- **Total Test Suite**: 355 passed (100% green — 12 Phase 5A freshness tests + 4 Phase 4B lifecycle freshness tests + 8 Phase 4 caching tests + 17 Phase 3 forecasting tests + 21 Phase 2 spatial consumer tests + 41 Phase 1 regression tests).
 - **FastAPI Endpoints**: Realtime pulse, commodities (catalog + history + compare + multi-store prices + **7-day price forecast**), locations (districts, markets, spatial-arbitrage, consumer-opportunity), anomalies, simulation sandbox, bazaar basket optimizer, saved baskets.
 - **Retail Collectors**: DAM (government), TCB (statutory), Chaldal (e-commerce), Shwapno (superstore live API), Meena Bazar (superstore live API), Pandamart (transparent modeled).
-- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer with **Hybrid Spatial Opportunity Panel & 7-Day Forecast Outlook Panel**, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2496 modules).
+- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse with **explicit freshness badges & verified source provenance**, Commodity Explorer with **Hybrid Spatial Opportunity Panel & 7-Day Forecast Outlook Panel**, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2496 modules).
 - **Android State**: SDK 34 client with Room database offline cache, Custom Canvas sparklines, and Jetpack Compose screens. Android code is completely frozen and untouched.

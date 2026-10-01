@@ -41,6 +41,8 @@ class StorePriceOut(BaseModel):
     observation_date: Optional[str] = None
     raw_name: Optional[str] = None
     error_message: Optional[str] = None
+    freshness_tier: Optional[str] = "FRESH_TODAY"
+    freshness_age_hours: Optional[float] = None
 
 
 class CommodityStoresResponse(BaseModel):

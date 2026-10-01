@@ -42,6 +42,57 @@ export function getTrendBadge(pctChange, lang = 'bn') {
 }
 
 /**
+ * Canonical freshness badge helper: FRESH_TODAY, YESTERDAY, STALE
+ */
+export function getFreshnessBadge(item, lang = 'bn') {
+  if (!item) {
+    return {
+      tier: 'FRESH_TODAY',
+      label: lang === 'bn' ? 'আজকের দর' : "Today's Price",
+      isPulsing: true,
+      dotClass: 'bg-emerald-500',
+      badgeClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60',
+    };
+  }
+
+  const tier = item.freshness?.freshness_tier || (item.freshness?.status === 'stale' ? 'STALE' : (item.freshness?.status === 'historical' ? 'YESTERDAY' : 'FRESH_TODAY'));
+  const obsDate = item.observation_date || item.date;
+
+  if (tier === 'FRESH_TODAY') {
+    return {
+      tier: 'FRESH_TODAY',
+      label: lang === 'bn' ? 'আজকের দর' : "Today's Price",
+      isPulsing: true,
+      dotClass: 'bg-emerald-500',
+      badgeClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60',
+    };
+  }
+
+  if (tier === 'YESTERDAY') {
+    return {
+      tier: 'YESTERDAY',
+      label: lang === 'bn' ? 'গতকালের দর' : "Yesterday's Price",
+      isPulsing: false,
+      dotClass: 'bg-sky-500',
+      badgeClass: 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800/60',
+    };
+  }
+
+  // STALE / Older observation
+  const dateLabel = obsDate
+    ? (lang === 'bn' ? `পুরনো (${toBengaliNumeral(obsDate, lang)})` : `Older (${obsDate})`)
+    : (lang === 'bn' ? 'পুরনো বাজারদর' : 'Older Price');
+
+  return {
+    tier: 'STALE',
+    label: dateLabel,
+    isPulsing: false,
+    dotClass: 'bg-amber-500',
+    badgeClass: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/60',
+  };
+}
+
+/**
  * Standard Consumer Familiar Titles for Clean Bazaar Look
  */
 export const FAMILIAR_NAMES = {
@@ -207,6 +258,7 @@ export default function CommodityCard({
 
   const pctChange = item.percentage_change_7d !== undefined ? item.percentage_change_7d : 0.0;
   const trend = getTrendBadge(pctChange, lang);
+  const freshness = getFreshnessBadge(item, lang);
 
   const sparklineData = item.sparkline_7d && item.sparkline_7d.length > 0
     ? item.sparkline_7d.map(val => val * sparklineMultiplier)
@@ -238,6 +290,8 @@ export default function CommodityCard({
     return (
       <div
         onClick={onClick}
+        data-testid="commodity-card-hero"
+        data-commodity={item.canonical_name}
         className="col-span-full p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-sm cursor-pointer transition-all duration-200 group relative overflow-hidden text-slate-800 dark:text-slate-100"
       >
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
@@ -282,18 +336,22 @@ export default function CommodityCard({
                 {displaySubtitle}
               </p>
               
-              {/* Verified Source & Live Freshness Badge for Hero */}
+              {/* Verified Source & Explicit Freshness Badge for Hero */}
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[11px] font-semibold" title="কৃষি বিপণন অধিদপ্তর ও ট্রেডিং কর্পোরেশন অব বাংলাদেশ কর্তৃক সরাসরি যাচাইকৃত">
                   <span>🏛️</span>
                   <span>{lang === 'bn' ? 'DAM / TCB ভেরিফাইড' : 'DAM / TCB Verified'}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/60">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span>{item.date ? (lang === 'bn' ? `তারিখ: ${item.date}` : `Date: ${item.date}`) : (lang === 'bn' ? 'আজকের যাচাইকৃত বাজারদর' : 'Today\'s Verified Rates')}</span>
+                <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-md border ${freshness.badgeClass}`}>
+                  {freshness.isPulsing ? (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  ) : (
+                    <span className={`inline-block h-2 w-2 rounded-full ${freshness.dotClass}`}></span>
+                  )}
+                  <span>{freshness.label}</span>
                 </span>
               </div>
             </div>
@@ -417,6 +475,8 @@ export default function CommodityCard({
   return (
     <div
       onClick={onClick}
+      data-testid="commodity-card"
+      data-commodity={item.canonical_name}
       className="p-5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50/60 dark:hover:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs hover:shadow-sm transition-all duration-150 cursor-pointer group flex flex-col justify-between space-y-4 h-full"
     >
       {/* 1. Header Row: Category Vector Icon + Multi-line Wrapped Staple Name + English Subtitle */}
@@ -537,12 +597,16 @@ export default function CommodityCard({
             <span>🏛️</span>
             <span>{lang === 'bn' ? 'DAM / TCB ভেরিফাইড' : 'DAM / TCB Verified'}</span>
           </span>
-          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="text-[10px]">{item.date ? (lang === 'bn' ? `তারিখ: ${item.date}` : `Date: ${item.date}`) : (lang === 'bn' ? 'আজকের যাচাইকৃত দর' : 'Verified Today')}</span>
+          <span className={`inline-flex items-center gap-1 font-medium px-1.5 py-0.5 rounded border ${freshness.badgeClass}`}>
+            {freshness.isPulsing ? (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            ) : (
+              <span className={`inline-block h-2 w-2 rounded-full ${freshness.dotClass}`}></span>
+            )}
+            <span className="text-[10px]">{freshness.label}</span>
           </span>
         </div>
       </div>

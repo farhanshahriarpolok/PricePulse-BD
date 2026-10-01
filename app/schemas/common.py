@@ -10,8 +10,10 @@ from pydantic import BaseModel, Field
 class FreshnessMetadata(BaseModel):
     status: str = Field(..., description="'fresh', 'stale', 'realtime_ingested', or 'historical'")
     last_scraped_at: Optional[datetime] = Field(None, description="Timestamp of latest observation scraping")
-    is_stale: bool = Field(False, description="True if observation is older than 12 hours")
+    is_stale: bool = Field(False, description="True if observation is older than 12 hours or marked stale")
     cache_age_seconds: Optional[int] = Field(None, description="Age in seconds of the cached observation")
+    freshness_tier: str = Field("FRESH_TODAY", description="Explicit semantic freshness tier: 'FRESH_TODAY', 'YESTERDAY', or 'STALE'")
+    freshness_age_hours: Optional[float] = Field(0.0, description="Elapsed hours since observation scrape or market date anchor")
 
 
 class HealthResponse(BaseModel):

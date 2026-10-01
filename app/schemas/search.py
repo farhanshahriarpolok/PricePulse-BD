@@ -43,6 +43,7 @@ class DailyPulseItem(BaseModel):
     channels: ChannelComparisonOut
     price_status: str
     freshness: FreshnessMetadata
+    observation_date: Optional[dt.date] = Field(None, description="Calendar date of the price observation")
     sparkline_7d: List[float] = Field(default_factory=list, description="Last 7 daily representative prices in chronological order")
     percentage_change_7d: float = Field(0.0, description="7-day percentage change relative to 7d SMA or start of window")
     min_price: float = Field(0.0, description="Observed daily minimum price in BDT")
