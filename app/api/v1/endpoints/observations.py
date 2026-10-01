@@ -135,6 +135,12 @@ def submit_manual_observation(
         db.refresh(new_obs)
         persisted_record = new_obs
 
+    # Invalidate downstream forecast and spatial opportunity caches for this commodity
+    from app.services.forecast_service import forecast_service
+    from app.services.spatial_service import spatial_service
+    forecast_service.invalidate(commodity_id=commodity.id)
+    spatial_service.invalidate(commodity_id=commodity.id)
+
     return ManualObservationResponse(
         id=persisted_record.id,
         commodity_id=commodity.id,

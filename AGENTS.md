@@ -93,7 +93,7 @@ Agents must never violate or refactor away these architectural invariants:
   ```bash
   venv\Scripts\python.exe -m pytest tests/ -q
   ```
-- **Standard**: All 293 unit and integration tests must pass with 100% green status.
+- **Standard**: All 343 unit and integration tests must pass with 100% green status.
 
 ---
 

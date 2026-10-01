@@ -13,6 +13,7 @@ Architectural Guarantees:
 """
 
 import math
+import time
 from datetime import date, timedelta
 from typing import Dict, List, Optional, Tuple
 from sqlalchemy import select, func, desc
@@ -41,10 +42,51 @@ class ForecastService:
     HORIZON_DAYS = 7
     MIN_TRAIN_DAYS = 14
     MIN_TOTAL_DAYS = 14
+    DEFAULT_CACHE_TTL = 3600  # 1 hour in-memory cache
 
-    def __init__(self, normalizer: Optional[CommodityNormalizer] = None):
+    def __init__(self, normalizer: Optional[CommodityNormalizer] = None, cache_ttl: int = 3600):
         self.normalizer = normalizer or commodity_normalizer
         self.anomaly_engine = AnomalyEngine()
+        self.cache_ttl = cache_ttl
+        # Key: (commodity_id, channel, market_id) -> (cached_at_timestamp, CommodityForecastResponse)
+        self._cache: Dict[Tuple[int, str, Optional[int]], Tuple[float, CommodityForecastResponse]] = {}
+        self._cache_hits = 0
+        self._cache_misses = 0
+
+    def clear_cache(self) -> None:
+        """Purge entire in-memory forecast cache."""
+        self._cache.clear()
+        self._cache_hits = 0
+        self._cache_misses = 0
+
+    def invalidate(self, commodity_id: Optional[int] = None, channel: Optional[str] = None) -> int:
+        """
+        Granularly evict cache entries.
+        If commodity_id is provided, evicts only entries for that commodity (optionally filtered by channel).
+        If commodity_id is None, clears the entire cache.
+        Returns count of evicted entries.
+        """
+        if commodity_id is None:
+            count = len(self._cache)
+            self._cache.clear()
+            return count
+
+        ch_filter = channel.lower() if channel else None
+        keys_to_del = [
+            k for k in self._cache
+            if k[0] == commodity_id and (ch_filter is None or k[1] == ch_filter)
+        ]
+        for k in keys_to_del:
+            del self._cache[k]
+        return len(keys_to_del)
+
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Telemetry for cache hits, misses, and current entry count."""
+        return {
+            "hits": self._cache_hits,
+            "misses": self._cache_misses,
+            "size": len(self._cache),
+        }
 
     def resolve_commodity(self, db: Session, commodity_identifier: str) -> Optional[Commodity]:
         """Resolve commodity ID or localized name to Commodity instance."""
@@ -425,6 +467,19 @@ class ForecastService:
                 ),
             )
 
+        # Check in-memory TTL cache (key: commodity_id, normalized channel, market_id)
+        cache_key = (comm.id, channel.lower(), market_id)
+        now = time.time()
+        if cache_key in self._cache:
+            cached_at, cached_res = self._cache[cache_key]
+            if now - cached_at < self.cache_ttl:
+                self._cache_hits += 1
+                return cached_res
+            else:
+                del self._cache[cache_key]
+
+        self._cache_misses += 1
+
         # 1. Fetch Empirical Series
         series, eligibility, scope_meta = self.get_empirical_series(
             db=db,
@@ -547,7 +602,7 @@ class ForecastService:
             candidate_models=[m.model_name for m in backtest_metrics],
             selection_metric="MAE",
             fallback_reason=fallback_msg,
-            interval_method="Parametric 95% interval derived from rolling walk-forward RMSE",
+            interval_method="Estimated parametric uncertainty range derived from rolling walk-forward RMSE",
             current_observed_price_bdt=current_price,
             forecast_day7_bdt=day7_point.predicted_price_bdt,
             forecast_day7_lower_bdt=day7_point.lower_bound_bdt,
@@ -555,7 +610,7 @@ class ForecastService:
             daily_schedule=daily_points,
         )
 
-        return CommodityForecastResponse(
+        res = CommodityForecastResponse(
             commodity_id=comm.id,
             canonical_name=comm.canonical_name,
             bangla_name=comm.bangla_name,
@@ -567,6 +622,8 @@ class ForecastService:
             forecast_detail=forecast_detail,
             backtest_metrics=backtest_metrics,
         )
+        self._cache[cache_key] = (now, res)
+        return res
 
 
 forecast_service = ForecastService()

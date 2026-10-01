@@ -173,7 +173,9 @@ function ForecastResearchLayer({ data, lang }) {
                 <th className="px-3 py-1.5 text-left font-semibold">Day</th>
                 <th className="px-3 py-1.5 text-left font-semibold">Date</th>
                 <th className="px-3 py-1.5 text-right font-semibold">Point Estimate</th>
-                <th className="px-3 py-1.5 text-right font-semibold">95% Interval</th>
+                <th className="px-3 py-1.5 text-right font-semibold">
+                  {lang === 'bn' ? 'অনিশ্চয়তা পরিধি (±1.96σ)' : 'Uncertainty Range (±1.96σ)'}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -212,7 +214,7 @@ function ForecastResearchLayer({ data, lang }) {
           )}
         </p>
         <p>
-          Method: Chronological rolling-origin walk-forward validation (Zero future data leakage).
+          Method: Chronological rolling-origin walk-forward validation (Zero future data leakage). Uncertainty range is an estimated parametric interval based on out-of-sample RMSE (σ_h = RMSE_OOS · √(1 + 0.10(h-1))).
         </p>
       </div>
     </div>

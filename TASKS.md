@@ -23,6 +23,49 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## DONE RECENTLY
 
+- **Phase 4B — Data Freshness & Cache Correctness Audit** (2026-10-01):
+  - **Freshness Audit & Bug Discovery**:
+    - Traced execution flows across `ForecastService`, `SpatialService`, `IngestionPipeline`, `scheduler.py`, and `observations.py`.
+    - Proved via empirical lifecycle tests (`test_phase4b_lifecycle_freshness.py`) that under pure TTL caching, newly ingested price observations (from background harvests or manual spot reports) left downstream forecast and spatial opportunity caches stale for up to 3600s.
+  - **Minimal Correctness Hardening (Strategy A)**:
+    - Added granular `invalidate(commodity_id: Optional[int], channel: Optional[str])` to `ForecastService`.
+    - Added granular `invalidate(commodity_id: Optional[int])` to `SpatialService`.
+    - Updated `SpatialService.get_consumer_opportunity` to compute `eff_date` before building `cache_key`, preventing stale `(comm.id, None)` collisions across dates.
+    - Wired event-driven invalidation hooks into `IngestionPipeline.run_collector`, `ingest_observations`, and `submit_manual_observation`: newly inserted or updated observations immediately evict only the affected commodities, leaving unaffected staples warm in cache.
+  - **Verification**:
+    - **343/343 Pytest tests 100% green** (331 baseline + 8 caching + 4 lifecycle freshness).
+    - Production Vite build passing (392.92 kB JS / 117.37 kB gzip, 0 chunk warnings).
+    - Production smoke test 6/6 passing.
+    - Android client directory 100% untouched.
+
+- **Phase 4 — Controlled Hardening, Performance Caching, Bundle Optimization & Viva Readiness** (2026-10-01):
+  - **P1 — Documentation Alignment**:
+    - Audited `app/services/forecast_service.py` vs `BRAIN.md`. Aligned documentation to reflect the actual production formulas:
+      - Estimated parametric uncertainty range: $\sigma_h = \text{RMSE}_{\text{OOS}} \cdot \sqrt{1.0 + 0.10(h-1)}$, with bounds $[\max(0, \hat{P}_h - 1.96\sigma_h), \hat{P}_h + 1.96\sigma_h]$.
+      - Volatility-aware direction deadband: Base $\pm 3.0\%$; modulated when $CV_{14} > 8.0\%$ by $\min(4.0\%, (CV_{14} - 8.0\%) \times 0.4)$, bounded within $[3.0\%, 7.0\%]$.
+    - Clarified terminology: Labeled as "estimated uncertainty range based on out-of-sample RMSE" rather than uncalibrated confidence intervals.
+  - **P2 & P3 — In-Memory Performance Caching**:
+    - Implemented deterministic bounded TTL cache (`cache_ttl = 3600s`) in `ForecastService` keyed by `(commodity_id, channel, market_id)`.
+      - Measured latency dropped from **196.25 ms** to **6.19 ms** (>30x speedup / 96.8% latency reduction).
+      - Added cache isolation (channel, market, cross-commodity) and exclusion of incomplete/sparse datasets.
+    - Implemented deterministic bounded TTL cache (`cache_ttl = 3600s`) in `SpatialService` keyed by `(commodity_id, date_key)`.
+      - Measured latency dropped from **8.49 ms** to **5.70 ms** (33% latency reduction).
+    - Added comprehensive cache test suite (`tests/test_phase4_caching.py`, 8 tests).
+  - **P4 — Frontend Bundle Optimization & Code Splitting**:
+    - Implemented `React.lazy` and `Suspense` for heavy non-landing modules (`BangladeshPriceMap`, `SimulationSandbox`, `ComparisonView`, `CommodityDetailExplorer`, and modal dialogs).
+    - Removed unused `HistoricalTrendChart` import from `App.jsx`.
+    - **Initial JS bundle size slashed from 1,078.77 kB to 392.90 kB (63.6% reduction)**; initial gzip payload slashed from **302.61 kB to 117.35 kB (61.2% reduction)**.
+    - Eliminated all Vite >500 kB build chunk warnings.
+  - **P5 & P6 — Viva / Demo Hardening & Documentation Consistency**:
+    - Replaced unverified "nationwide" and "64-district" claims in translations and UI with accurate commercial hub and inter-district freight corridor labels.
+    - Replaced "95% Interval" table headers with "Uncertainty Range (±1.96σ)" and added empirical out-of-sample RMSE methodology disclosures.
+    - Verified all 65 canonical commodities, 7 populated markets, 5 districts with empirical observations, zero SARIMA/deep learning, and modeled-data isolation.
+  - **P7 & P8 — Security Recheck & Comprehensive Verification**:
+    - All 339 unit and integration tests passing (100% green).
+    - Production Vite build passing in 4.53s.
+    - Production smoke test 6/6 passing.
+    - Android client directory 100% untouched.
+
 - **Phase 3 — Forecasting, Direction Signals, Backtesting & Research Analytics** (2026-10-01):
   - **Backend Forecasting Engine**:
     - Built production `ForecastService` (`app/services/forecast_service.py`) supporting hybrid candidate models: Naive persistence, SMA-7, SMA-14, and formal non-seasonal ARIMA(1,1,0) with analytical OLS AR(1) fallback.

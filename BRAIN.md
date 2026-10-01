@@ -91,11 +91,20 @@ Integrated under Phase 3 (`app/services/forecast_service.py`):
   - $T_{\text{train}} = 14$ days, $H = 7$ days forecast horizon.
   - Strictly chronological walk-forward splits with absolute zero future data leakage ($\max(\text{train\_indices}) < \min(\text{val\_indices})$).
   - Out-of-sample MAE and RMSE evaluated for all candidate models; the lowest-MAE model is dynamically selected.
-- **Parametric Uncertainty Interval & Direction Signal**:
-  - 95% confidence interval derived from walk-forward backtest empirical RMSE:
-    $$\text{Interval}_h = \hat{P}_h \pm 1.96 \cdot \text{RMSE} \cdot \sqrt{\frac{h}{7}}$$
+- **Parametric Uncertainty Range & Direction Signal**:
+  - Estimated uncertainty range derived from out-of-sample walk-forward RMSE ($\text{RMSE}_{\text{OOS}}$):
+    $$\sigma_h = \text{RMSE}_{\text{OOS}} \cdot \sqrt{1.0 + 0.10(h - 1)}$$
+    $$\text{Range}_h = \left[\max\left(0, \hat{P}_h - 1.96 \cdot \sigma_h\right), \; \hat{P}_h + 1.96 \cdot \sigma_h\right]$$
+    *(Note: This represents an estimated parametric uncertainty range scaling with forecast horizon $h \in [1..7]$, not an empirically calibrated multi-year 95% prediction interval).*
   - Direction classified as `UP`, `DOWN`, `STABLE`, or `UNAVAILABLE`.
-  - Base deadband threshold is $\pm 3.0\%$, modulated upwards by historical volatility ($\text{Effective Threshold} = \max(3.0\%, 1.5 \cdot CV_{14})$).
+  - Volatility-aware engineering deadband heuristic: Base threshold is $\pm 3.0\%$. When 14-day historical coefficient of variation exceeds $8.0\%$, the threshold expands linearly:
+    $$\text{Effective Threshold} = \begin{cases} 3.0\% & \text{if } CV_{14} \le 8.0\% \\ 3.0\% + \min\left(4.0\%, (CV_{14} - 8.0) \times 0.4\right) & \text{if } CV_{14} > 8.0\% \end{cases}$$
+    *(Effective deadband is strictly bounded between $\pm 3.0\%$ and $\pm 7.0\%$, preventing runaway deadbands during volatile market shocks).*
+- **Deterministic Caching & Event-Driven Freshness**:
+  - In-memory bounded TTL cache (`cache_ttl = 3600s`) for forecast backtests (`ForecastService`) and spatial consumer opportunity calculations (`SpatialService`).
+  - Forecast cache key: `(commodity_id, channel, market_id)`.
+  - Spatial cache key: `(commodity_id, eff_date)`.
+  - **Freshness Contract**: Bounded 1-hour TTL with event-driven invalidation hooks. Whenever new price observations are committed (`IngestionPipeline`, `ingest_observations`, or `submit_manual_observation`), affected commodities are immediately evicted from downstream forecast and spatial caches. Unaffected commodities remain cached.
 - **Documented Limitations**:
   - The historical dataset contains approximately 33 calendar days. This sample size supports short-term 7-day projections and rolling backtesting across ~13 windows, but does NOT statistically establish long-term or weekly seasonal (SARIMA) dynamics.
 
@@ -122,8 +131,8 @@ Integrated under Phase 3 (`app/services/forecast_service.py`):
 
 ## 7. Current Project State & Verification Summary
 
-- **Total Test Suite**: 331 passed (100% green — 17 Phase 3 forecasting tests + 21 Phase 2 spatial consumer tests + 41 Phase 1 regression tests across audit fixes).
+- **Total Test Suite**: 343 passed (100% green — 4 Phase 4B lifecycle freshness tests + 8 Phase 4 caching tests + 17 Phase 3 forecasting tests + 21 Phase 2 spatial consumer tests + 41 Phase 1 regression tests).
 - **FastAPI Endpoints**: Realtime pulse, commodities (catalog + history + compare + multi-store prices + **7-day price forecast**), locations (districts, markets, spatial-arbitrage, consumer-opportunity), anomalies, simulation sandbox, bazaar basket optimizer, saved baskets.
 - **Retail Collectors**: DAM (government), TCB (statutory), Chaldal (e-commerce), Shwapno (superstore live API), Meena Bazar (superstore live API), Pandamart (transparent modeled).
-- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer with **Hybrid Spatial Opportunity Panel & 7-Day Forecast Outlook Panel**, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2495 modules).
+- **Frontend State**: React 18 + Vite, single-page application with 6 core navigation tabs (Market Pulse, Commodity Explorer with **Hybrid Spatial Opportunity Panel & 7-Day Forecast Outlook Panel**, 64-District Map, Anomaly Alerts, Viva Simulator, Bazaar Basket). Production build verified (2496 modules).
 - **Android State**: SDK 34 client with Room database offline cache, Custom Canvas sparklines, and Jetpack Compose screens. Android code is completely frozen and untouched.

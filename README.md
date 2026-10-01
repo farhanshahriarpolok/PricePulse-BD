@@ -238,7 +238,7 @@ To operate robustly across real-world internet instability without crashing or p
 
 ### In-Process Background Task Scheduler
 - Built on Python's native `asyncio` event loop inside `app/services/scheduler.py`, requiring zero external daemon or cron infrastructure.
-- **Periodic Harvesting**: Automatically executes periodic data harvests and incremental anomaly checks on a recurring 12-hour cadence.
+- **Periodic Harvesting**: Automatically executes periodic data harvests and incremental anomaly checks on a recurring 6-hour cadence (`interval_seconds = 21600`).
 - **Asynchronous On-Demand Trigger**:
   - `POST /api/v1/system/sync` schedules background execution without blocking the FastAPI event loop and returns an immediate tracking task ID.
   - Clients poll `GET /api/v1/system/sync/{task_id}` for execution progress, inserted count, and updated record counts.
@@ -266,10 +266,24 @@ To operate robustly across real-world internet instability without crashing or p
 - [x] **Milestone 008**: Quantitative evaluation suite, P95/P99 latency benchmarks, LaTeX vector figures, and interactive Reveal.js presentation deck.
 - [x] **Milestone 009**: Full 21-commodity market basket expansion (Beef, Mutton, Fish, Milk, Green Chilli, Sugar, Salt), live marquee ticker, category filtering, and commercial Material 3 Android app.
 - [x] **Milestone 010**: National 64-District spatial expansion, Spatial Price Dispersion Index $D(t)$, freight/transport arbitrage model, autonomous TCB & newspaper regex harvesters, Android Room offline database caching, custom Canvas price charts, and Live Viva Defense Simulation Sandbox.
+- [x] **Milestone 013**: Persistent Saved Baskets with SQLite relational mapping, 30-day CPI trajectory calculations, and consumer basket optimizer.
+- [x] **Milestone 014**: Production branding sanitization and live storefront collector integration.
+- [x] **Milestone 015 & 016**: Android Room offline basket database caching and Jetpack Compose Basket screen.
+- [x] **Milestone 017**: Automated daily ingestion resilience and live harvester fault-tolerance.
+- [x] **Milestone 018**: Highway transit corridor waypoints and interactive Leaflet route visualization.
+- [x] **Milestone 020**: Mass-consumer localization overhaul, colloquial Bengali toggle, and expanded taxonomy (35 staples).
+- [x] **Milestone 021 & 022**: Custom vector illustration system, multi-stage production Docker container, and Android release APK packaging.
+- [x] **Milestone 023**: UI/UX minimal overhaul, card simplification, and navigation de-cluttering.
+- [x] **Milestone 024**: Bazaar basket WhatsApp fard export and printable physical bazaar checklist.
+- [x] **Milestone 025**: Multi-store retail collector trio (Shwapno, Meena Bazar, Pandamart) and `/commodities/{id}/stores` API.
+- [x] **Phase 1**: Real data integration foundation, taxonomy safety boundaries, and provenance isolation.
+- [x] **Phase 2**: Spatial intelligence hybrid UI, canonical default units, and consumer opportunity API.
+- [x] **Phase 3**: Rolling walk-forward backtesting, hybrid candidate model selection (Naive, SMA, ARIMA), and 7-day forecast outlook panel.
+- [x] **Phase 4 & 4B**: Controlled hardening, performance in-memory caching (3600s TTL), event-driven cache invalidation, and frontend code splitting.
 
 ---
 
-## 8. Viva Defense Live Simulation Mode
+## 9. Viva Defense Live Simulation Mode
 
 Examiners and evaluators can interactively stress-test the statistical anomaly detection engine without altering ground-truth records:
 1. Navigate to the **"Viva Simulator"** tab in the web client.
@@ -284,7 +298,7 @@ Examiners and evaluators can interactively stress-test the statistical anomaly d
 
 ---
 
-## 9. License & Academic Attribution
+## 10. License & Academic Attribution
 
 This project is developed as part of an undergraduate CSE Final Year Research Project.
 - **Author**: Farhan Shahriar Polok

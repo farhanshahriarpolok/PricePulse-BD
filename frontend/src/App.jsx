@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { 
   Activity, 
   TrendingUp, 
@@ -23,24 +23,25 @@ import BottomFloatingBar from './components/BottomFloatingBar';
 import PulseSummaryCard from './components/PulseSummaryCard';
 import RealtimeSearch from './components/RealtimeSearch';
 import ChannelComparisonCard from './components/ChannelComparisonCard';
-import HistoricalTrendChart from './components/HistoricalTrendChart';
 import AnomalyAlertCard from './components/AnomalyAlertCard';
-import BangladeshPriceMap from './components/BangladeshPriceMap';
 import ProvenanceDrawer from './components/ProvenanceDrawer';
-import ComparisonView from './components/ComparisonView';
-import ManualIngestionModal from './components/ManualIngestionModal';
 import SourceHealthCard from './components/SourceHealthCard';
 import MarketTicker from './components/MarketTicker';
 import CategoryFilter, { matchesCategory, CATEGORIES } from './components/CategoryFilter';
-import ExportDataModal from './components/ExportDataModal';
-import SimulationSandbox from './components/SimulationSandbox';
 import CommodityCard from './components/CommodityCard';
 import CommodityTableView from './components/CommodityTableView';
 import LocationBanner from './components/LocationBanner';
 import BazaarBasketView from './components/BazaarBasketView';
-import BudgetOptimizerModal from './components/BudgetOptimizerModal';
-import CommodityDetailExplorer from './components/CommodityDetailExplorer';
 import ErrorBoundary from './components/ErrorBoundary';
+
+// Lazy-loaded components for non-landing views & heavy sub-features
+const CommodityDetailExplorer = React.lazy(() => import('./components/CommodityDetailExplorer'));
+const BangladeshPriceMap = React.lazy(() => import('./components/BangladeshPriceMap'));
+const SimulationSandbox = React.lazy(() => import('./components/SimulationSandbox'));
+const ComparisonView = React.lazy(() => import('./components/ComparisonView'));
+const ManualIngestionModal = React.lazy(() => import('./components/ManualIngestionModal'));
+const ExportDataModal = React.lazy(() => import('./components/ExportDataModal'));
+const BudgetOptimizerModal = React.lazy(() => import('./components/BudgetOptimizerModal'));
 import { getTranslation } from './i18n/translations';
 
 import {
@@ -715,14 +716,20 @@ export default function App() {
         {/* TAB 2: COMPARE MARKETS */}
         {activeTab === 'compare' && (
           <ErrorBoundary title={t('nav_compare')}>
-            <ComparisonView
-              commodities={commodities}
-              onSelectCommodity={(id) => {
-                const matched = commodities.find((c) => c.id === id);
-                if (matched) setSelectedCommodity(matched);
-                setActiveTab('explorer');
-              }}
-            />
+            <Suspense fallback={
+              <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs">
+                {lang === 'bn' ? 'বাজার তুলনা লোড হচ্ছে...' : 'Loading market comparison...'}
+              </div>
+            }>
+              <ComparisonView
+                commodities={commodities}
+                onSelectCommodity={(id) => {
+                  const matched = commodities.find((c) => c.id === id);
+                  if (matched) setSelectedCommodity(matched);
+                  setActiveTab('explorer');
+                }}
+              />
+            </Suspense>
           </ErrorBoundary>
         )}
 
@@ -730,17 +737,23 @@ export default function App() {
         {activeTab === 'explorer' && (
           <ErrorBoundary title={t('nav_explorer')}>
             {(selectedCommodity || (commodities && commodities.length > 0)) ? (
-              <CommodityDetailExplorer
-                commodity={selectedCommodity || commodities[0]}
-                commodities={commodities || []}
-                onSelectCommodity={setSelectedCommodity}
-                historyData={commodityHistory || []}
-                spatialData={spatialData}
-                matchedPulse={(allPulseItems || []).find((p) => p.commodity_id === (selectedCommodity || commodities[0])?.id)}
-                onBack={() => setActiveTab('pulse')}
-                onAddToBasket={handleAddToBasket}
-                lang={lang}
-              />
+              <Suspense fallback={
+                <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs">
+                  {lang === 'bn' ? 'পণ্যের বিস্তারিত তথ্য লোড হচ্ছে...' : 'Loading commodity details...'}
+                </div>
+              }>
+                <CommodityDetailExplorer
+                  commodity={selectedCommodity || commodities[0]}
+                  commodities={commodities || []}
+                  onSelectCommodity={setSelectedCommodity}
+                  historyData={commodityHistory || []}
+                  spatialData={spatialData}
+                  matchedPulse={(allPulseItems || []).find((p) => p.commodity_id === (selectedCommodity || commodities[0])?.id)}
+                  onBack={() => setActiveTab('pulse')}
+                  onAddToBasket={handleAddToBasket}
+                  lang={lang}
+                />
+              </Suspense>
             ) : (
               <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-sm shadow-sm">
                 {lang === 'bn' ? 'অনুগ্রহ করে একটি পণ্য নির্বাচন করুন।' : 'Please select a commodity.'}
@@ -800,7 +813,13 @@ export default function App() {
                   {t('simulator_subtitle')}
                 </p>
               </div>
-              <SimulationSandbox commodities={commodities} />
+              <Suspense fallback={
+                <div className="p-12 text-center rounded-2xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
+                  {lang === 'bn' ? 'সিমুলেশন ইঞ্জিন লোড হচ্ছে...' : 'Loading simulation engine...'}
+                </div>
+              }>
+                <SimulationSandbox commodities={commodities} />
+              </Suspense>
             </div>
           </ErrorBoundary>
         )}
@@ -838,14 +857,20 @@ export default function App() {
               </div>
 
               {spatialData ? (
-                <BangladeshPriceMap
-                  spatialData={spatialData}
-                  commodityName={selectedCommodity?.canonical_name}
-                  unit={selectedCommodity?.default_unit}
-                />
+                <Suspense fallback={
+                  <div className="p-12 text-center rounded-2xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
+                    {lang === 'bn' ? 'বাংলাদেশ ম্যাপ লোড হচ্ছে...' : 'Loading geospatial map...'}
+                  </div>
+                }>
+                  <BangladeshPriceMap
+                    spatialData={spatialData}
+                    commodityName={selectedCommodity?.canonical_name}
+                    unit={selectedCommodity?.default_unit}
+                  />
+                </Suspense>
               ) : (
                 <div className="p-8 text-center rounded-xl bg-slate-800/40 border border-slate-700 text-slate-400 text-xs">
-                  ম্যাপ ডাটা লোড হচ্ছে...
+                  {lang === 'bn' ? 'ম্যাপ ডাটা লোড হচ্ছে...' : 'Loading map data...'}
                 </div>
               )}
             </div>
@@ -956,32 +981,44 @@ export default function App() {
       <ProvenanceDrawer observation={activeProvenance} onClose={() => setActiveProvenance(null)} />
 
       {/* Manual Spot Price Ingestion Modal */}
-      <ManualIngestionModal
-        isOpen={isManualModalOpen}
-        onClose={() => setIsManualModalOpen(false)}
-        commodities={commodities}
-        onSuccess={() => {
-          loadData();
-        }}
-      />
+      {isManualModalOpen && (
+        <Suspense fallback={null}>
+          <ManualIngestionModal
+            isOpen={isManualModalOpen}
+            onClose={() => setIsManualModalOpen(false)}
+            commodities={commodities}
+            onSuccess={() => {
+              loadData();
+            }}
+          />
+        </Suspense>
+      )}
 
       {/* Export Market Intelligence Modal */}
-      <ExportDataModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        pulseItems={allPulseItems}
-        selectedCommodity={selectedCommodity}
-        commodityHistory={commodityHistory}
-      />
+      {isExportModalOpen && (
+        <Suspense fallback={null}>
+          <ExportDataModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            pulseItems={allPulseItems}
+            selectedCommodity={selectedCommodity}
+            commodityHistory={commodityHistory}
+          />
+        </Suspense>
+      )}
 
       {/* Family Budget Optimizer Modal */}
-      <BudgetOptimizerModal
-        isOpen={isBudgetModalOpen}
-        onClose={() => setIsBudgetModalOpen(false)}
-        commodities={commodities}
-        onApplyBasket={handleApplyBudgetBasket}
-        lang={lang}
-      />
+      {isBudgetModalOpen && (
+        <Suspense fallback={null}>
+          <BudgetOptimizerModal
+            isOpen={isBudgetModalOpen}
+            onClose={() => setIsBudgetModalOpen(false)}
+            commodities={commodities}
+            onApplyBasket={handleApplyBudgetBasket}
+            lang={lang}
+          />
+        </Suspense>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 py-4 pb-24 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors duration-150">

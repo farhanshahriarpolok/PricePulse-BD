@@ -45,7 +45,7 @@ export const translations = {
 
     // Market Pulse Dashboard
     pulse_title: 'আজকের নিত্যপণ্যের বাজারদর',
-    pulse_subtitle: 'সারা দেশের পাইকারি ও খুচরা বাজারের নির্ভরযোগ্য লাইভ দাম',
+    pulse_subtitle: 'প্রধান বাণিজ্যিক হাব ও খুচরা বাজারের নির্ভরযোগ্য যাচাইকৃত বাজারদর',
     pulse_live_badge: 'আজকের লাইভ রেট',
     top_mover_badge: 'আজ সবচেয়ে বেশি ওঠানামা',
     no_commodities_found: 'এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি। সব পণ্য দেখতে "সব পণ্য" সিলেক্ট করুন।',
@@ -63,8 +63,8 @@ export const translations = {
     anomaly_equilibrium_title: 'বাজারে সব পণ্যের দাম স্বাভাবিক আছে',
     anomaly_equilibrium_sub: 'আজ কোনো অস্বাভাবিক মূল্যবৃদ্ধি বা ঘাটতি লক্ষ্য করা যায়নি।',
 
-    map_title: '৬৪ জেলার বাজারদর ও পরিবহন করিডোর',
-    map_subtitle: 'সারা দেশের উৎপাদন জেলা থেকে রাজধানী ও বিভাগীয় শহরে মাল চলাচলের খরচ ও লাভ',
+    map_title: 'আন্তঃজেলা বাজারদর ও হাইওয়ে পরিবহন করিডোর',
+    map_subtitle: 'প্রধান উৎপাদন অঞ্চল ও বিভাগীয় বাণিজ্যিক হাবের মধ্যে পণ্য পরিবহনের খরচ ও সুযোগ',
     map_corridors_toggle: 'হাইওয়ে পরিবহন করিডোর',
     map_dispersion_label: 'জেলাভিত্তিক দামের পার্থক্য:',
 
@@ -123,7 +123,7 @@ export const translations = {
 
     // Market Pulse Dashboard
     pulse_title: "Today's Essential Staples Pulse",
-    pulse_subtitle: 'Canonical benchmark prices across wholesale and retail tiers nationwide.',
+    pulse_subtitle: 'Canonical benchmark prices across commercial wholesale and retail hubs.',
     pulse_live_badge: 'Live Today',
     top_mover_badge: 'Top Market Mover',
     no_commodities_found: 'No commodities found in this category. Select "All Items" to view the full basket.',
@@ -141,8 +141,8 @@ export const translations = {
     anomaly_equilibrium_title: 'All Commodities in Market Equilibrium',
     anomaly_equilibrium_sub: 'No abnormal price spikes or critical supply restrictions detected today.',
 
-    map_title: '64-District Price Map & Freight Corridors',
-    map_subtitle: 'Inter-district spatial price variation and national highway freight transport feasibility.',
+    map_title: 'Inter-District Price Map & Freight Corridors',
+    map_subtitle: 'Inter-district spatial price variation and arterial highway freight transport feasibility.',
     map_corridors_toggle: 'Highway Transit Corridors',
     map_dispersion_label: 'District Variance D(t):',
 

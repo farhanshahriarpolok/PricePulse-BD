@@ -4,8 +4,9 @@ Spatial market analytics service calculating geographic spreads, markups, and Ge
 
 import json
 import math
+import time
 from datetime import date
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session, selectinload
 
@@ -33,9 +34,47 @@ from app.schemas.spatial import (
 class SpatialService:
     """Computes inter-market spatial spreads, regional disparities, and GeoJSON structures."""
 
-    def __init__(self, normalizer: Optional[CommodityNormalizer] = None):
+    DEFAULT_CACHE_TTL = 3600  # 1 hour in-memory cache
+
+    def __init__(self, normalizer: Optional[CommodityNormalizer] = None, cache_ttl: int = 3600):
         self.normalizer = normalizer or commodity_normalizer
         self.geojson_path = settings.data_dir / "geo" / "bangladesh_districts_simplified.json"
+        self.cache_ttl = cache_ttl
+        # Key: (commodity_id: int, target_date_str: Optional[str]) -> (cached_at: float, ConsumerOpportunityResponse)
+        self._opportunity_cache: Dict[Tuple[int, Optional[str]], Tuple[float, ConsumerOpportunityResponse]] = {}
+        self._cache_hits = 0
+        self._cache_misses = 0
+
+    def clear_cache(self) -> None:
+        """Purge entire in-memory spatial consumer opportunity cache."""
+        self._opportunity_cache.clear()
+        self._cache_hits = 0
+        self._cache_misses = 0
+
+    def invalidate(self, commodity_id: Optional[int] = None) -> int:
+        """
+        Granularly evict spatial opportunity cache entries.
+        If commodity_id is provided, evicts only entries for that commodity.
+        If commodity_id is None, clears the entire opportunity cache.
+        Returns count of evicted entries.
+        """
+        if commodity_id is None:
+            count = len(self._opportunity_cache)
+            self._opportunity_cache.clear()
+            return count
+
+        keys_to_del = [k for k in self._opportunity_cache if k[0] == commodity_id]
+        for k in keys_to_del:
+            del self._opportunity_cache[k]
+        return len(keys_to_del)
+
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Telemetry for spatial cache hits, misses, and current entry count."""
+        return {
+            "hits": self._cache_hits,
+            "misses": self._cache_misses,
+            "size": len(self._opportunity_cache),
+        }
 
     def resolve_commodity(self, db: Session, commodity_identifier: str) -> Optional[Commodity]:
         """Resolve either an integer ID, canonical name, or localized alias to Commodity model."""
@@ -733,6 +772,33 @@ class SpatialService:
         Always returns a result (never None) — sets has_opportunity=False
         when no freight-viable arbitrage exists.
         """
+        comm = self.resolve_commodity(db, commodity_identifier)
+        if not comm:
+            return None
+
+        # Determine effective date so date_key accurately reflects observation date
+        if target_date:
+            eff_date = target_date
+        else:
+            latest_date_stmt = (
+                select(func.max(PriceObservation.observation_date))
+                .where(PriceObservation.commodity_id == comm.id)
+            )
+            eff_date = db.scalar(latest_date_stmt) or date.today()
+
+        date_key = eff_date.isoformat() if hasattr(eff_date, "isoformat") else str(eff_date)
+        cache_key = (comm.id, date_key)
+        now = time.time()
+        if cache_key in self._opportunity_cache:
+            cached_at, cached_res = self._opportunity_cache[cache_key]
+            if now - cached_at < self.cache_ttl:
+                self._cache_hits += 1
+                return cached_res
+            else:
+                del self._opportunity_cache[cache_key]
+
+        self._cache_misses += 1
+
         full = self.get_spatial_arbitrage(db, commodity_identifier, target_date)
         if not full:
             return None
@@ -769,7 +835,7 @@ class SpatialService:
                 transit_hours=top.transit_hours_estimated,
                 corridor_name=top.corridor_name,
             )
-            return ConsumerOpportunityResponse(
+            resp = ConsumerOpportunityResponse(
                 commodity_id=full.commodity_id,
                 canonical_name=full.canonical_name,
                 bangla_name=full.bangla_name,
@@ -807,7 +873,7 @@ class SpatialService:
                     f"\u09f3{top.net_arbitrage_margin_bdt:.2f}/{calc_unit} net \u2014 "
                     f"below the \u09f3{2.00:.2f} minimum viable threshold."
                 )
-            return ConsumerOpportunityResponse(
+            resp = ConsumerOpportunityResponse(
                 commodity_id=full.commodity_id,
                 canonical_name=full.canonical_name,
                 bangla_name=full.bangla_name,
@@ -831,5 +897,8 @@ class SpatialService:
                 all_routes_count=len(full.routes),
                 top_routes=all_routes[:5],
             )
+
+        self._opportunity_cache[cache_key] = (now, resp)
+        return resp
 
 spatial_service = SpatialService()

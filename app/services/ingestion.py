@@ -98,6 +98,7 @@ class IngestionPipeline:
         inserted_count = 0
         updated_count = 0
         skipped_count = 0
+        affected_commodities: set[int] = set()
 
         try:
             for raw in raw_items:
@@ -167,6 +168,7 @@ class IngestionPipeline:
                         existing_obs.normalized_unit = norm_unit
                         existing_obs.confidence_score = score
                         updated_count += 1
+                        affected_commodities.add(commodity.id)
                     elif score == existing_obs.confidence_score and existing_obs.raw_name != raw.raw_commodity_name:
                         if norm_price < existing_obs.normalized_price:
                             existing_obs.raw_name = raw.raw_commodity_name
@@ -175,6 +177,7 @@ class IngestionPipeline:
                             existing_obs.normalized_price = norm_price
                             existing_obs.normalized_unit = norm_unit
                             updated_count += 1
+                            affected_commodities.add(commodity.id)
                         else:
                             skipped_count += 1
                     else:
@@ -196,8 +199,17 @@ class IngestionPipeline:
                     self.db.add(new_obs)
                     self.db.flush()
                     inserted_count += 1
+                    affected_commodities.add(commodity.id)
 
             self.db.commit()
+
+            # Invalidate downstream analytical caches for updated commodities
+            if affected_commodities:
+                from app.services.forecast_service import forecast_service
+                from app.services.spatial_service import spatial_service
+                for cid in affected_commodities:
+                    forecast_service.invalidate(commodity_id=cid)
+                    spatial_service.invalidate(commodity_id=cid)
         except Exception as exc:
             self.db.rollback()
             logger.error(f"Ingestion transaction failed for {collector.source_code}: {exc}")
@@ -243,6 +255,7 @@ def ingest_observations(
 
     inserted_count = 0
     updated_count = 0
+    affected_commodities: set[int] = set()
 
     for raw in raw_items:
         market = pipeline._resolve_market(raw.market_name)
@@ -287,6 +300,7 @@ def ingest_observations(
                 )
                 existing_obs.confidence_score = max(existing_obs.confidence_score, score)
                 updated_count += 1
+                affected_commodities.add(commodity.id)
             elif score >= existing_obs.confidence_score:
                 existing_obs.raw_name = raw.raw_commodity_name
                 existing_obs.raw_price = raw.raw_price
@@ -295,6 +309,7 @@ def ingest_observations(
                 existing_obs.normalized_unit = norm_unit
                 existing_obs.confidence_score = score
                 updated_count += 1
+                affected_commodities.add(commodity.id)
         else:
             new_obs = PriceObservation(
                 commodity_id=commodity.id,
@@ -312,7 +327,16 @@ def ingest_observations(
             db.add(new_obs)
             db.flush()
             inserted_count += 1
+            affected_commodities.add(commodity.id)
 
     db.commit()
+
+    if affected_commodities:
+        from app.services.forecast_service import forecast_service
+        from app.services.spatial_service import spatial_service
+        for cid in affected_commodities:
+            forecast_service.invalidate(commodity_id=cid)
+            spatial_service.invalidate(commodity_id=cid)
+
     return inserted_count, updated_count
 
