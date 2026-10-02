@@ -6,9 +6,10 @@ services:
     container_name: pricepulse_bd_app
     restart: always
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - DATABASE_URL=sqlite:////app/data/pricepulse.db
+      - BACKUP_DIR=/app/data/backups
       - PYTHONUNBUFFERED=1
     volumes:
       - pricepulse_data:/app/data
@@ -30,6 +31,7 @@ services:
       - worker
     environment:
       - DATABASE_URL=sqlite:////app/data/pricepulse.db
+      - BACKUP_DIR=/app/data/backups
       - PYTHONUNBUFFERED=1
     volumes:
       - pricepulse_data:/app/data

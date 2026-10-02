@@ -3,11 +3,12 @@ REST API endpoint for manual field spot price reporting and verification.
 """
 
 from datetime import date, datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_admin_api_key
 from app.models.commodity import Commodity
 from app.models.location import Market, District
 from app.models.source import Source
@@ -27,12 +28,14 @@ router = APIRouter(prefix="/observations", tags=["Observations"])
     description=(
         "Accepts a human-in-the-loop spot price quote from field reporters. "
         "Standardizes raw units (e.g. 'হালি' -> pc, 'ডজন' -> pc) to SI base metrics, "
-        "assigns calibrated Tier-4 field confidence (0.60 base scalar), and persists the record."
+        "assigns calibrated Tier-4 field confidence (0.60 base scalar), and persists the record. "
+        "Requires administrative authentication via X-API-Key header."
     ),
 )
 def submit_manual_observation(
     payload: ManualObservationCreate,
     db: Session = Depends(get_db),
+    _api_key: str = Security(require_admin_api_key),
 ):
     # 1. Verify target commodity exists
     commodity = db.get(Commodity, payload.commodity_id)

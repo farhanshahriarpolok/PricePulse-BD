@@ -80,8 +80,10 @@ def create_application() -> FastAPI:
             500: "INTERNAL_SERVER_ERROR",
         }
         code_str = code_map.get(exc.status_code, "HTTP_ERROR")
+        headers = dict(exc.headers) if exc.headers else None
         return JSONResponse(
             status_code=exc.status_code,
+            headers=headers,
             content=ErrorResponse(
                 error=ErrorDetail(
                     code=code_str,

@@ -6,13 +6,15 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- Phase 5D complete and verified. Ready for audit review.
+- Phase 6B — API Security Safeguards (Admin API Key Authentication) completed and verified locally. Ready for audit review.
 
 ---
 
 ## NEXT
 
-- Phase 6 — Production Packaging, Deployment & Linux Host Hardening.
+- Phase 6C — Automated Backup Restore Drill & Verification Automation.
+- Phase 6D — Remote GitHub Synchronization.
+- Phase 6E — Linux VPS Cloud Host Provisioning & Nginx SSL Deployment.
 
 ---
 
@@ -22,6 +24,22 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 6B — API Security Safeguards (Admin API Key Authentication)** (2026-10-02):
+  - **Reusable Security Dependency**: Implemented `require_admin_api_key` dependency (`app/core/security.py`) enforcing `X-API-Key` HTTP header authentication with timing-safe comparison (`secrets.compare_digest()`).
+  - **Protected Mutation Endpoints**: Secured `POST /api/v1/observations/manual` and `POST /api/v1/system/sync`.
+  - **Fail-Closed Default**: Configured dynamic settings property `admin_api_key` reading `PRICEPULSE_ADMIN_API_KEY`. Rejects all mutation attempts with HTTP 401 when unset or empty.
+  - **Zero Leakage**: Guaranteed no secret emission in error envelopes, OpenAPI specs, URL params, logs, or frontend code.
+  - **Public Endpoints Untouched**: `GET /health`, `GET /api/v1/system/sources`, `POST /api/v1/simulation/inject-shock`, `GET /api/v1/commodities`, etc., remain public and accessible without authentication.
+  - **Verification**: 17/17 Phase 6B tests passing, 430/430 full backend regression tests passing, clean Vite build, 6/6 production smoke tests passing.
+
+- **Phase 6A — Container & Process Model Hardening** (2026-10-02):
+  - **Single-Worker Process Model**: Configured Uvicorn runner to `--workers 1` in `Dockerfile`, eliminating duplicate in-process background sync schedulers across forked processes.
+  - **Non-Root Container Runtime**: Hardened runtime container to run as dedicated unprivileged service user (`pricepulse`, UID/GID 1000) with explicit directory permissions.
+  - **Persistent Hot Backup Storage**: Defaulted container backup destination to `/app/data/backups/`, ensuring snapshots share the persistent `pricepulse_data` volume across container recreation.
+  - **Localhost-Only Port Binding**: Restricted container port exposure in `docker-compose.yml` to `127.0.0.1:8000:8000` to prevent direct public access bypassing Nginx.
+  - **Verification**: 413/413 tests passing 100% green, clean Vite build, 6/6 production smoke tests passing.
+
 
 - **Phase 5D — Observability, Health Telemetry & Automated Operational Safeguards** (2026-10-02):
   - **Persistent Source Health Telemetry (5D.1)**:

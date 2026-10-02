@@ -175,14 +175,18 @@ class TestSchedulerRegistration:
 class TestSyncEndpoint:
     """Verify the manual sync endpoint contract."""
 
-    def test_sync_trigger_endpoint_accessible(self):
+    def test_sync_trigger_endpoint_accessible(self, monkeypatch):
         """POST /api/v1/system/sync must respond (200/202)."""
-        resp = client.post("/api/v1/system/sync")
+        test_key = "test-daily-sync-key-safe"
+        monkeypatch.setenv("PRICEPULSE_ADMIN_API_KEY", test_key)
+        resp = client.post("/api/v1/system/sync", headers={"X-API-Key": test_key})
         assert resp.status_code in (200, 202, 400)
 
-    def test_sync_trigger_returns_task_id(self):
+    def test_sync_trigger_returns_task_id(self, monkeypatch):
         """POST /api/v1/system/sync must return a task_id or status field."""
-        resp = client.post("/api/v1/system/sync")
+        test_key = "test-daily-sync-key-safe"
+        monkeypatch.setenv("PRICEPULSE_ADMIN_API_KEY", test_key)
+        resp = client.post("/api/v1/system/sync", headers={"X-API-Key": test_key})
         if resp.status_code in (200, 202):
             data = resp.json()
             assert "task_id" in data or "status" in data or "message" in data

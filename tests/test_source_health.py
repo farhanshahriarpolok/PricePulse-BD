@@ -80,9 +80,11 @@ class TestSystemAPIEndpoints:
         assert "CHALDAL_RETAIL" in source_codes
         assert "field_report" in source_codes
 
-    def test_trigger_manual_sync(self):
+    def test_trigger_manual_sync(self, monkeypatch):
         """POST /api/v1/system/sync starts async harvest and returns tracking task ID."""
-        resp = client.post("/api/v1/system/sync")
+        test_key = "test-system-sync-key-safe"
+        monkeypatch.setenv("PRICEPULSE_ADMIN_API_KEY", test_key)
+        resp = client.post("/api/v1/system/sync", headers={"X-API-Key": test_key})
         assert resp.status_code in [200, 202]
         data = resp.json()
         assert "task_id" in data

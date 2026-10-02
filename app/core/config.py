@@ -52,5 +52,14 @@ class Settings(BaseModel):
             return env_url
         return f"sqlite:///{self.default_sqlite_path.as_posix()}"
 
+    @property
+    def admin_api_key(self) -> str:
+        """
+        Server-side administrative API key for protecting mutation endpoints.
+        Read dynamically from PRICEPULSE_ADMIN_API_KEY environment variable.
+        Defaults to empty string (fails closed in authentication dependency).
+        """
+        return os.getenv("PRICEPULSE_ADMIN_API_KEY", "").strip()
+
 
 settings = Settings()

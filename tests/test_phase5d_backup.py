@@ -27,6 +27,7 @@ from scripts.backup_db import (
     perform_hot_backup,
     verify_sqlite_backup,
     cleanup_old_backups,
+    resolve_default_backup_dir,
 )
 
 
@@ -273,3 +274,37 @@ def test_cli_execution_failure_non_zero_exit_code(temp_env):
     proc = subprocess.run(cmd, capture_output=True, text=True)
     assert proc.returncode != 0
     assert "[ERROR]" in proc.stderr or "[ERROR]" in proc.stdout
+
+
+# ── 6. Persistent Docker Volume & Default Backup Directory Resolution ──────────
+
+def test_resolve_default_backup_dir_with_env(monkeypatch, tmp_path):
+    """When BACKUP_DIR environment variable is set, it takes priority for defaults."""
+    custom_dir = tmp_path / "custom_backup_location"
+    monkeypatch.setenv("BACKUP_DIR", str(custom_dir))
+
+    resolved = resolve_default_backup_dir(tmp_path / "data" / "pricepulse.db")
+    assert resolved == custom_dir.resolve()
+
+
+def test_resolve_default_backup_dir_in_data_directory(monkeypatch, tmp_path):
+    """When database is located in a 'data' directory without BACKUP_DIR env, backups default to data/backups."""
+    monkeypatch.delenv("BACKUP_DIR", raising=False)
+    data_dir = tmp_path / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    db_file = data_dir / "pricepulse.db"
+
+    resolved = resolve_default_backup_dir(db_file)
+    assert resolved == (data_dir / "backups").resolve()
+
+
+def test_resolve_default_backup_dir_project_root_fallback(monkeypatch, tmp_path):
+    """When database is in root without BACKUP_DIR, backups default to root/backups."""
+    monkeypatch.delenv("BACKUP_DIR", raising=False)
+    root_dir = tmp_path / "custom_project_root"
+    root_dir.mkdir(parents=True, exist_ok=True)
+    db_file = root_dir / "pricepulse.db"
+
+    resolved = resolve_default_backup_dir(db_file)
+    project_root = Path(__file__).resolve().parent.parent
+    assert resolved == (project_root / "backups").resolve()

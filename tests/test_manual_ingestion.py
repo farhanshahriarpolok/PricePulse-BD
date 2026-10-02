@@ -2,6 +2,7 @@
 Unit and integration tests for manual field spot price reporting endpoint.
 """
 
+import os
 import pytest
 from datetime import date
 from fastapi.testclient import TestClient
@@ -14,10 +15,23 @@ from app.models.location import Market
 from app.models.observation import PriceObservation
 from app.models.source import Source
 
+TEST_ADMIN_KEY = "test-manual-ingestion-api-key-safe"
+
+
+@pytest.fixture(scope="module", autouse=True)
+def configure_test_admin_key():
+    old = os.environ.get("PRICEPULSE_ADMIN_API_KEY")
+    os.environ["PRICEPULSE_ADMIN_API_KEY"] = TEST_ADMIN_KEY
+    yield
+    if old is not None:
+        os.environ["PRICEPULSE_ADMIN_API_KEY"] = old
+    else:
+        os.environ.pop("PRICEPULSE_ADMIN_API_KEY", None)
+
 
 @pytest.fixture(scope="module")
-def client():
-    with TestClient(app) as test_client:
+def client(configure_test_admin_key):
+    with TestClient(app, headers={"X-API-Key": TEST_ADMIN_KEY}) as test_client:
         yield test_client
 
 

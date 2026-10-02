@@ -181,7 +181,7 @@ def test_ingestion_pipeline_event_driven_invalidation(db: Session):
         spatial_service.clear_cache()
 
 
-def test_manual_observation_endpoint_invalidates_caches(client: TestClient, db: Session):
+def test_manual_observation_endpoint_invalidates_caches(client: TestClient, db: Session, monkeypatch):
     """
     Test real application lifecycle for manual field spot observation:
     1. Query and cache forecast and spatial opportunity for a commodity.
@@ -205,6 +205,9 @@ def test_manual_observation_endpoint_invalidates_caches(client: TestClient, db: 
     new_date = latest_date + timedelta(days=1)
     manual_price = 160.0
 
+    test_key = "test-phase4b-key-safe"
+    monkeypatch.setenv("PRICEPULSE_ADMIN_API_KEY", test_key)
+
     # Submit manual observation through REST API
     payload = {
         "commodity_id": comm.id,
@@ -216,7 +219,7 @@ def test_manual_observation_endpoint_invalidates_caches(client: TestClient, db: 
         "reporter_name": "QA Reporter",
         "reporter_note": "Fresh spot price test",
     }
-    resp = client.post("/api/v1/observations/manual", json=payload)
+    resp = client.post("/api/v1/observations/manual", json=payload, headers={"X-API-Key": test_key})
     assert resp.status_code == 201
 
     try:

@@ -17,7 +17,7 @@ This handbook provides production instructions for self-hosting **PricePulse BD*
                                ▼
         ┌──────────────────────────────────────────────┐
         │  Docker Container (pricepulse_bd_app)        │
-        │  Port 8000: Uvicorn ASGI Runner (2 Workers)  │
+        │  Port 8000: Uvicorn Runner (1 Worker, UID 1000)
         │                                              │
         │  ┌────────────────────┐ ┌──────────────────┐ │
         │  │ FastAPI REST API   │ │ React 18 SPA     │ │
@@ -26,7 +26,7 @@ This handbook provides production instructions for self-hosting **PricePulse BD*
         │            │                                 │
         │            ▼                                 │
         │  SQLite 3 (WAL Mode, 5000ms Busy Timeout)   │
-        │  Volume: /app/data/pricepulse.db             │
+        │  Volume: /app/data (DB & Backups)           │
         └──────────────────────────────────────────────┘
 ```
 
@@ -54,8 +54,10 @@ docker compose logs -f pricepulse-app
 
 The container automatically:
 - Builds the Vite React 18 production bundle inside Node 20.
-- Boots FastAPI with 2 Uvicorn workers on port `8000`.
+- Boots FastAPI with 1 Uvicorn worker on localhost port `127.0.0.1:8000` (preserving singleton in-process scheduler).
+- Executes as an unprivileged user (`pricepulse`, UID 1000).
 - Initializes the SQLite database at `/app/data/pricepulse.db` with WAL mode.
+- Directs automated hot backups to persistent volume storage at `/app/data/backups/`.
 - Seeds all 65 canonical commodities, 64 districts, and 30-day baseline observations.
 
 ---
@@ -167,11 +169,11 @@ PricePulse BD includes a production-grade hot backup utility (`scripts/backup_db
 # Direct Python execution (Linux or Windows host)
 python scripts/backup_db.py --retention-count 7
 
-# Inside Docker container
+# Inside Docker container (automatically persists to /app/data/backups via named volume)
 docker exec pricepulse_bd_app python scripts/backup_db.py --retention-count 14
 
 # Synchronize verified backups to remote off-site storage or S3
-rsync -avz backups/ user@backupserver:/backups/
+rsync -avz /var/lib/docker/volumes/pricepulse_data/_data/backups/ user@backupserver:/backups/
 ```
 
 ### Automated Scheduling Options:
@@ -199,7 +201,7 @@ To ensure persistent reliability monitoring across server reboots, provider chec
 
 ---
 
-## 5. Physical Android Device Sideloading (APK)
+## 6. Physical Android Device Sideloading (APK)
 
 To build and distribute the native Android client to field agents, consumers, or defense evaluators:
 
@@ -216,7 +218,7 @@ To build and distribute the native Android client to field agents, consumers, or
 
 ---
 
-## 6. Production Smoke Test Verification
+## 7. Production Smoke Test Verification
 
 Before signing off on any production deployment, run the automated verification suite:
 
@@ -235,4 +237,38 @@ Expected Output:
 ============================================================================
   ALL 6 PRODUCTION SMOKE TESTS PASSED! System is ready for deployment.
 ============================================================================
+```
+
+---
+
+## 8. Administrative Security & API Key Safeguards (Phase 6B)
+
+To secure administrative mutations against anonymous calls in production, PricePulse BD enforces server-side API key authentication via the `X-API-Key` HTTP header.
+
+### Protected Mutation Endpoints:
+- `POST /api/v1/observations/manual` (Field spot price submission)
+- `POST /api/v1/system/sync` (On-demand data harvest initiation)
+
+### Environment Variable Configuration:
+Configure the secret key on your server or container environment:
+```bash
+export PRICEPULSE_ADMIN_API_KEY="your-strong-random-32char-secret-key"
+```
+
+In `docker-compose.yml` or container environment files (`.env`):
+```yaml
+environment:
+  - PRICEPULSE_ADMIN_API_KEY=${PRICEPULSE_ADMIN_API_KEY}
+```
+
+### Security Invariants & Fail-Closed Design:
+1. **Fail-Closed Default**: If `PRICEPULSE_ADMIN_API_KEY` is not configured or empty, administrative endpoints reject all mutation attempts with `HTTP 401 Unauthorized`.
+2. **Timing-Safe Digest**: Uses Python's `secrets.compare_digest()` to prevent timing attack side-channels.
+3. **Zero Secret Leaks**: The configured secret is never emitted in error envelopes, server logs, API docs, URL parameters, or frontend code bundles.
+4. **Public Endpoints Untouched**: Read endpoints (`GET /health`, `GET /api/v1/system/sources`, `GET /api/v1/commodities`, etc.) and the Viva Simulation Sandbox (`POST /api/v1/simulation/inject-shock`, rate-limited via Nginx) remain unauthenticated.
+
+### Example Authenticated Ingestion Trigger:
+```bash
+curl -i -X POST http://127.0.0.1:8000/api/v1/system/sync \
+  -H "X-API-Key: your-strong-random-32char-secret-key"
 ```

@@ -53,6 +53,26 @@ def resolve_default_db_path() -> Path:
     return local_db
 
 
+def resolve_default_backup_dir(db_path: Path) -> Path:
+    """
+    Resolve default backup directory:
+      1. BACKUP_DIR environment variable if explicitly set.
+      2. If db_path is located in a dedicated data directory (e.g. /app/data/pricepulse.db),
+         default to a 'backups' subdirectory within that same data directory so snapshots
+         share the persistent Docker storage volume.
+      3. Otherwise fall back to 'backups/' directory at project root.
+    """
+    env_backup = os.getenv("BACKUP_DIR", "").strip()
+    if env_backup:
+        return Path(env_backup).resolve()
+
+    if db_path.parent.name == "data" or str(db_path.parent).rstrip("/\\").endswith("data"):
+        return (db_path.parent / "backups").resolve()
+
+    project_root = Path(__file__).resolve().parent.parent
+    return (project_root / "backups").resolve()
+
+
 def verify_sqlite_backup(
     backup_path: Path,
     expected_tables: Optional[List[str]] = None,
@@ -258,7 +278,7 @@ def main():
 
     project_root = Path(__file__).resolve().parent.parent
     db_path = args.db_path or resolve_default_db_path()
-    backup_dir = args.backup_dir or (project_root / "backups")
+    backup_dir = args.backup_dir or resolve_default_backup_dir(db_path)
 
     try:
         backup_file = perform_hot_backup(

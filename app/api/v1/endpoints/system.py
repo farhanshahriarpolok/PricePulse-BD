@@ -3,10 +3,11 @@ System status, source health telemetry, and on-demand background sync endpoints.
 """
 
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_admin_api_key
 from app.services.source_health import source_health_service
 from app.services.scheduler import sync_scheduler
 
@@ -33,9 +34,11 @@ def get_source_health(db: Session = Depends(get_db)):
     "/sync",
     status_code=status.HTTP_202_ACCEPTED,
     summary="Trigger On-Demand Market Ingestion",
-    description="Asynchronously launches the live collector ingestion pipeline without blocking the event loop.",
+    description="Asynchronously launches the live collector ingestion pipeline without blocking the event loop. Requires administrative authentication via X-API-Key header.",
 )
-def trigger_system_sync():
+def trigger_system_sync(
+    _api_key: str = Security(require_admin_api_key),
+):
     """Trigger an immediate asynchronous data harvest and return tracking ID."""
     task_id = sync_scheduler.trigger_sync(trigger_type="manual_api")
     return {
