@@ -6,13 +6,12 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- Phase 5B complete. Ready for final review.
+- Phase 5C complete and verified. Ready for audit review.
 
 ---
 
 ## NEXT
 
-- Phase 5C — Supply-Chain Margin & Arath Commission Deconstruction (Must not invent commission or retail markup; components must be explicitly modeled assumptions with provenance).
 - Phase 6 — Production Packaging, Deployment & Linux Host Hardening.
 
 ---
@@ -23,6 +22,26 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 5C — Supply-Chain Price Gap & Arath Commission Deconstruction** (2026-10-02):
+  - **Strict Provenance Hierarchy**:
+    - Categorized price metrics into `OBSERVED` (empirical wholesale and retail prices, road distances), `OFFICIAL` (statutory bridge toll gazettes), and `MODELED_ASSUMPTION` (arath commission, terminal handling, transit wastage).
+    - Refused unsupported statutory claims; modeled arath commission (3.0%) and perishability wastage (0.5% - 6.0%) transparently tagged with academic citations (Minten et al., World Bank, BARC).
+  - **Unclamped Economic Formulation**:
+    - Implemented `residual_spread = gross_spread - observed_costs - modeled_costs` without clamping to zero.
+    - Gracefully surfaces `COMPRESSED_MARGIN` with negative residual and exact compression deficit (`margin_compression_bdt`) when intermediary modeled costs exceed observed price spread.
+  - **Backend Engine & API**:
+    - Created `SupplyChainService` (`app/services/supply_chain_service.py`) and schemas (`app/schemas/supply_chain.py`).
+    - Exposed `GET /api/v1/commodities/{id}/supply-chain` with district and temporal filters.
+  - **Consumer-First Hybrid UI**:
+    - Built `SupplyChainMarginPanel.jsx` mounted within `CommodityDetailExplorer.jsx`.
+    - Features observed price blocks, modeled cost breakdown cards, residual spread banner, and an expandable audit accordion drill-down table.
+    - Fully localized in Bengali and English via `translations.js`.
+  - **Verification**:
+    - **388/388 Pytest tests 100% green** (374 baseline + 14 Phase 5C tests).
+    - Production Vite build passing in 4.64s (0 errors, 0 warnings).
+    - Browser QA verified on desktop (1440px) and mobile (390px) with 0 console errors and 0 horizontal overflow.
+
 
 - **Phase 5B — Smart Cheaper Alternative Recommendations (Hardened & Audited)** (2026-10-02):
   - **Empirical Intra-Category Substitution Registry**:

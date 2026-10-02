@@ -1,0 +1,92 @@
+{
+  "version": "1.0",
+  "provenance_disclaimer": "All secondary components in this model represent explicitly modeled economic assumptions or published research estimates. They do not constitute audited merchant ledgers, verified individual trader receipts, or legally binding statutory fixed tariffs.",
+  "parameters": {
+    "arath_commission": {
+      "parameter_name": "Arathdar / Wholesale Commission Assumption",
+      "value": 3.0,
+      "unit": "percent_of_wholesale",
+      "provenance_type": "MODELED_ASSUMPTION",
+      "source_name": "Agricultural Supply Chain Research & Secondary Literature",
+      "source_reference": "Minten et al. (2010), World Bank (2023) agricultural marketing studies note commission charges typically range between 2.5% and 4.0% of auction turnover. While the Agricultural Marketing Act 2018 empowers regulatory oversight, no single fixed statutory rate schedule is universally enforced.",
+      "source_date": "2023",
+      "methodology_note": "The 3.0% rate is a project modeling assumption chosen as a representative midpoint within the 2.5% - 4.0% range reported in agricultural surveys (Minten et al., World Bank). It is NOT a single statutory value or an empirical merchant ledger value directly reported by the cited sources.",
+      "confidence_qualification_note": "Unobserved at individual transaction level; varies by market hub, seasonality, and credit relations."
+    },
+    "terminal_handling_porterage": {
+      "parameter_name": "Terminal Handling, Porterage & Market Toll Assumption",
+      "value_per_unit": {
+        "kg": 1.25,
+        "liter": 1.00,
+        "pc": 0.50
+      },
+      "unit": "BDT_per_canonical_unit",
+      "provenance_type": "MODELED_ASSUMPTION",
+      "source_name": "Urban Wholesale Terminal Porterage Baselines",
+      "source_reference": "Secondary estimates of physical loading, sack offloading, municipal entry tolls, and wet market stall porterage (kuli) across major urban hubs.",
+      "source_date": "2024",
+      "methodology_note": "These unit rates (1.25 BDT/kg, 1.00 BDT/L, 0.50 BDT/pc) are project modeling assumptions based on secondary estimates of urban porterage and market entry tolls. They are NOT values directly reported by an official municipal tariff schedule.",
+      "confidence_qualification_note": "Unobserved at store level; dependent on vehicle size, packaging type, and municipal market jurisdiction."
+    },
+    "transit_wastage_allowance": {
+      "parameter_name": "Transit Shrinkage & Spoilage Allowance Assumption",
+      "tiers": {
+        "HIGH_PERISHABILITY": {
+          "categories": ["Vegetables", "Fish & Seafood", "Fruits"],
+          "rate_pct": 6.0,
+          "provenance_type": "MODELED_ASSUMPTION",
+          "source_name": "BARC & FAO Post-Harvest Research Baselines",
+          "source_reference": "Bangladesh Agricultural Research Council (BARC) & FAO studies report physical and moisture losses between 5.0% and 12.0% for fresh produce during transit.",
+          "methodology_note": "The 6.0% rate is a project modeling assumption chosen as a conservative baseline within the 5.0% - 12.0% loss range reported in BARC and FAO post-harvest studies. It is NOT a fixed empirical value directly reported by the cited studies."
+        },
+        "MODERATE_PERISHABILITY": {
+          "categories": ["Tubers & Bulbs", "Spices", "Meat & Poultry", "Eggs & Dairy"],
+          "rate_pct": 3.0,
+          "provenance_type": "MODELED_ASSUMPTION",
+          "source_name": "BARC Post-Harvest Storage & Handling Baselines",
+          "source_reference": "BARC post-harvest handling studies report 2.0% to 5.0% sorting and cullage loss for tubers, bulbs, and processed animal protein.",
+          "methodology_note": "The 3.0% rate is a project modeling assumption within the 2.0% - 5.0% loss range reported in BARC post-harvest handling studies. It is NOT a fixed empirical value directly reported by the cited studies."
+        },
+        "LOW_PERISHABILITY": {
+          "categories": ["Grains & Cereals", "Edible Oils", "Pulses & Lentils", "Sugar & Sweeteners"],
+          "rate_pct": 0.5,
+          "provenance_type": "MODELED_ASSUMPTION",
+          "source_name": "Grain Storage & Bulk Logistics Baselines",
+          "source_reference": "Standard bulk transit handling loss factor for dry grains and sealed commodities (0.5% - 1.0%).",
+          "methodology_note": "The 0.5% rate is a project modeling assumption based on typical bulk grain handling spillage allowances (0.5% - 1.0%). It is NOT a fixed empirical value directly reported by the cited studies."
+        }
+      },
+      "confidence_qualification_note": "Theoretical loss envelope; actual loss varies significantly with ambient humidity, transport duration, and packaging."
+    },
+    "freight_logistics": {
+      "local_intra_district_flat_bdt": 1.50,
+      "variable_rate_bdt_per_kg_km": 0.018,
+      "road_circuity_factor": 1.25,
+      "provenance_type": "MODELED_ASSUMPTION",
+      "source_name": "PricePulse BD Highway Corridor Logistics Model",
+      "source_reference": "Calibrated carrier freight model parameterized in SpatialService for commercial truck transport over national highway corridors.",
+      "methodology_note": "The freight parameters (intra-district ৳1.50/kg, variable ৳0.018/kg-km, circuity 1.25) are project modeling assumptions calibrated for commercial highway trucking. They are NOT directly reported cargo tariff rates from transport unions or government agencies.",
+      "toll_buffers": {
+        "padma_bridge": {
+          "toll_bdt_per_kg": 0.60,
+          "provenance_type": "OFFICIAL",
+          "source_name": "Bangladesh Bridge Authority (BBA) Official Toll Gazette",
+          "source_reference": "SRO No. 132-Law/2022 (Padma Multipurpose Bridge toll schedule converted to per-kg cargo capacity payload)."
+        },
+        "jamuna_bridge": {
+          "toll_bdt_per_kg": 0.50,
+          "provenance_type": "OFFICIAL",
+          "source_name": "Bangladesh Bridge Authority (BBA) Official Toll Gazette",
+          "source_reference": "SRO No. 147-Law/2011 (Bangabandhu Jamuna Bridge truck toll schedule converted to per-kg cargo capacity payload)."
+        },
+        "general_inter_district": {
+          "toll_bdt_per_kg": 0.35,
+          "provenance_type": "MODELED_ASSUMPTION",
+          "source_name": "Average National Highway Toll Buffer",
+          "source_reference": "Estimated average toll and ferry buffer for inter-district highway travel.",
+          "methodology_note": "The ৳0.35/kg rate is a project modeling assumption for average highway ferry and toll buffers, not a gazetted rate."
+        }
+      }
+    }
+  }
+}

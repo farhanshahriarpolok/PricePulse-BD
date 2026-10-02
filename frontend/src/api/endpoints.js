@@ -119,5 +119,11 @@ export const getCommodityForecast = (commodityId, channel = 'wholesale', marketI
   return apiClient.get(`/commodities/${commodityId}/forecast`, { params });
 };
 
-
-
+/**
+ * GET /commodities/:id/supply-chain
+ * Supply chain price gap deconstruction into freight, arath commission,
+ * porterage handling, transit shrinkage, and residual spread (unobserved/unallocated portion).
+ */
+export const getSupplyChainDeconstruction = (commodityId, params = {}) => {
+  return apiClient.get(`/commodities/${commodityId}/supply-chain`, { params });
+};

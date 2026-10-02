@@ -23,6 +23,7 @@ import CommodityIcon from './media/CommodityIcon';
 import HistoricalTrendChart from './HistoricalTrendChart';
 import SpatialOpportunityPanel from './SpatialOpportunityPanel';
 import ForecastOutlookPanel from './ForecastOutlookPanel';
+import SupplyChainMarginPanel from './SupplyChainMarginPanel';
 import { getCommodityStores } from '../api/endpoints';
 
 
@@ -791,6 +792,15 @@ export default function CommodityDetailExplorer({
       {/* ── SECTION 3.6: 7-DAY PRICE FORECAST & DIRECTION (Phase 3) ─────────────── */}
       {commodity?.id && (
         <ForecastOutlookPanel
+          commodityId={commodity.id}
+          commodityName={commodity.canonical_name}
+          lang={lang}
+        />
+      )}
+
+      {/* ── SECTION 3.7: SUPPLY CHAIN PRICE GAP DECONSTRUCTION (Phase 5C) ───────── */}
+      {commodity?.id && (
+        <SupplyChainMarginPanel
           commodityId={commodity.id}
           commodityName={commodity.canonical_name}
           lang={lang}

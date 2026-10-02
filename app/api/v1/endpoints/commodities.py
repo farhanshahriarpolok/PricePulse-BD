@@ -25,6 +25,8 @@ from app.schemas.observation import (
 )
 from app.schemas.forecast import CommodityForecastResponse
 from app.services.forecast_service import forecast_service
+from app.schemas.supply_chain import SupplyChainDeconstructionResponse
+from app.services.supply_chain_service import supply_chain_service
 
 router = APIRouter(prefix="/commodities", tags=["Commodities"])
 
@@ -448,3 +450,33 @@ def get_commodity_forecast(
         )
     return res
 
+
+@router.get(
+    "/{commodity_id}/supply-chain",
+    response_model=SupplyChainDeconstructionResponse,
+    summary="Supply Chain Price Gap Deconstruction",
+    description=(
+        "Deconstructs wholesale-to-retail price spread into freight, arath commission, "
+        "porterage handling, transit shrinkage, and residual spread (unobserved/unallocated portion) with explicit provenance."
+    ),
+)
+def get_supply_chain_deconstruction(
+    commodity_id: str,
+    district_id: Optional[int] = Query(None, description="Optional wholesale origin district ID"),
+    destination_district_id: Optional[int] = Query(None, description="Optional retail destination district ID"),
+    obs_date: Optional[date] = Query(None, alias="date", description="Target calendar date (YYYY-MM-DD)"),
+    db: Session = Depends(get_db),
+):
+    res = supply_chain_service.deconstruct_price_gap(
+        db=db,
+        commodity_identifier=commodity_id,
+        district_id=district_id,
+        destination_district_id=destination_district_id,
+        target_date=obs_date,
+    )
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Commodity '{commodity_id}' could not be resolved.",
+        )
+    return res

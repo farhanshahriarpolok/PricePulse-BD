@@ -31,7 +31,7 @@ export default function PulseSummaryCard({ pulseData, anomalyCount = 0, lang = '
       borderColor: anomalyCount > 0 ? 'border-rose-200 dark:border-rose-500/20' : 'border-emerald-200 dark:border-emerald-500/20',
     },
     {
-      label: lang === 'bn' ? 'গড় খুচরা মুনাফা' : 'Avg Retail Spread',
+      label: lang === 'bn' ? 'গড় খুচরা স্প্রেড' : 'Avg Retail Spread',
       value: `+${toBengaliNumeral(avgMarkup, lang)}%`,
       change: lang === 'bn' ? 'পাইকারি → খুচরা' : 'Wholesale → Retail',
       icon: ArrowUpRight,
