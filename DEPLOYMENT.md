@@ -68,9 +68,14 @@ sudo apt update
 sudo apt install -y nginx certbot python3-certbot-nginx
 ```
 
-### Step B: Configure Nginx Server Block
+### Step B: Configure Nginx Server Block with Rate Limiting (Phase 5D.3)
 Create `/etc/nginx/sites-available/pricepulse`:
 ```nginx
+# Rate limiting zone for compute-intensive Viva simulation shock injection (Phase 5D.3)
+# Key: $binary_remote_addr (10MB memory stores ~160,000 distinct client IPs)
+# Rate: 5 requests per second (5r/s) strictly protecting hypothetical supply shock evaluations
+limit_req_zone $binary_remote_addr zone=simulation_shock_limit:10m rate=5r/s;
+
 server {
     server_name pricepulse.yourdomain.com;
 
@@ -80,6 +85,25 @@ server {
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
 
+    # 1. Protected Route: Simulation Shock Injection (Phase 5D.3)
+    #    Limited to 5 req/sec with a controlled burst=10 nodelay.
+    #    Returns HTTP 429 (Too Many Requests) when burst capacity is exceeded.
+    location = /api/v1/simulation/inject-shock {
+        limit_req zone=simulation_shock_limit burst=10 nodelay;
+        limit_req_status 429;
+
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 90s;
+    }
+
+    # 2. General REST API and Static React SPA Pass-Through (Unthrottled)
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
@@ -94,7 +118,7 @@ server {
 }
 ```
 
-### Step C: Enable Site & Issue SSL Certificate
+### Step C: Enable Site & Reload Nginx
 ```bash
 sudo ln -s /etc/nginx/sites-available/pricepulse /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -127,17 +151,51 @@ crontab -e
 
 ---
 
-## 4. SQLite Zero-Downtime Backup & Disaster Recovery
+## 4. SQLite Zero-Downtime Hot Backup & Disaster Recovery (Phase 5D.2)
 
-Because PricePulse BD uses SQLite WAL mode, database backups can be taken hot while transactions are actively executing:
+PricePulse BD includes a production-grade hot backup utility (`scripts/backup_db.py`) utilizing Python's native SQLite Online Backup API (`sqlite3.Connection.backup`). It safely captures live WAL databases without interrupting active write transactions.
 
+### Workflow & Invariants:
+1. **Live Snapshot**: Copies pages online to an ephemeral `.db.tmp` file.
+2. **Deep Verification**: Executes `PRAGMA integrity_check;` and verifies critical table schemas (`commodities`, `sources`, `price_observations`, `districts`, `divisions`).
+3. **Atomic Promotion**: Successfully verified snapshots are atomically promoted to `pricepulse_backup_YYYYMMDD_HHMMSS.db`.
+4. **Retention Pruning**: Automatically prunes older backups beyond the configured retention limit (default: 7 snapshots).
+5. **Fail-Safe Rollback**: If verification fails, the `.tmp` file is purged, the last-known good backup is preserved, and a non-zero exit code is returned.
+
+### Manual Backup Execution:
 ```bash
-# Create an atomic hot backup to host storage
-docker exec pricepulse_bd_app sqlite3 /app/data/pricepulse.db ".backup '/app/data/backup_$(date +%Y%m%d).db'"
+# Direct Python execution (Linux or Windows host)
+python scripts/backup_db.py --retention-count 7
 
-# Synchronize backup to remote off-site storage or S3
-rsync -avz /var/lib/docker/volumes/pricepulse-bd_pricepulse_data/_data/backup_*.db user@backupserver:/backups/
+# Inside Docker container
+docker exec pricepulse_bd_app python scripts/backup_db.py --retention-count 14
+
+# Synchronize verified backups to remote off-site storage or S3
+rsync -avz backups/ user@backupserver:/backups/
 ```
+
+### Automated Scheduling Options:
+- **Host Linux Crontab (Nightly at 02:00 AM)**:
+  ```cron
+  0 2 * * * cd /opt/pricepulse-bd && python3 scripts/backup_db.py --retention-count 14 >> /var/log/pricepulse_backup.log 2>&1
+  ```
+- **Windows Task Scheduler (Local Development)**:
+  ```powershell
+  schtasks /create /tn "PricePulseDB_Backup" /tr "D:\PricePulse BD\venv\Scripts\python.exe D:\PricePulse BD\scripts\backup_db.py" /sc daily /st 02:00
+  ```
+
+---
+
+## 5. Source Health Observability & Rolling 7-Day Telemetry (Phase 5D.1)
+
+To ensure persistent reliability monitoring across server reboots, provider check attempts are stored in the SQLite `source_health_logs` table with an idempotent `UNIQUE(source_name, date)` constraint.
+
+### Key Capabilities:
+- **Zero Hallucination / Pure Math**: Availability is deterministically computed as:
+  $$\text{Availability } (\%) = \frac{\text{Successful Checks}}{\text{Total Checks}} \times 100$$
+- **Unskewed Latency Metrics**: Latency averages, minimums, and maximums are computed exclusively from successful checks; network timeouts and HTTP errors never artificially lower latency metrics.
+- **Rolling 7-Day Aggregation**: `GET /api/v1/system/sources` aggregates observations over the trailing 7 calendar days, handling missing observation days gracefully without treating unattempted dates as failures.
+- **Full API Compatibility**: Exposes both live operational state (`current_status`, `last_sync`, `last_success`, `last_failure`) and historical 7-day durability (`rolling_7d_availability`, `rolling_7d_avg_latency_ms`).
 
 ---
 

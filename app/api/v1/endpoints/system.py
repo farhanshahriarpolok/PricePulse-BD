@@ -3,8 +3,10 @@ System status, source health telemetry, and on-demand background sync endpoints.
 """
 
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from app.core.database import get_db
 from app.services.source_health import source_health_service
 from app.services.scheduler import sync_scheduler
 
@@ -14,11 +16,11 @@ router = APIRouter(prefix="/system", tags=["System Operations"])
 @router.get(
     "/sources",
     summary="Get Upstream Provider Health Status",
-    description="Returns telemetry, latency, and fallback operational health for all registered market data providers.",
+    description="Returns telemetry, latency, fallback operational health, and persistent 7-day rolling availability for all registered market data providers.",
 )
-def get_source_health():
-    """Returns telemetry for all registered external and crowdsourced providers."""
-    sources = source_health_service.get_all_statuses()
+def get_source_health(db: Session = Depends(get_db)):
+    """Returns telemetry and rolling metrics for all registered external and crowdsourced providers."""
+    sources = source_health_service.get_all_statuses(session=db)
     return {
         "status": "operational",
         "total": len(sources),

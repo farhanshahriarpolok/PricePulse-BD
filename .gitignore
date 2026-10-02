@@ -20,6 +20,7 @@ htmlcov/
 *.sqlite-wal
 *.sqlite-shm
 instance/
+backups/
 
 # Environment and secrets
 .env

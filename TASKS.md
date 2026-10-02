@@ -6,7 +6,7 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 
 ## NOW
 
-- Phase 5C complete and verified. Ready for audit review.
+- Phase 5D complete and verified. Ready for audit review.
 
 ---
 
@@ -22,6 +22,26 @@ This file tracks the active development tasks for **PricePulse BD**. Only items 
 ---
 
 ## DONE RECENTLY
+
+- **Phase 5D — Observability, Health Telemetry & Automated Operational Safeguards** (2026-10-02):
+  - **Persistent Source Health Telemetry (5D.1)**:
+    - Added `source_health_logs` table with `UNIQUE(source_name, date)` constraint.
+    - Implemented deterministic daily health aggregation: `availability = (successful / total) * 100`.
+    - Unskewed latency: failed/timeout attempts strictly excluded from latency averages.
+    - Enriched `GET /api/v1/system/sources` with trailing 7-day rolling metrics (`rolling_7d_availability`, `rolling_7d_avg_latency_ms`) while maintaining 100% backward compatibility with legacy consumers. Missing observation days handled safely without treating unharvested dates as failures.
+  - **Safe SQLite Online Hot Backup (5D.2)**:
+    - Created `scripts/backup_db.py` utilizing Python's native SQLite Online Backup API (`sqlite3.Connection.backup`).
+    - Validates snapshots via `PRAGMA integrity_check; -> 'ok'` and schema verification of canonical tables before atomic promotion (`.tmp` -> `.db`).
+    - Enforces configurable retention pruning (`--retention-count`, default: 7 snapshots).
+    - Preserves last-known good backup on candidate verification failure and exits with non-zero status.
+  - **Nginx Simulation Rate Limiting (5D.3)**:
+    - Configured `nginx/nginx.conf` with `limit_req_zone` targeting `/api/v1/simulation/inject-shock` at `5r/s` with `burst=10 nodelay`, returning HTTP 429 upon exhaustion.
+    - Preserved unthrottled pass-through for general market discovery routes and React SPA assets.
+    - Updated `DEPLOYMENT.md` with complete backup, rate limiting, and telemetry operational guides.
+  - **Verification**:
+    - **410/410 Pytest tests passing 100% green** across all 32 test suites.
+    - Clean production Vite build (0 errors, 0 warnings).
+    - All 6/6 production smoke tests passing.
 
 - **Phase 5C — Supply-Chain Price Gap & Arath Commission Deconstruction** (2026-10-02):
   - **Strict Provenance Hierarchy**:
